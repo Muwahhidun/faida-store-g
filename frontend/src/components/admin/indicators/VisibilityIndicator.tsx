@@ -2,6 +2,18 @@ import React from 'react';
 import { VisibilityIndicatorProps, Category } from '../../../types/admin';
 
 /**
+ * Форматирование количества в зависимости от единицы измерения
+ * КГ - 3 знака после запятой, ШТ - целое число
+ */
+const formatQuantity = (quantity: number, unit: string): string => {
+    const num = Number(quantity);
+    if (unit === 'кг') {
+        return num.toFixed(3);
+    }
+    return Math.round(num).toString();
+};
+
+/**
  * Компонент индикатора видимости товара для пользователей
  * Показывает статус видимости и причины скрытия
  */
@@ -119,7 +131,7 @@ export const VisibilityIndicator: React.FC<VisibilityIndicatorProps> = ({
         if (product.stock_quantity < minStock) {
             reasons.push({
                 type: 'stock',
-                message: `Остаток (${product.stock_quantity}) меньше минимального (${minStock})`,
+                message: `Остаток (${formatQuantity(product.stock_quantity, product.unit)}) меньше минимального (${minStock})`,
                 field: 'stock_quantity'
             });
         }

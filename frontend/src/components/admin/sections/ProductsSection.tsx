@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTags, FaSpinner, FaSlidersH } from 'react-icons/fa';
+import { FaTags, FaSpinner, FaSlidersH, FaTimesCircle } from 'react-icons/fa';
 import { Product, Category, Source, GlobalSettings } from '../../../types/admin';
 import { adminClient } from '../../../api/adminClient';
 import { VisibilityIndicator } from '../indicators/VisibilityIndicator';
@@ -50,6 +50,18 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
     });
     const [editingProductStock, setEditingProductStock] = useState<Product | null>(null);
     const [showProductStockModal, setShowProductStockModal] = useState(false);
+
+    /**
+     * Форматирование количества в зависимости от единицы измерения
+     * КГ - 3 знака после запятой, ШТ - целое число
+     */
+    const formatStockQuantity = (quantity: number | string, unit: string): string => {
+        const num = Number(quantity);
+        if (unit === 'кг') {
+            return num.toFixed(3);
+        }
+        return Math.round(num).toString();
+    };
 
     const fetchProducts = async (page: number = 1, search: string = '', currentFilters: any = {}) => {
         try {
@@ -177,7 +189,8 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
 
             {/* Панель фильтров */}
             <div className="mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="flex items-end gap-4">
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                     {/* Поиск */}
                     <div className="lg:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2">Поиск</label>
@@ -229,17 +242,16 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
                             <option value="">Все категории</option>
                             {getFlattenedCategories(categories).map(category => (
                                 <option key={category.id} value={category.id}>
-                                    {'  '.repeat(category.level)}
-                                    {category.level > 0 ? '└ ' : ''}
+                                    {'└ '.repeat(category.level)}
                                     {category.name}
                                 </option>
                             ))}
                         </select>
                     </div>
 
-                    {/* Видимость */}
+                    {/* Статус товара */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Видимость</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Статус товара</label>
                         <select
                             value={filters.is_visible_on_site}
                             onChange={(e) => {
@@ -249,11 +261,51 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
                             }}
                             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500"
                         >
-                            <option value="">Все товары</option>
-                            <option value="true">Видимые</option>
-                            <option value="false">Скрытые</option>
+                            <option value="">Все</option>
+                            <option value="true">Включен</option>
+                            <option value="false">Выключен</option>
                         </select>
                     </div>
+
+                    {/* Настройки остатков */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Настройки остатков</label>
+                        <select
+                            value={filters.use_default_stock_settings}
+                            onChange={(e) => {
+                                const newFilters = { ...filters, use_default_stock_settings: e.target.value };
+                                setFilters(newFilters);
+                                fetchProducts(1, searchTerm, newFilters);
+                            }}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500"
+                        >
+                            <option value="">Все</option>
+                            <option value="true">Общие</option>
+                            <option value="false">Индивидуальные</option>
+                        </select>
+                    </div>
+                    </div>
+
+                    {/* Кнопка очистки фильтров */}
+                    <button
+                        onClick={() => {
+                            setSearchTerm('');
+                            const clearedFilters = {
+                                source: '',
+                                category: '',
+                                is_visible_on_site: '',
+                                use_default_stock_settings: '',
+                                ordering: '-updated_at'
+                            };
+                            setFilters(clearedFilters);
+                            fetchProducts(1, '', clearedFilters);
+                        }}
+                        className="px-4 py-2 h-[42px] bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 text-sm font-medium whitespace-nowrap"
+                        title="Очистить все фильтры"
+                    >
+                        <FaTimesCircle className="w-4 h-4" />
+                        Очистить фильтры
+                    </button>
                 </div>
             </div>
 
@@ -277,6 +329,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
                                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Товар</th>
                                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Цена</th>
                                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Остаток</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ед.</th>
                                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Видимость</th>
                                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Действия</th>
                                 </tr>
@@ -303,8 +356,9 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-3 text-sm text-gray-900">{product.price} {product.currency}</td>
-                                        <td className="px-4 py-3 text-sm text-gray-900">{product.stock_quantity}</td>
+                                        <td className="px-4 py-3 text-sm text-gray-900">{Number(product.price).toFixed(2)} {product.currency}</td>
+                                        <td className="px-4 py-3 text-sm text-gray-900">{formatStockQuantity(product.stock_quantity, product.unit)}</td>
+                                        <td className="px-4 py-3 text-sm text-gray-900">{product.unit}</td>
                                         <td className="px-4 py-3">
                                             <VisibilityIndicator
                                                 product={product}
@@ -315,13 +369,24 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center space-x-2">
-                                                <button
-                                                    onClick={() => handleEditProductStock(product)}
-                                                    className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-100 rounded-lg"
-                                                    title="Настройки остатков"
-                                                >
-                                                    <FaSlidersH className="w-4 h-4" />
-                                                </button>
+                                                <div className="flex flex-col items-center">
+                                                    <button
+                                                        onClick={() => handleEditProductStock(product)}
+                                                        className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-100 rounded-lg"
+                                                        title="Настройки остатков"
+                                                    >
+                                                        <FaSlidersH className="w-4 h-4" />
+                                                    </button>
+                                                    {product.use_default_stock_settings ? (
+                                                        <span className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded mt-1" title="Используются общие настройки сайта">
+                                                            Общие
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-xs text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded mt-1" title="Используются индивидуальные настройки">
+                                                            Индивид.
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <label className="relative inline-flex items-center cursor-pointer">
                                                     <input
                                                         type="checkbox"
@@ -367,7 +432,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
             {/* Модальное окно настроек остатков */}
             {showProductStockModal && editingProductStock && (
                 <ProductStockSettingsModal
-                    product={editingProductStock}
+                    product={products.find(p => p.id === editingProductStock.id) || editingProductStock}
                     onClose={() => {
                         setShowProductStockModal(false);
                         setEditingProductStock(null);

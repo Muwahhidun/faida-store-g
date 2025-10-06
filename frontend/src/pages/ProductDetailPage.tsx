@@ -83,6 +83,17 @@ interface ProductDetail {
   };
 }
 
+/**
+ * Форматирование количества в зависимости от единицы измерения
+ * КГ - 3 знака после запятой, ШТ - целое число
+ */
+const formatQuantity = (quantity: number, unit: string): string => {
+  if (unit === 'кг') {
+    return quantity.toFixed(3);
+  }
+  return Math.round(quantity).toString();
+};
+
 const fetchProduct = async (id: string): Promise<ProductDetail> => {
   try {
     const response = await fetch(`http://localhost:8000/api/products/${id}/`);
@@ -448,13 +459,13 @@ const ProductDetailPage: React.FC = () => {
                           <div className="text-center">
                             <div className="font-medium text-gray-600">На складе</div>
                             <div className="text-lg font-bold text-gray-900">
-                              {stockInfo.total.toFixed(3)} {product.unit}
+                              {formatQuantity(stockInfo.total, product.unit)} {product.unit}
                             </div>
                           </div>
                           <div className="text-center">
                             <div className="font-medium text-gray-600">В резерве</div>
                             <div className="text-lg font-bold text-orange-600">
-                              {stockInfo.reserved.toFixed(3)} {product.unit}
+                              {formatQuantity(stockInfo.reserved, product.unit)} {product.unit}
                             </div>
                           </div>
                           <div className="text-center">
@@ -462,7 +473,7 @@ const ProductDetailPage: React.FC = () => {
                             <div className={`text-lg font-bold ${
                               stockInfo.available > 0 ? 'text-green-600' : 'text-red-600'
                             }`}>
-                              {stockInfo.available.toFixed(3)} {product.unit}
+                              {formatQuantity(stockInfo.available, product.unit)} {product.unit}
                             </div>
                           </div>
                         </div>

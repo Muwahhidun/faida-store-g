@@ -17,8 +17,17 @@ import {
 const AdminPanelPage: React.FC = () => {
     const navigate = useNavigate();
 
+    // Получаем вкладку из URL hash или используем 'settings' по умолчанию
+    const getInitialTab = (): 'settings' | 'sources' | 'categories' | 'products' => {
+        const hash = window.location.hash.slice(1); // Убираем '#'
+        if (hash === 'sources' || hash === 'categories' || hash === 'products' || hash === 'settings') {
+            return hash;
+        }
+        return 'settings';
+    };
+
     // Основное состояние
-    const [selectedTab, setSelectedTab] = useState<'settings' | 'sources' | 'categories' | 'products'>('settings');
+    const [selectedTab, setSelectedTab] = useState<'settings' | 'sources' | 'categories' | 'products'>(getInitialTab());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -142,6 +151,11 @@ const AdminPanelPage: React.FC = () => {
             }
         };
     }, [sources, loading]);
+
+    // Обновление URL hash при изменении вкладки
+    useEffect(() => {
+        window.location.hash = selectedTab;
+    }, [selectedTab]);
 
     // Выход
     const handleLogout = () => {
