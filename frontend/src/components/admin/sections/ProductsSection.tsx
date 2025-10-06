@@ -12,6 +12,8 @@ interface ProductsSectionProps {
     minStock: number;
     onError: (message: string) => void;
     onSuccess: (message: string) => void;
+    onProductsCountChange?: (count: number) => void;
+    initialProductsCount?: number;
 }
 
 /**
@@ -24,7 +26,9 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
     globalSettings,
     minStock,
     onError,
-    onSuccess
+    onSuccess,
+    onProductsCountChange,
+    initialProductsCount = 0
 }) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
@@ -36,10 +40,11 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
         use_default_stock_settings: '',
         ordering: '-updated_at'
     });
+    const PAGE_SIZE = 24;
     const [pagination, setPagination] = useState({
         page: 1,
-        total_pages: 1,
-        count: 0,
+        total_pages: Math.max(1, Math.ceil(initialProductsCount / PAGE_SIZE)), // Вычисляем из начального значения
+        count: initialProductsCount, // Используем начальное значение
         next: null as string | null,
         previous: null as string | null
     });
@@ -49,7 +54,6 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
     const fetchProducts = async (page: number = 1, search: string = '', currentFilters: any = {}) => {
         try {
             setLoading(true);
-            const PAGE_SIZE = 24;
             const params: any = { limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE };
 
             if (search.trim()) {
@@ -78,6 +82,10 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
                     next: data.next,
                     previous: data.previous
                 });
+                // Обновляем счетчик товаров в родительском компоненте
+                if (onProductsCountChange) {
+                    onProductsCountChange(data.count);
+                }
             } else {
                 setProducts(Array.isArray(data) ? data : []);
                 setPagination({
@@ -321,7 +329,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
                                                         onChange={() => handleProductToggle(product)}
                                                         className="sr-only peer"
                                                     />
-                                                    <div className="w-9 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
+                                                    <div className="w-9 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
                                                 </label>
                                             </div>
                                         </td>

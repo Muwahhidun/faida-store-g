@@ -26,6 +26,7 @@ const AdminPanelPage: React.FC = () => {
     // Данные
     const [sources, setSources] = useState<Source[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [productsCount, setProductsCount] = useState<number>(0);
     const [availableOptions, setAvailableOptions] = useState<AvailableOptions>({ price_types: [], warehouses: [] });
     const [loadingCategories, setLoadingCategories] = useState(false);
 
@@ -71,6 +72,19 @@ const AdminPanelPage: React.FC = () => {
         }
     };
 
+    // Загрузка количества товаров
+    const fetchProductsCount = async () => {
+        try {
+            const productsResponse = await adminClient.get('/products-management/', {
+                params: { limit: 1 } // Загружаем только 1 товар, нам нужен только count
+            });
+            const count = productsResponse.data.count || 0;
+            setProductsCount(count);
+        } catch (err) {
+            console.error('Ошибка загрузки количества товаров:', err);
+        }
+    };
+
     // Загрузка настроек
     const fetchSettings = async () => {
         try {
@@ -94,6 +108,7 @@ const AdminPanelPage: React.FC = () => {
             await fetchSettings();
             await fetchSources();
             await fetchCategories();
+            await fetchProductsCount();
             setLoading(false);
             setDataLoaded(true);
         };
@@ -230,7 +245,7 @@ const AdminPanelPage: React.FC = () => {
                                 }`}
                             >
                                 <FaTags className="w-4 h-4" />
-                                <span>Товары</span>
+                                <span>Товары ({productsCount})</span>
                             </button>
                         </div>
                     </div>
@@ -243,7 +258,7 @@ const AdminPanelPage: React.FC = () => {
                         </div>
                     ) : (
                         <>
-                            {selectedTab === 'settings' && (
+                            <div style={{ display: selectedTab === 'settings' ? 'block' : 'none' }}>
                                 <SettingsSection
                                     initialSettings={{
                                         minStock,
@@ -255,9 +270,9 @@ const AdminPanelPage: React.FC = () => {
                                     onSuccess={handleSuccess}
                                     onSettingsUpdate={fetchSettings}
                                 />
-                            )}
+                            </div>
 
-                            {selectedTab === 'sources' && (
+                            <div style={{ display: selectedTab === 'sources' ? 'block' : 'none' }}>
                                 <SourcesSection
                                     sources={sources}
                                     availableOptions={availableOptions}
@@ -265,9 +280,9 @@ const AdminPanelPage: React.FC = () => {
                                     onError={handleError}
                                     onSuccess={handleSuccess}
                                 />
-                            )}
+                            </div>
 
-                            {selectedTab === 'categories' && (
+                            <div style={{ display: selectedTab === 'categories' ? 'block' : 'none' }}>
                                 <CategoriesSection
                                     categories={categories}
                                     sources={sources}
@@ -276,9 +291,9 @@ const AdminPanelPage: React.FC = () => {
                                     onError={handleError}
                                     onSuccess={handleSuccess}
                                 />
-                            )}
+                            </div>
 
-                            {selectedTab === 'products' && (
+                            <div style={{ display: selectedTab === 'products' ? 'block' : 'none' }}>
                                 <ProductsSection
                                     categories={categories}
                                     sources={sources}
@@ -290,8 +305,10 @@ const AdminPanelPage: React.FC = () => {
                                     minStock={minStock}
                                     onError={handleError}
                                     onSuccess={handleSuccess}
+                                    onProductsCountChange={setProductsCount}
+                                    initialProductsCount={productsCount}
                                 />
-                            )}
+                            </div>
                         </>
                     )}
                 </div>
