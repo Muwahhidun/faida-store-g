@@ -63,3 +63,8 @@ Thumbs.db
 # Project specific
 data/goods/
 faida_store.log
+
+# Backup files
+*.OLD.tsx
+*.OLD.backup.tsx
+*.backup.tsx
