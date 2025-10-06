@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { FaList, FaDatabase, FaExpandArrowsAlt, FaCompressArrowsAlt, FaChevronRight, FaChevronDown, FaSpinner } from 'react-icons/fa';
+import { FaList, FaDatabase, FaExpandArrowsAlt, FaCompressArrowsAlt, FaChevronRight, FaChevronDown, FaSpinner, FaEdit } from 'react-icons/fa';
 import { Category, Source } from '../../../types/admin';
 import { adminClient } from '../../../api/adminClient';
+import { EditCategoryModal } from '../modals';
 
 interface CategoriesSectionProps {
     categories: Category[];
@@ -25,6 +26,7 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
     onSuccess
 }) => {
     const [collapsedCategories, setCollapsedCategories] = useState<Set<number>>(new Set());
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
     // Функции для работы с категориями
     const toggleCategoryCollapse = (categoryId: number) => {
@@ -67,6 +69,17 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
             onCategoriesUpdate();
         } catch (err) {
             onError('Ошибка при обновлении категории.');
+        }
+    };
+
+    const handleCategorySave = async (id: number, data: Partial<Category>) => {
+        try {
+            await adminClient.patch(`/categories-management/${id}/`, data);
+            onSuccess('Категория успешно обновлена.');
+            onCategoriesUpdate();
+        } catch (err) {
+            onError('Ошибка при сохранении категории.');
+            throw err;
         }
     };
 
@@ -149,19 +162,33 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                         <div className={`w-2 h-2 rounded-full ${
                             category.is_visible_on_site ? 'bg-purple-500' : 'bg-gray-300'
                         }`}></div>
-                        <div>
-                            <span className={`text-sm font-medium ${
-                                level === 0 ? 'text-gray-900' : 'text-gray-700'
-                            } ${
-                                category.is_active ? '' : 'text-gray-400'
-                            }`}>
-                                {level > 0 && '└ '}{category.name}
-                                {hasChildren && (
-                                    <span className="ml-2 text-xs text-gray-400">
-                                        ({category.children.length})
+                        <div className="flex-1">
+                            <div className="flex items-center flex-wrap gap-1">
+                                <span className={`text-sm font-medium ${
+                                    level === 0 ? 'text-gray-900' : 'text-gray-700'
+                                } ${
+                                    category.is_active ? '' : 'text-gray-400'
+                                }`}>
+                                    {level > 0 && '└ '}{category.category_visible_name || category.name}
+                                    {hasChildren && (
+                                        <span className="ml-2 text-xs text-gray-400">
+                                            ({category.children.length})
+                                        </span>
+                                    )}
+                                </span>
+                                <button
+                                    onClick={() => setEditingCategory(category)}
+                                    className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                    title="Редактировать название"
+                                >
+                                    <FaEdit className="w-3.5 h-3.5" />
+                                </button>
+                                {category.display_name && (
+                                    <span className="text-xs text-gray-500">
+                                        (из 1С: <span className="italic">{category.name}</span>)
                                     </span>
                                 )}
-                            </span>
+                            </div>
                             <div className="text-xs text-gray-500">
                                 Товаров: {category.products_count}
                                 {!category.is_active && ' (неактивна)'}
@@ -256,6 +283,15 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                     ))
                 )}
             </div>
+
+            {/* Модальное окно редактирования категории */}
+            {editingCategory && (
+                <EditCategoryModal
+                    category={editingCategory}
+                    onClose={() => setEditingCategory(null)}
+                    onSave={handleCategorySave}
+                />
+            )}
         </div>
     );
 };

@@ -10,7 +10,14 @@ class Category(models.Model):
     
     name = models.CharField(
         max_length=255,
-        verbose_name="Название категории"
+        verbose_name="Название категории",
+        help_text="Название из 1С (автоматически обновляется при синхронизации)"
+    )
+    display_name = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Название для показа",
+        help_text="Альтернативное название для отображения на сайте. Если не заполнено, используется название из 1С"
     )
     slug = models.SlugField(
         max_length=255,
@@ -97,7 +104,15 @@ class Category(models.Model):
     
     def __str__(self):
         return self.name
-    
+
+    @property
+    def category_visible_name(self):
+        """
+        Возвращает название для отображения на сайте.
+        Если display_name заполнено - возвращает его, иначе - name из 1С.
+        """
+        return self.display_name if self.display_name else self.name
+
     def get_ancestors(self):
         """Получить список всех родительских категорий."""
         ancestors = []

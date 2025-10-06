@@ -37,6 +37,8 @@ export interface AvailableOptions {
 export interface Category {
     id: number;
     name: string;
+    display_name: string;
+    category_visible_name: string;  // Название для отображения (display_name или name)
     parent: number | null;
     is_active: boolean;
     is_visible_on_site: boolean;

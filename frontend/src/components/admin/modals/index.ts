@@ -8,3 +8,4 @@ export { PriceWarehouseModal } from './PriceWarehouseModal';
 export { AutoSyncModal } from './AutoSyncModal';
 export { SyncLogsModal } from './SyncLogsModal';
 export { DeleteConfirmModal } from './DeleteConfirmModal';
+export { EditCategoryModal } from './EditCategoryModal';

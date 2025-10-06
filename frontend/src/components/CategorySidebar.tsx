@@ -8,6 +8,8 @@ import { useQuery } from '@tanstack/react-query';
 interface Category {
   id: number;
   name: string;
+  display_name: string;
+  category_visible_name: string;
   slug: string;
   parent: number | null;
   children?: Category[];
@@ -126,14 +128,14 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
           }`}
           style={{ paddingLeft: `${0.75 + level * 1}rem` }}
           onClick={() => onCategorySelect(category.id)}
-          title={`${category.name} (${category.products_count || 0} товаров)`}
+          title={`${category.category_visible_name} (${category.products_count || 0} товаров)`}
         >
           <div className="flex items-center flex-1 min-w-0">
-            <span 
-              className="text-sm truncate font-medium" 
-              title={category.name}
+            <span
+              className="text-sm truncate font-medium"
+              title={category.category_visible_name}
             >
-              {category.name}
+              {category.category_visible_name}
             </span>
             {category.products_count && (
               <span className="ml-2 text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full flex-shrink-0">

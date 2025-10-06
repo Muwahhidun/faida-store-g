@@ -36,13 +36,14 @@ class IntegrationSourceSerializer(serializers.ModelSerializer):
 class CategoryManagementSerializer(serializers.ModelSerializer):
     """Сериализатор для управления категориями в админ-панели."""
     products_count = serializers.ReadOnlyField()
+    category_visible_name = serializers.ReadOnlyField()
     sources = serializers.SerializerMethodField()
     children = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Category
         fields = (
-            'id', 'name', 'parent', 'is_active', 'is_visible_on_site', 
+            'id', 'name', 'display_name', 'category_visible_name', 'parent', 'is_active', 'is_visible_on_site',
             'products_count', 'order', 'sources', 'children'
         )
 
@@ -170,14 +171,15 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор для категорий."""
-    
+
     products_count = serializers.ReadOnlyField()
-    
+    category_visible_name = serializers.ReadOnlyField()  # Название для отображения
+
     class Meta:
         model = Category
         fields = [
-            'id', 'name', 'slug', 'description', 'parent',
-            'image', 'products_count', 'is_active'
+            'id', 'name', 'display_name', 'category_visible_name', 'slug',
+            'description', 'parent', 'image', 'products_count', 'is_active'
         ]
 
 
@@ -262,16 +264,18 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
 class CategoryDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для детального просмотра категории."""
-    
+
     children = CategorySerializer(many=True, read_only=True)
     products_count = serializers.ReadOnlyField()
-    
+    category_visible_name = serializers.ReadOnlyField()  # Название для отображения
+
     class Meta:
         model = Category
         fields = [
-            'id', 'name', 'slug', 'description', 'parent', 'children',
-            'image', 'seo_title', 'seo_description', 'products_count',
-            'is_active', 'created_at', 'updated_at'
+            'id', 'name', 'display_name', 'category_visible_name', 'slug',
+            'description', 'parent', 'children', 'image', 'seo_title',
+            'seo_description', 'products_count', 'is_active',
+            'created_at', 'updated_at'
         ]
 
 

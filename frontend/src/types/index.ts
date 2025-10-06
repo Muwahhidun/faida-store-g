@@ -29,6 +29,8 @@ export interface ProductImage {
 // Категория
 export interface Category extends BaseModel {
   name: string;
+  display_name: string;
+  category_visible_name: string;  // Название для отображения на сайте
   slug: string;
   description: string;
   parent?: number;
