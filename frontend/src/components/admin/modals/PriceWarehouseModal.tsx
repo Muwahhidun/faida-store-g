@@ -27,6 +27,17 @@ export const PriceWarehouseModal: React.FC<PriceWarehouseModalProps> = ({
         fetchAvailableOptions();
     }, [source.id]);
 
+    // Обработчик ESC для закрытия модального окна
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && !saving) {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [onClose, saving]);
+
     const fetchAvailableOptions = async () => {
         setLoading(true);
         try {

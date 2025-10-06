@@ -38,6 +38,17 @@ export const SyncLogsModal: React.FC<SyncLogsModalProps> = ({ sourceId, sourceNa
         fetchLogs();
     }, [sourceId]);
 
+    // Обработчик ESC для закрытия модального окна
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [onClose]);
+
     const fetchLogs = async () => {
         setLoading(true);
         setError(null);

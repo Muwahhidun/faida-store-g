@@ -356,12 +356,23 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
                                             </div>
                                         )}
                                     </div>
+                                    {!source.is_active && (
+                                        <div className="text-xs text-orange-600 mt-1 flex items-center space-x-1">
+                                            <FaExclamationTriangle className="w-3 h-3" />
+                                            <span className="font-medium">
+                                                Источник неактивен - синхронизация отключена
+                                            </span>
+                                        </div>
+                                    )}
                                     {source.auto_sync_enabled && (
-                                        <div className="text-xs text-blue-600 mt-1 flex items-center space-x-1">
+                                        <div className={`text-xs mt-1 flex items-center space-x-1 ${
+                                            source.is_active ? 'text-blue-600' : 'text-gray-400'
+                                        }`}>
                                             <FaHourglassHalf className="w-3 h-3" />
                                             <span>
                                                 Автосинхронизация: данные каждые {source.data_sync_interval} мин,
                                                 полная каждые {source.full_sync_interval} мин
+                                                {!source.is_active && ' (не работает)'}
                                             </span>
                                         </div>
                                     )}
@@ -414,9 +425,9 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
                                 {/* Управление синхронизацией */}
                                 <button
                                     onClick={() => handleImportData(source, 'quick')}
-                                    disabled={isSourceSyncing(source) || !source.show_on_site || isAnySourceSyncing()}
+                                    disabled={!source.is_active || isSourceSyncing(source) || !source.show_on_site || isAnySourceSyncing()}
                                     className="p-2 text-gray-500 hover:text-yellow-600 hover:bg-yellow-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                    title="Быстрая синхронизация (только данные)"
+                                    title={!source.is_active ? "Источник неактивен - синхронизация недоступна" : "Быстрая синхронизация (только данные)"}
                                 >
                                     {importingSourceId === source.id && source.import_status === 'running_data'
                                         ? <FaSpinner className="w-5 h-5 animate-spin text-yellow-600" />
@@ -425,9 +436,9 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
                                 </button>
                                 <button
                                     onClick={() => handleImportData(source, 'full')}
-                                    disabled={isSourceSyncing(source) || !source.show_on_site || isAnySourceSyncing()}
+                                    disabled={!source.is_active || isSourceSyncing(source) || !source.show_on_site || isAnySourceSyncing()}
                                     className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                    title="Полная синхронизация (данные + изображения)"
+                                    title={!source.is_active ? "Источник неактивен - синхронизация недоступна" : "Полная синхронизация (данные + изображения)"}
                                 >
                                     {importingSourceId === source.id && source.import_status === 'running_full'
                                         ? <FaSpinner className="w-5 h-5 animate-spin text-green-600" />

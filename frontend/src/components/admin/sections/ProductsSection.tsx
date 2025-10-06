@@ -277,8 +277,23 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
                                 {products.map(product => (
                                     <tr key={product.id} className="hover:bg-gray-50">
                                         <td className="px-4 py-3">
-                                            <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                                            <div className="text-xs text-gray-500">{product.code}</div>
+                                            <div className="flex items-center space-x-3">
+                                                {product.main_image ? (
+                                                    <img
+                                                        src={product.main_image.image}
+                                                        alt={product.main_image.alt_text || product.name}
+                                                        className="w-12 h-12 object-contain rounded-lg border border-gray-200 bg-white"
+                                                    />
+                                                ) : (
+                                                    <div className="w-12 h-12 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
+                                                        <FaTags className="w-5 h-5 text-gray-400" />
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                                                    <div className="text-xs text-gray-500">{product.code}</div>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td className="px-4 py-3 text-sm text-gray-900">{product.price} {product.currency}</td>
                                         <td className="px-4 py-3 text-sm text-gray-900">{product.stock_quantity}</td>

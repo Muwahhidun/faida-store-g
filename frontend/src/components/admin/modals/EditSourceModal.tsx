@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaEdit, FaTimes } from 'react-icons/fa';
+import { FaEdit, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
 import { Switch } from '@headlessui/react';
 import { Source } from '../../../types/admin';
 
@@ -22,6 +22,17 @@ export const EditSourceModal: React.FC<EditSourceModalProps> = ({ source, onClos
         media_dir_path: source.media_dir_path,
     });
     const [saving, setSaving] = useState(false);
+
+    // Обработчик ESC для закрытия модального окна
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && !saving) {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [onClose, saving]);
 
     const handleSave = async () => {
         setSaving(true);
@@ -123,6 +134,24 @@ export const EditSourceModal: React.FC<EditSourceModalProps> = ({ source, onClos
                             </Switch>
                         </div>
                     </div>
+
+                    {/* Предупреждение об отключении источника */}
+                    {!editedSource.is_active && source.auto_sync_enabled && (
+                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                            <div className="flex items-start space-x-3">
+                                <FaExclamationTriangle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                                <div className="flex-1">
+                                    <h4 className="text-sm font-medium text-orange-800 mb-1">
+                                        Внимание: автосинхронизация будет остановлена
+                                    </h4>
+                                    <p className="text-sm text-orange-700">
+                                        У этого источника включена автосинхронизация. Отключение источника остановит все автоматические синхронизации,
+                                        пока вы не активируете источник снова.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
                 <div className="flex items-center justify-end p-6 border-t border-gray-200 bg-gray-50">
                     <button

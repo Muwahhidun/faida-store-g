@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaSlidersH, FaTimes } from 'react-icons/fa';
 import { ProductStockSettingsModalProps } from '../../../types/admin';
 
@@ -15,6 +15,17 @@ export const ProductStockSettingsModal: React.FC<ProductStockSettingsModalProps>
     const [useDefaultSettings, setUseDefaultSettings] = useState(product.use_default_stock_settings ?? true);
     const [stockDisplayStyle, setStockDisplayStyle] = useState(product.stock_display_style || 'detailed_status');
     const [lowStockThreshold, setLowStockThreshold] = useState(product.low_stock_threshold || 5);
+
+    // Обработчик ESC для закрытия модального окна
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [onClose]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

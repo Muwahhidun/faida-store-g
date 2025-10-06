@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaPlus, FaTimes } from 'react-icons/fa';
 import { Switch } from '@headlessui/react';
 import { Source } from '../../../types/admin';
@@ -18,6 +18,17 @@ export const CreateSourceModal: React.FC<CreateSourceModalProps> = ({ onClose, o
         media_dir_path: '',
     });
     const [saving, setSaving] = useState(false);
+
+    // Обработчик ESC для закрытия модального окна
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && !saving) {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [onClose, saving]);
 
     const handleSave = async () => {
         setSaving(true);

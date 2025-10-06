@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaTrash, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
 import { Source } from '../../../types/admin';
 
@@ -14,6 +14,17 @@ interface DeleteConfirmModalProps {
 export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({ source, onClose, onConfirm }) => {
     const [deleting, setDeleting] = useState(false);
     const [confirmText, setConfirmText] = useState('');
+
+    // Обработчик ESC для закрытия модального окна
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && !deleting) {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [onClose, deleting]);
 
     const handleDelete = async () => {
         setDeleting(true);
