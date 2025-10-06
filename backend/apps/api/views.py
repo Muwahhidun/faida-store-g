@@ -797,5 +797,17 @@ class SyncLogViewSet(mixins.ListModelMixin,
                 queryset = queryset.filter(started_at__gte=since_date)
             except (ValueError, TypeError):
                 pass
-        
+
         return queryset
+
+
+# JWT Token View с кастомным сериализатором
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenObtainPairSerializer
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    Кастомное view для получения JWT токена.
+    Использует CustomTokenObtainPairSerializer для добавления роли пользователя в токен.
+    """
+    serializer_class = CustomTokenObtainPairSerializer

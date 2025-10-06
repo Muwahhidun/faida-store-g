@@ -309,3 +309,22 @@ class SyncLogSerializer(serializers.ModelSerializer):
             else:
                 return f"{seconds} сек"
         return None
+
+
+# JWT Token Serializer с добавлением роли пользователя
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """
+    Кастомный сериализатор для JWT токена.
+    Добавляет информацию о роли пользователя в токен.
+    """
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Добавляем информацию о пользователе в токен
+        token['role'] = user.role if hasattr(user, 'role') else 'user'
+        token['username'] = user.username
+
+        return token

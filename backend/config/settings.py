@@ -34,6 +34,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
+    'apps.users',  # Кастомная модель пользователя
     'apps.products',
     'apps.categories',
     'apps.sync1c',
@@ -42,6 +43,9 @@ LOCAL_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+# Кастомная модель пользователя
+AUTH_USER_MODEL = 'users.User'
 
 # Middleware
 MIDDLEWARE = [
