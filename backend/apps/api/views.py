@@ -462,9 +462,12 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         """
         Оптимизированный queryset для товаров.
-        Показывает только активные товары из активных источников,
-        у которых стоит флаг 'show_on_site' и остаток больше или равен
-        глобальной настройке min_stock_for_display.
+        Показывает только активные товары из источников, у которых установлен
+        флаг 'show_on_site', и остаток больше или равен глобальной настройке
+        min_stock_for_display.
+
+        Примечание: is_active источника контролирует только синхронизацию,
+        а show_on_site контролирует видимость товаров на сайте.
         """
         # Загружаем настройки сайта
         site_settings = SiteSettings.load()
@@ -475,11 +478,10 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         ).prefetch_related(
             'images', 'related_products'
         ).filter(
-            is_visible_on_site=True,  # <-- Единственное правило для товаров!
-            source__is_active=True,
-            source__show_on_site=True,
+            is_visible_on_site=True,  # Товар должен быть видимым
+            source__show_on_site=True,  # Источник должен показываться на сайте
             category__is_active=True,
-            category__is_visible_on_site=True,  # <-- Правило для категорий!
+            category__is_visible_on_site=True,  # Категория должна быть видимой
             stock_quantity__gte=min_stock
         )
     
