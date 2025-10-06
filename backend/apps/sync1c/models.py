@@ -32,18 +32,20 @@ class IntegrationSource(models.Model):
         help_text="Относительный путь к папке с медиафайлами от 'goods_data'"
     )
 
-    # Правила по умолчанию для этого источника
-    default_price_type_name = models.CharField(
-        max_length=100,
+    # Правила по умолчанию для этого источника (храним только коды)
+    default_price_type = models.CharField(
+        max_length=255,
         blank=True,
-        verbose_name="Название вида цены по умолчанию",
-        help_text="Например, 'Розница' или 'Опт'"
+        null=True,
+        verbose_name="Код вида цены по умолчанию",
+        help_text="UUID кода цены из 1С"
     )
-    default_warehouse_name = models.CharField(
-        max_length=100,
+    default_warehouse = models.CharField(
+        max_length=255,
         blank=True,
-        verbose_name="Название склада по умолчанию",
-        help_text="Например, 'Склад (№1)'"
+        null=True,
+        verbose_name="Код склада по умолчанию",
+        help_text="UUID кода склада из 1С"
     )
 
     is_active = models.BooleanField(
@@ -150,7 +152,57 @@ class IntegrationSource(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.code})"
-    
+
+    @property
+    def default_price_type_name(self):
+        """Получает название типа цены из JSON файла по коду."""
+        if not self.default_price_type:
+            return ''
+
+        try:
+            import json
+            from pathlib import Path
+            from django.conf import settings
+
+            json_path = Path(settings.GOODS_DATA_DIR) / self.json_file_path
+            if json_path.exists():
+                with open(json_path, 'r', encoding='utf-8-sig') as f:
+                    data = json.load(f)
+
+                for product in data:
+                    for price in product.get('Цены', []):
+                        if price.get('КодЦены') == self.default_price_type:
+                            return price.get('ВидЦены', '')
+        except Exception:
+            pass
+
+        return ''
+
+    @property
+    def default_warehouse_name(self):
+        """Получает название склада из JSON файла по коду."""
+        if not self.default_warehouse:
+            return ''
+
+        try:
+            import json
+            from pathlib import Path
+            from django.conf import settings
+
+            json_path = Path(settings.GOODS_DATA_DIR) / self.json_file_path
+            if json_path.exists():
+                with open(json_path, 'r', encoding='utf-8-sig') as f:
+                    data = json.load(f)
+
+                for product in data:
+                    for stock in product.get('Остатки', []):
+                        if stock.get('КодСклада') == self.default_warehouse:
+                            return stock.get('Склад', '')
+        except Exception:
+            pass
+
+        return ''
+
     def schedule_next_data_sync(self):
         """Планирует следующую синхронизацию данных."""
         from django.utils import timezone

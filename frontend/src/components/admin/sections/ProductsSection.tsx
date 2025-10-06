@@ -153,9 +153,9 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
     };
 
     return (
-        <div className="space-y-6">
+        <div className="card p-6">
             {/* Заголовок */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 mb-6">
                 <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                     <FaTags className="w-5 h-5 text-orange-600" />
                 </div>
@@ -168,7 +168,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
             </div>
 
             {/* Панель фильтров */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     {/* Поиск */}
                     <div className="lg:col-span-2">
@@ -250,7 +250,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
             </div>
 
             {/* Список товаров */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div>
                 {loading ? (
                     <div className="py-12 text-center">
                         <FaSpinner className="w-8 h-8 text-orange-600 animate-spin mx-auto mb-3" />
@@ -262,7 +262,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
                         <p className="text-gray-500">Товары не найдены</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto border border-gray-200 rounded-lg">
                         <table className="w-full">
                             <thead className="bg-gray-50 border-b border-gray-200">
                                 <tr>
@@ -319,7 +319,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
 
                 {/* Пагинация */}
                 {pagination.total_pages > 1 && (
-                    <div className="px-4 py-3 border-t border-gray-200 flex items-center justify-between">
+                    <div className="px-4 py-3 border border-gray-200 rounded-lg mt-4 flex items-center justify-between bg-white">
                         <button
                             onClick={() => fetchProducts(pagination.page - 1, searchTerm, filters)}
                             disabled={!pagination.previous}

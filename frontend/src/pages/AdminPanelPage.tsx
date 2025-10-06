@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCog, FaDatabase, FaList, FaTags, FaPowerOff } from 'react-icons/fa';
-import { Helmet } from 'react-helmet';
 import { adminClient } from '../api/adminClient';
 import { Source, Category, AvailableOptions } from '../types/admin';
 import {
@@ -27,7 +26,7 @@ const AdminPanelPage: React.FC = () => {
     // Данные
     const [sources, setSources] = useState<Source[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [availableOptions, setAvailableOptions] = useState<AvailableOptions>({ price_types: [], warehouse_names: [] });
+    const [availableOptions, setAvailableOptions] = useState<AvailableOptions>({ price_types: [], warehouses: [] });
     const [loadingCategories, setLoadingCategories] = useState(false);
 
     // Настройки
@@ -48,12 +47,9 @@ const AdminPanelPage: React.FC = () => {
                 ? sourcesResponse.data
                 : sourcesResponse.data.results || [];
 
-            const currentStatuses = sources.map(s => `${s.id}:${s.import_status}`).join(',');
-            const newStatuses = sourcesData.map(s => `${s.id}:${s.import_status}`).join(',');
-
-            if (currentStatuses !== newStatuses) {
-                setSources(sourcesData);
-            }
+            // Всегда обновляем источники, чтобы получить свежие данные
+            // (включая default_price_type_name и default_warehouse_name)
+            setSources(sourcesData);
         } catch (err) {
             console.error('Ошибка загрузки источников:', err);
         }
@@ -154,12 +150,7 @@ const AdminPanelPage: React.FC = () => {
     };
 
     return (
-        <>
-            <Helmet>
-                <title>Админ-панель - Faida Group Store</title>
-            </Helmet>
-
-            <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50">
                 {/* Шапка */}
                 <div className="bg-white shadow-sm border-b border-gray-200">
                     <div className="container mx-auto px-4">
@@ -305,7 +296,6 @@ const AdminPanelPage: React.FC = () => {
                     )}
                 </div>
             </div>
-        </>
     );
 };
 

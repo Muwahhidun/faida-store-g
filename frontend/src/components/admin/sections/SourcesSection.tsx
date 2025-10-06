@@ -6,6 +6,14 @@ import {
 import { Switch } from '@headlessui/react';
 import { Source, AvailableOptions } from '../../../types/admin';
 import { adminClient } from '../../../api/adminClient';
+import {
+    CreateSourceModal,
+    EditSourceModal,
+    PriceWarehouseModal,
+    AutoSyncModal,
+    SyncLogsModal,
+    DeleteConfirmModal
+} from '../modals';
 
 interface SourcesSectionProps {
     sources: Source[];
@@ -27,6 +35,12 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
     onSuccess
 }) => {
     const [importingSourceId, setImportingSourceId] = useState<number | null>(null);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [editingSource, setEditingSource] = useState<Source | null>(null);
+    const [priceWarehouseSource, setPriceWarehouseSource] = useState<Source | null>(null);
+    const [autoSyncSource, setAutoSyncSource] = useState<Source | null>(null);
+    const [logsSource, setLogsSource] = useState<Source | null>(null);
+    const [deletingSource, setDeletingSource] = useState<Source | null>(null);
 
     // Вспомогательные функции
     const getStatusIcon = (status: string) => {
@@ -140,38 +154,151 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
     };
 
     const handleCreateSource = () => {
-        // TODO: Открыть модальное окно создания источника
-        console.log('Create source');
+        setShowCreateModal(true);
+    };
+
+    const handleSaveNewSource = async (newSource: Partial<Source>) => {
+        // Валидация
+        if (!newSource.name || !newSource.code || !newSource.json_file_path || !newSource.media_dir_path) {
+            onError('Все поля обязательны для заполнения.');
+            throw new Error('Validation failed');
+        }
+
+        try {
+            await adminClient.post('/sources/', newSource);
+            onSuccess(`Источник "${newSource.name}" успешно создан.`);
+            onSourcesUpdate();
+        } catch (err: any) {
+            console.error('Ошибка создания источника:', err);
+            const errorMessage = err.response?.data ? JSON.stringify(err.response.data) : 'Не удалось создать источник.';
+            onError(`Ошибка: ${errorMessage}`);
+            throw err;
+        }
     };
 
     const handleEditSource = (source: Source) => {
-        // TODO: Открыть модальное окно редактирования источника
-        console.log('Edit source', source);
+        setEditingSource(source);
+    };
+
+    const handleSaveEditedSource = async (id: number, updatedSource: Partial<Source>) => {
+        try {
+            await adminClient.patch(`/sources/${id}/`, updatedSource);
+            onSuccess(`Источник успешно обновлен.`);
+            onSourcesUpdate();
+        } catch (err: any) {
+            const errorMessage = err.response?.data ? JSON.stringify(err.response.data) : 'Не удалось обновить источник.';
+            onError(`Ошибка: ${errorMessage}`);
+            throw err;
+        }
     };
 
     const handleEditPriceWarehouse = (source: Source) => {
-        // TODO: Открыть модальное окно настройки цен и складов
-        console.log('Edit price/warehouse', source);
+        setPriceWarehouseSource(source);
+    };
+
+    const handleSavePriceWarehouse = async (id: number, data: { default_price_type?: string; default_warehouse?: string }) => {
+        try {
+            await adminClient.patch(`/sources/${id}/`, data);
+            onSuccess('Настройки цен и складов успешно обновлены.');
+            onSourcesUpdate();
+        } catch (err: any) {
+            const errorMessage = err.response?.data ? JSON.stringify(err.response.data) : 'Не удалось обновить настройки.';
+            onError(`Ошибка: ${errorMessage}`);
+            throw err;
+        }
     };
 
     const handleEditAutoSync = (source: Source) => {
-        // TODO: Открыть модальное окно автосинхронизации
-        console.log('Edit auto sync', source);
+        setAutoSyncSource(source);
+    };
+
+    const handleSaveAutoSync = async (id: number, data: {
+        auto_sync_enabled?: boolean;
+        data_sync_interval?: number;
+        full_sync_interval?: number;
+    }) => {
+        try {
+            await adminClient.patch(`/sources/${id}/`, data);
+            onSuccess('Настройки автосинхронизации успешно обновлены.');
+            onSourcesUpdate();
+        } catch (err: any) {
+            const errorMessage = err.response?.data ? JSON.stringify(err.response.data) : 'Не удалось обновить настройки.';
+            onError(`Ошибка: ${errorMessage}`);
+            throw err;
+        }
     };
 
     const handleShowLogs = (source: Source) => {
-        // TODO: Открыть модальное окно с логами
-        console.log('Show logs', source);
+        setLogsSource(source);
     };
 
     const handleDeleteSource = (source: Source) => {
-        // TODO: Открыть модальное окно подтверждения удаления
-        console.log('Delete source', source);
+        setDeletingSource(source);
+    };
+
+    const handleConfirmDelete = async (id: number) => {
+        try {
+            await adminClient.delete(`/sources/${id}/`);
+            onSuccess('Источник успешно удален.');
+            onSourcesUpdate();
+        } catch (err: any) {
+            const errorMessage = err.response?.data ? JSON.stringify(err.response.data) : 'Не удалось удалить источник.';
+            onError(`Ошибка: ${errorMessage}`);
+            throw err;
+        }
     };
 
     return (
-        <div className="card p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+        <>
+            {showCreateModal && (
+                <CreateSourceModal
+                    onClose={() => setShowCreateModal(false)}
+                    onSave={handleSaveNewSource}
+                />
+            )}
+
+            {editingSource && (
+                <EditSourceModal
+                    source={editingSource}
+                    onClose={() => setEditingSource(null)}
+                    onSave={handleSaveEditedSource}
+                />
+            )}
+
+            {priceWarehouseSource && (
+                <PriceWarehouseModal
+                    source={priceWarehouseSource}
+                    onClose={() => setPriceWarehouseSource(null)}
+                    onSave={handleSavePriceWarehouse}
+                />
+            )}
+
+            {autoSyncSource && (
+                <AutoSyncModal
+                    source={autoSyncSource}
+                    onClose={() => setAutoSyncSource(null)}
+                    onSave={handleSaveAutoSync}
+                />
+            )}
+
+            {logsSource && (
+                <SyncLogsModal
+                    sourceId={logsSource.id}
+                    sourceName={logsSource.name}
+                    onClose={() => setLogsSource(null)}
+                />
+            )}
+
+            {deletingSource && (
+                <DeleteConfirmModal
+                    source={deletingSource}
+                    onClose={() => setDeletingSource(null)}
+                    onConfirm={handleConfirmDelete}
+                />
+            )}
+
+            <div className="card p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                 <div className="flex items-center space-x-3 min-w-0">
                     <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                         <FaDatabase className="w-5 h-5 text-green-600" />
@@ -244,25 +371,25 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
                                 {/* Настройки */}
                                 <button
                                     onClick={() => handleEditSource(source)}
-                                    className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                                    className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Редактировать источник"
-                                    disabled={isAnySourceSyncing()}
+                                    disabled={isSourceSyncing(source)}
                                 >
                                     <FaEdit className="w-5 h-5" />
                                 </button>
                                 <button
                                     onClick={() => handleEditPriceWarehouse(source)}
-                                    className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                                    className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Настройки цен и складов"
-                                    disabled={isAnySourceSyncing()}
+                                    disabled={isSourceSyncing(source)}
                                 >
                                     <FaCogs className="w-5 h-5" />
                                 </button>
                                 <button
                                     onClick={() => handleEditAutoSync(source)}
-                                    className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-100 rounded-lg transition-colors"
+                                    className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Настройки автосинхронизации"
-                                    disabled={isAnySourceSyncing()}
+                                    disabled={isSourceSyncing(source)}
                                 >
                                     <FaPlay className="w-5 h-5" />
                                 </button>
@@ -275,9 +402,9 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
                                 </button>
                                 <button
                                     onClick={() => handleDeleteSource(source)}
-                                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Удалить источник"
-                                    disabled={isAnySourceSyncing()}
+                                    disabled={isSourceSyncing(source)}
                                 >
                                     <FaTrash className="w-5 h-5" />
                                 </button>
@@ -323,7 +450,7 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
                                 <Switch
                                     checked={source.show_on_site}
                                     onChange={() => handleSourceToggle(source)}
-                                    disabled={isAnySourceSyncing()}
+                                    disabled={isSourceSyncing(source)}
                                     className={`${
                                         source.show_on_site ? 'bg-blue-600' : 'bg-gray-200'
                                     } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50`}
@@ -339,6 +466,7 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
                     ))
                 )}
             </div>
-        </div>
+            </div>
+        </>
     );
 };

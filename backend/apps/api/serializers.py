@@ -19,13 +19,14 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 class IntegrationSourceSerializer(serializers.ModelSerializer):
     import_status_display = serializers.CharField(source='get_import_status_display', read_only=True)
-    
+
     class Meta:
         model = IntegrationSource
         fields = (
-            'id', 'name', 'code', 'is_active', 'show_on_site', 
+            'id', 'name', 'code', 'is_active', 'show_on_site',
             'json_file_path', 'media_dir_path',
-            'default_price_type_name', 'default_warehouse_name',
+            'default_price_type', 'default_price_type_name',
+            'default_warehouse', 'default_warehouse_name',
             'import_status', 'import_status_display', 'last_import_started', 'last_import_completed',
             'import_error_message', 'auto_sync_enabled', 'data_sync_interval', 'last_data_sync',
             'next_data_sync', 'full_sync_interval', 'last_full_sync', 'next_full_sync', 'last_error_time'

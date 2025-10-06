@@ -141,22 +141,95 @@ class IntegrationSourceViewSet(mixins.CreateModelMixin,
         Сбрасывает статус импорта для конкретного источника.
         """
         source = self.get_object()
-        
+
         try:
             source.import_status = 'idle'
             source.import_error_message = None
             source.save()
-            
+
             return Response({
                 'success': True,
                 'message': f'Статус импорта для источника "{source.name}" сброшен.'
             })
-            
+
         except Exception as e:
             return Response({
                 'success': False,
                 'message': f'Ошибка при сбросе статуса: {str(e)}'
             }, status=500)
+
+    @action(detail=True, methods=['get'])
+    def sync_logs(self, request, pk=None):
+        """
+        Возвращает историю синхронизации для конкретного источника.
+        """
+        source = self.get_object()
+
+        # Получаем логи синхронизации для этого источника
+        logs = SyncLog.objects.filter(source=source).order_by('-started_at')[:50]
+        serializer = SyncLogSerializer(logs, many=True)
+
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def available_options(self, request, pk=None):
+        """
+        Возвращает доступные типы цен и склады из JSON файла источника.
+        """
+        source = self.get_object()
+
+        try:
+            import json
+            from pathlib import Path
+            from django.conf import settings
+
+            # Формируем путь к JSON файлу
+            json_path = Path(settings.GOODS_DATA_DIR) / source.json_file_path
+
+            if not json_path.exists():
+                return Response({
+                    'price_types': [],
+                    'warehouses': []
+                }, status=200)
+
+            # Читаем JSON файл
+            with open(json_path, 'r', encoding='utf-8-sig') as f:
+                data = json.load(f)
+
+            # Собираем уникальные виды цен и складов
+            price_types_set = set()
+            warehouses_set = set()
+
+            for product in data:
+                # Собираем виды цен
+                for price in product.get('Цены', []):
+                    price_type = price.get('ВидЦены')
+                    price_code = price.get('КодЦены')
+                    if price_type and price_code:
+                        price_types_set.add((price_code, price_type))
+
+                # Собираем склады
+                for stock in product.get('Остатки', []):
+                    warehouse = stock.get('Склад')
+                    warehouse_code = stock.get('КодСклада')
+                    if warehouse and warehouse_code:
+                        warehouses_set.add((warehouse_code, warehouse))
+
+            # Преобразуем в списки словарей
+            price_types = [{'code': code, 'name': name} for code, name in sorted(price_types_set, key=lambda x: x[1])]
+            warehouses = [{'code': code, 'name': name} for code, name in sorted(warehouses_set, key=lambda x: x[1])]
+
+            return Response({
+                'price_types': price_types,
+                'warehouses': warehouses
+            })
+
+        except Exception as e:
+            return Response({
+                'price_types': [],
+                'warehouses': [],
+                'error': str(e)
+            }, status=200)
 
     @action(detail=True, methods=['post'])
     def apply_settings(self, request, pk=None):

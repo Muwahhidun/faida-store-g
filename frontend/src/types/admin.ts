@@ -5,9 +5,14 @@
 export interface Source {
     id: number;
     name: string;
+    code: string;
     is_active: boolean;
     show_on_site: boolean;
+    json_file_path: string;
+    media_dir_path: string;
+    default_price_type?: string;
     default_price_type_name: string;
+    default_warehouse?: string;
     default_warehouse_name: string;
     import_status: 'idle' | 'running' | 'completed' | 'failed' | 'running_data' | 'running_full';
     import_status_display: string;
@@ -25,8 +30,8 @@ export interface Source {
 }
 
 export interface AvailableOptions {
-    price_types: string[];
-    warehouse_names: string[];
+    price_types: Array<{ code: string; name: string }>;
+    warehouses: Array<{ code: string; name: string }>;
 }
 
 export interface Category {
