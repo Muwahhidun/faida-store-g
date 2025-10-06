@@ -1,0 +1,107 @@
+﻿{
+    "value":  [
+                  {
+                      "id":  10,
+                      "name":  "ÐÐÐÐ",
+                      "slug":  "inab",
+                      "description":  "",
+                      "parent":  null,
+                      "image":  null,
+                      "products_count":  6,
+                      "is_active":  true
+                  },
+                  {
+                      "id":  9,
+                      "name":  "ÐÐÐÐÐÐ¢ÐÐ ÐÐ",
+                      "slug":  "konditerka",
+                      "description":  "",
+                      "parent":  null,
+                      "image":  null,
+                      "products_count":  9,
+                      "is_active":  true
+                  },
+                  {
+                      "id":  1,
+                      "name":  "Ð¡ÐÐÐÐÐ«Ð ÐÐ ÐÐ",
+                      "slug":  "slavnyy-kray",
+                      "description":  "",
+                      "parent":  null,
+                      "image":  null,
+                      "products_count":  12,
+                      "is_active":  true,
+                      "children":  [
+                                       {
+                                           "id":  4,
+                                           "name":  "ÐÐ°ÑÐµÐ½ÑÐµ ÐºÐ¾Ð»Ð±Ð°ÑÑ",
+                                           "slug":  "varenye-kolbasy",
+                                           "description":  "",
+                                           "parent":  1,
+                                           "image":  null,
+                                           "products_count":  11,
+                                           "is_active":  true
+                                       },
+                                       {
+                                           "id":  6,
+                                           "name":  "ÐÐ°Ð¼Ð¾ÑÐ¾Ð·ÐºÐ°",
+                                           "slug":  "zamorozka",
+                                           "description":  "",
+                                           "parent":  1,
+                                           "image":  null,
+                                           "products_count":  39,
+                                           "is_active":  true
+                                       },
+                                       {
+                                           "id":  5,
+                                           "name":  "ÐÑÑÐ¸ÑÐ° Ð¸ ÐºÐ¾Ð¿ÑÐµÐ½Ð¸Ðµ",
+                                           "slug":  "kuritsa-i-kopchenie",
+                                           "description":  "",
+                                           "parent":  1,
+                                           "image":  null,
+                                           "products_count":  18,
+                                           "is_active":  true
+                                       },
+                                       {
+                                           "id":  8,
+                                           "name":  "ÐÑÑÐ¸ÑÐ°, ÑÐ°Ð·Ð´ÐµÐ»ÐºÐ°",
+                                           "slug":  "kuritsa-razdelka",
+                                           "description":  "",
+                                           "parent":  1,
+                                           "image":  null,
+                                           "products_count":  16,
+                                           "is_active":  true
+                                       },
+                                       {
+                                           "id":  2,
+                                           "name":  "ÐÐ¾Ð»Ñ-ÐºÐ¾Ð¿ÑÐµÐ½ÑÐµ ÐºÐ¾Ð»Ð±Ð°ÑÑ",
+                                           "slug":  "polu-kopchenye-kolbasy",
+                                           "description":  "",
+                                           "parent":  1,
+                                           "image":  null,
+                                           "products_count":  12,
+                                           "is_active":  true
+                                       },
+                                       {
+                                           "id":  7,
+                                           "name":  "Ð¡ÐµÐ¼ÐµÐ¹Ð½Ð°Ñ",
+                                           "slug":  "semeynaya",
+                                           "description":  "",
+                                           "parent":  1,
+                                           "image":  null,
+                                           "products_count":  8,
+                                           "is_active":  true
+                                       },
+                                       {
+                                           "id":  3,
+                                           "name":  "Ð¡Ð¾ÑÐ¸ÑÐºÐ¸, ÑÐ°ÑÐ´ÐµÐ»ÑÐºÐ¸",
+                                           "slug":  "sosiski-sardelki",
+                                           "description":  "",
+                                           "parent":  1,
+                                           "image":  null,
+                                           "products_count":  21,
+                                           "is_active":  true
+                                       }
+                                   ]
+                  }
+              ],
+    "Count":  3
+}

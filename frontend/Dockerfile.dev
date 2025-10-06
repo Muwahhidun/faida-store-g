@@ -1,0 +1,20 @@
+# Development Dockerfile для Vite
+FROM node:18-alpine
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Копируем файлы зависимостей
+COPY package*.json ./
+
+# Устанавливаем зависимости
+RUN npm install
+
+# Устанавливаем переменные окружения
+ENV NODE_ENV=development
+
+# Открываем порт
+EXPOSE 5173
+
+# Команда по умолчанию для разработки
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

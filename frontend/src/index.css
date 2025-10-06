@@ -1,0 +1,241 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Базовые стили */
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+/* Компоненты */
+@layer components {
+  /* Кнопки */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500;
+  }
+  
+  .btn-outline {
+    @apply btn border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-primary-500;
+  }
+  
+  .btn-danger {
+    @apply btn bg-error-600 text-white hover:bg-error-700 focus:ring-error-500;
+  }
+  
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+  
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+  
+  /* Карточки */
+  .card {
+    @apply bg-white rounded-lg shadow-md border border-gray-200;
+  }
+
+  .card-hover {
+    @apply card transition-shadow duration-200 hover:shadow-lg;
+  }
+  
+  /* Инпуты */
+  .input {
+    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm;
+  }
+  
+  .input-error {
+    @apply input border-error-300 focus:ring-error-500 focus:border-error-500;
+  }
+  
+  /* Бейджи */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-primary {
+    @apply badge bg-primary-100 text-primary-800;
+  }
+  
+  .badge-success {
+    @apply badge bg-success-100 text-success-800;
+  }
+  
+  .badge-warning {
+    @apply badge bg-warning-100 text-warning-800;
+  }
+  
+  .badge-error {
+    @apply badge bg-error-100 text-error-800;
+  }
+  
+  /* Лоадеры */
+  .spinner {
+    @apply animate-spin rounded-full border-2 border-gray-200 border-t-primary-600;
+  }
+  
+  /* Сетки товаров */
+  .products-grid {
+    @apply grid gap-6 auto-rows-fr;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  
+  @media (min-width: 640px) {
+    .products-grid {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .products-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .products-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+  }
+  
+  .products-grid-large {
+    @apply grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3;
+  }
+  
+  /* Навигационные ссылки */
+  .nav-link {
+    @apply text-gray-700 hover:text-primary-600 transition-colors duration-200;
+  }
+  
+  .nav-link-active {
+    @apply nav-link text-primary-600 font-medium;
+  }
+}
+
+/* Утилиты */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-4 {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .aspect-product {
+    aspect-ratio: 4/3;
+  }
+  
+  .aspect-square {
+    aspect-ratio: 1/1;
+  }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Кастомные стили для компонентов */
+.product-image {
+  @apply aspect-square object-cover w-full h-full rounded-md;
+}
+
+.product-card-image {
+  @apply w-full h-40 object-contain object-center bg-gray-50 rounded-md;
+  object-fit: contain;
+  object-position: center;
+  padding: 8px;
+}
+
+.category-image {
+  @apply aspect-square object-cover w-full h-full rounded-md;
+}
+
+.price-display {
+  @apply text-lg font-semibold text-gray-900;
+}
+
+.price-currency {
+  @apply text-sm font-normal text-gray-600 ml-1;
+}
+
+.stock-badge {
+  @apply absolute top-2 right-2 px-2 py-1 text-xs font-medium rounded-md;
+}
+
+.stock-in {
+  @apply stock-badge bg-success-100 text-success-800;
+}
+
+.stock-out {
+  @apply stock-badge bg-error-100 text-error-800;
+}
+
+.stock-low {
+  @apply stock-badge bg-warning-100 text-warning-800;
+}

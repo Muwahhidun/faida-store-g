@@ -1,0 +1,57 @@
+﻿{
+    "id":  367,
+    "code":  "Ð¿Ð¿-Ð¦Ð-00011376",
+    "article":  "Ð¢ÐµÑÑÐ¾Ð²ÑÐ¹ Ð°ÑÑÐ¸ÐºÑÐ»",
+    "name":  "Ð¡Ð¾ÑÐ¸ÑÐºÐ¸ \"ÐÑÑÐµ Ð³Ð¾Ñ. Ð§ÐµÑÐµÐ½ÑÐºÐ¸Ðµ\" Ð¾ÑÑÑÑÐµ Ð²Ð°Ðº. ÑÐ¿Ð°Ðº., (370 Ð³Ñ.) Ð¥Ð°Ð»ÑÐ»Ñ",
+    "category":  {
+                     "id":  54,
+                     "name":  "Ð¡Ð¾ÑÐ¸ÑÐºÐ¸, ÑÐ°ÑÐ´ÐµÐ»ÑÐºÐ¸",
+                     "slug":  "vyshe-gor-sosiski-sardelki",
+                     "description":  "",
+                     "parent":  52,
+                     "image":  null,
+                     "products_count":  7,
+                     "is_active":  true
+                 },
+    "price":  "127.00",
+    "currency":  "RUB",
+    "unit":  "ÑÑ",
+    "in_stock":  true,
+    "stock_quantity":  179,
+    "description":  "",
+    "brand":  "ÐÑÑÐµ Ð³Ð¾Ñ",
+    "weight":  "0",
+    "composition":  "",
+    "shelf_life":  "",
+    "storage_conditions":  "",
+    "nutritional_value":  {
+                              "calories":  null,
+                              "proteins":  null,
+                              "fats":  null,
+                              "carbohydrates":  null
+                          },
+    "seo_title":  "",
+    "seo_description":  "",
+    "tags_list":  [
+                      "4680649020261"
+                  ],
+    "barcodes_list":  [
+                          "1234567890123",
+                          "9876543210987"
+                      ],
+    "images":  [
+                   {
+                       "id":  591,
+                       "image":  "http://localhost:8000/media/products/2025/09/%D0%B2%D1%8B%D1%88%D0%B5_%D0%B3%D0%BE%D1%80_1_optimized.jpg",
+                       "alt_text":  "ÐÐ·Ð¾Ð±ÑÐ°Ð¶ÐµÐ½Ð¸Ðµ Ð¡Ð¾ÑÐ¸ÑÐºÐ¸ \"ÐÑÑÐµ Ð³Ð¾Ñ. Ð§ÐµÑÐµÐ½ÑÐºÐ¸Ðµ\" Ð¾ÑÑÑÑÐµ Ð²Ð°Ðº. ÑÐ¿Ð°Ðº., (370 Ð³Ñ.) Ð¥Ð°Ð»ÑÐ»Ñ",
+                       "is_main":  true,
+                       "order":  0
+                   }
+               ],
+    "related_products":  [
+
+                         ],
+    "is_available":  true,
+    "created_at":  "2025-09-11T23:52:00.158816+03:00",
+    "updated_at":  "2025-09-12T00:00:02.808232+03:00"
+}
