@@ -3,6 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
+/**
+ * Декодирует JWT токен без проверки подписи (только для чтения payload)
+ */
+const decodeJWT = (token: string): any => {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        console.error('Error decoding JWT:', error);
+        return null;
+    }
+};
+
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
@@ -21,15 +41,23 @@ const LoginPage: React.FC = () => {
                 username,
                 password,
             });
-            
+
             localStorage.setItem('access_token', response.data.access);
             localStorage.setItem('refresh_token', response.data.refresh);
-            
+
             // Уведомляем Header об изменении состояния авторизации
             window.dispatchEvent(new Event('authChanged'));
-            
-            // Перенаправляем на панель управления
-            navigate('/panel');
+
+            // Декодируем токен и проверяем роль
+            const payload = decodeJWT(response.data.access);
+            const userRole = payload?.role || 'user';
+
+            // Перенаправляем в зависимости от роли
+            if (userRole === 'admin' || userRole === 'moderator') {
+                navigate('/panel');
+            } else {
+                navigate('/');
+            }
         } catch (err) {
             setError('Неверное имя пользователя или пароль.');
             console.error('Ошибка входа:', err);
@@ -147,7 +175,7 @@ const LoginPage: React.FC = () => {
                 {/* Дополнительная информация */}
                 <div className="text-center">
                     <p className="text-sm text-gray-600">
-                        Система управления интернет-магазином
+                        Faida Group Store - Качественные халяль продукты
                     </p>
                 </div>
             </div>

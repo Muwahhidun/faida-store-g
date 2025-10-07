@@ -7,6 +7,7 @@ from apps.products.models import Product, ProductImage
 from apps.categories.models import Category
 from apps.core.models import SiteSettings
 from apps.sync1c.models import IntegrationSource, SyncLog
+from apps.users.models import User
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -328,3 +329,53 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['username'] = user.username
 
         return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        # Обновляем last_login при успешной аутентификации
+        from django.utils import timezone
+        self.user.last_login = timezone.now()
+        self.user.save(update_fields=['last_login'])
+
+        return data
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор для пользователей (управление в админ-панели)."""
+
+    role_display = serializers.CharField(source='get_role_display', read_only=True)
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'id', 'username', 'email', 'first_name', 'last_name',
+            'role', 'role_display', 'is_active', 'is_staff', 'is_superuser',
+            'date_joined', 'last_login', 'password'
+        )
+        read_only_fields = ('id', 'date_joined', 'last_login', 'is_staff', 'is_superuser')
+
+    def create(self, validated_data):
+        """Создание нового пользователя с хешированным паролем."""
+        password = validated_data.pop('password', None)
+        user = User(**validated_data)
+        if password:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
+        user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        """Обновление пользователя с возможностью смены пароля."""
+        password = validated_data.pop('password', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if password:
+            instance.set_password(password)
+
+        instance.save()
+        return instance

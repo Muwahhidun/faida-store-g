@@ -21,11 +21,12 @@ from apps.products.models import Product, ProductImage
 from apps.categories.models import Category
 from apps.core.models import SiteSettings
 from apps.sync1c.models import IntegrationSource, SyncLog
+from apps.users.models import User
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer, ProductImageSerializer,
     CategorySerializer, CategoryDetailSerializer,
     SiteSettingsSerializer, IntegrationSourceSerializer, CategoryManagementSerializer,
-    ProductManagementSerializer, SyncLogSerializer
+    ProductManagementSerializer, SyncLogSerializer, UserSerializer
 )
 from .filters import ProductFilter, CategoryFilter
 
@@ -799,6 +800,29 @@ class SyncLogViewSet(mixins.ListModelMixin,
                 pass
 
         return queryset
+
+
+class UserManagementViewSet(mixins.ListModelMixin,
+                            mixins.CreateModelMixin,
+                            mixins.UpdateModelMixin,
+                            mixins.DestroyModelMixin,
+                            viewsets.GenericViewSet):
+    """
+    ViewSet для управления пользователями в админ-панели.
+    Позволяет просматривать, создавать, обновлять и удалять пользователей.
+    Доступно только администраторам.
+    """
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminUser]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['username', 'email', 'first_name', 'last_name']
+    ordering_fields = ['username', 'email', 'date_joined', 'last_login']
+    ordering = ['-date_joined']
+    filterset_fields = ['role', 'is_active']
+
+    def get_queryset(self):
+        """Возвращает всех пользователей."""
+        return User.objects.all()
 
 
 # JWT Token View с кастомным сериализатором
