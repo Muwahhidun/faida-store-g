@@ -29,10 +29,10 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             await profileApi.updateProfile({ first_name: firstName, last_name: lastName });
             onUpdate('first_name', firstName);
             onUpdate('last_name', lastName);
-            showSuccess('Name updated successfully');
+            showSuccess('Имя успешно обновлено');
             setEditNameOpen(false);
         } catch (error) {
-            showError('Failed to update name');
+            showError('Не удалось обновить имя');
         }
     };
 
@@ -41,10 +41,10 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             const { profileApi } = await import('../../api/client');
             await profileApi.updateProfile({ email });
             onUpdate('email', email);
-            showSuccess('Email updated successfully');
+            showSuccess('Email успешно обновлен');
             setEditEmailOpen(false);
         } catch (error) {
-            showError('Failed to update email');
+            showError('Не удалось обновить email');
         }
     };
 
@@ -53,10 +53,10 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             const { profileApi } = await import('../../api/client');
             await profileApi.updateProfile({ phone });
             onUpdate('phone', phone);
-            showSuccess('Phone updated successfully');
+            showSuccess('Телефон успешно обновлен');
             setEditPhoneOpen(false);
         } catch (error) {
-            showError('Failed to update phone');
+            showError('Не удалось обновить телефон');
         }
     };
 
@@ -67,17 +67,17 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 current_password: currentPassword,
                 new_password: newPassword
             });
-            showSuccess('Password changed successfully');
+            showSuccess('Пароль успешно изменен');
             setEditPasswordOpen(false);
         } catch (error: any) {
-            showError(error.message || 'Failed to change password');
+            showError(error.message || 'Не удалось изменить пароль');
         }
     };
 
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">Personal Information</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">Личная информация</h2>
 
                 <div className="bg-gray-50 rounded-lg p-4 mb-4">
                     <div className="flex items-center justify-between">
@@ -86,11 +86,11 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                                 <FaUser className="w-5 h-5 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600">Name</p>
+                                <p className="text-sm text-gray-600">Имя и фамилия</p>
                                 <p className="text-base font-medium text-gray-900">
                                     {userData.first_name && userData.last_name
                                         ? `${userData.first_name} ${userData.last_name}`
-                                        : userData.username || 'Not specified'}
+                                        : userData.username || 'Не указано'}
                                 </p>
                             </div>
                         </div>
@@ -99,7 +99,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                             className="flex items-center space-x-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                             <FaEdit className="w-4 h-4" />
-                            <span>Edit</span>
+                            <span>Изменить</span>
                         </button>
                     </div>
                 </div>
@@ -113,7 +113,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                             <div>
                                 <p className="text-sm text-gray-600">Email</p>
                                 <p className="text-base font-medium text-gray-900">
-                                    {userData.email || 'Not specified'}
+                                    {userData.email || 'Не указан'}
                                 </p>
                             </div>
                         </div>
@@ -122,7 +122,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                             className="flex items-center space-x-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                             <FaEdit className="w-4 h-4" />
-                            <span>Edit</span>
+                            <span>Изменить</span>
                         </button>
                     </div>
                 </div>
@@ -134,9 +134,9 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                                 <FaPhone className="w-5 h-5 text-purple-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600">Phone</p>
+                                <p className="text-sm text-gray-600">Телефон</p>
                                 <p className="text-base font-medium text-gray-900">
-                                    {userData.phone || 'Not specified'}
+                                    {userData.phone || 'Не указан'}
                                 </p>
                             </div>
                         </div>
@@ -145,7 +145,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                             className="flex items-center space-x-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                             <FaEdit className="w-4 h-4" />
-                            <span>Edit</span>
+                            <span>Изменить</span>
                         </button>
                     </div>
                 </div>
@@ -157,8 +157,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                                 <FaKey className="w-5 h-5 text-red-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600">Password</p>
-                                <p className="text-base font-medium text-gray-900">""""""""</p>
+                                <p className="text-sm text-gray-600">Пароль</p>
+                                <p className="text-base font-medium text-gray-900">••••••••</p>
                             </div>
                         </div>
                         <button
@@ -166,24 +166,24 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                             className="flex items-center space-x-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                             <FaEdit className="w-4 h-4" />
-                            <span>Change</span>
+                            <span>Изменить</span>
                         </button>
                     </div>
                 </div>
             </div>
 
             <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Информация об аккаунте</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-gray-50 rounded-lg p-4">
-                        <p className="text-sm text-gray-600 mb-1">Username</p>
+                        <p className="text-sm text-gray-600 mb-1">Логин</p>
                         <p className="text-base font-medium text-gray-900">{userData.username}</p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-4">
-                        <p className="text-sm text-gray-600 mb-1">Role</p>
+                        <p className="text-sm text-gray-600 mb-1">Роль</p>
                         <p className="text-base font-medium text-gray-900">
-                            {userData.role === 'admin' ? 'Administrator' :
-                             userData.role === 'moderator' ? 'Moderator' : 'User'}
+                            {userData.role === 'admin' ? 'Администратор' :
+                             userData.role === 'moderator' ? 'Модератор' : 'Пользователь'}
                         </p>
                     </div>
                 </div>

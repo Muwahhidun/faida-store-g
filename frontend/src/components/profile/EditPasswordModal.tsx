@@ -32,22 +32,22 @@ export const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
         e.preventDefault();
 
         if (!currentPassword) {
-            setError('Current password is required');
+            setError('Введите текущий пароль');
             return;
         }
 
         if (!newPassword) {
-            setError('New password is required');
+            setError('Введите новый пароль');
             return;
         }
 
         if (newPassword.length < 8) {
-            setError('New password must be at least 8 characters');
+            setError('Новый пароль должен содержать минимум 8 символов');
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            setError('Passwords do not match');
+            setError('Пароли не совпадают');
             return;
         }
 
@@ -58,7 +58,7 @@ export const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
                 <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">Change Password</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Изменение пароля</h3>
                     <button
                         onClick={onClose}
                         className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -71,7 +71,7 @@ export const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
                     <div className="p-6 space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Current Password
+                                Текущий пароль
                             </label>
                             <div className="relative">
                                 <input
@@ -82,7 +82,7 @@ export const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
                                         setError('');
                                     }}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
-                                    placeholder="Enter current password"
+                                    placeholder="Введите текущий пароль"
                                     autoFocus
                                 />
                                 <button
@@ -97,7 +97,7 @@ export const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                New Password
+                                Новый пароль
                             </label>
                             <div className="relative">
                                 <input
@@ -108,7 +108,7 @@ export const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
                                         setError('');
                                     }}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
-                                    placeholder="Enter new password"
+                                    placeholder="Введите новый пароль"
                                 />
                                 <button
                                     type="button"
@@ -119,13 +119,13 @@ export const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
                                 </button>
                             </div>
                             <p className="mt-1 text-xs text-gray-500">
-                                Must be at least 8 characters
+                                Минимум 8 символов
                             </p>
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Confirm New Password
+                                Подтвердите новый пароль
                             </label>
                             <div className="relative">
                                 <input
@@ -136,7 +136,7 @@ export const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
                                         setError('');
                                     }}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
-                                    placeholder="Confirm new password"
+                                    placeholder="Подтвердите новый пароль"
                                 />
                                 <button
                                     type="button"
@@ -161,13 +161,13 @@ export const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
                             onClick={onClose}
                             className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                         >
-                            Cancel
+                            Отмена
                         </button>
                         <button
                             type="submit"
                             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
                         >
-                            Change Password
+                            Изменить пароль
                         </button>
                     </div>
                 </form>
