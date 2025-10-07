@@ -10,6 +10,7 @@ import {
     SettingsSection,
     UsersSection
 } from '../components/admin';
+import { Toast } from '../components/Toast';
 
 /**
  * Админ-панель - рефакторированная версия
@@ -205,20 +206,20 @@ const AdminPanelPage: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Уведомления */}
+                {/* Toast уведомления */}
                 {error && (
-                    <div className="container mx-auto px-4 mt-4">
-                        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
-                            {error}
-                        </div>
-                    </div>
+                    <Toast
+                        message={error}
+                        type="error"
+                        onClose={() => setError('')}
+                    />
                 )}
                 {success && (
-                    <div className="container mx-auto px-4 mt-4">
-                        <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-                            {success}
-                        </div>
-                    </div>
+                    <Toast
+                        message={success}
+                        type="success"
+                        onClose={() => setSuccess('')}
+                    />
                 )}
 
                 {/* Основной контент */}

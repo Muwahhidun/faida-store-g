@@ -214,6 +214,21 @@
   }
 }
 
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
 /* Кастомные стили для компонентов */
 .product-image {
   @apply aspect-square object-cover w-full h-full rounded-md;
