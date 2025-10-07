@@ -2,9 +2,10 @@
  * Компонент шапки сайта.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { FaShoppingCart } from 'react-icons/fa';
+import { FaShoppingCart, FaUser, FaCog, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
+import { Menu, Transition } from '@headlessui/react';
 import { useCart } from '../contexts/CartContext';
 
 interface UserData {
@@ -121,37 +122,88 @@ const Header: React.FC = () => {
                     
                     {/* Действия */}
                     <div className="flex items-center space-x-4">
-                        {/* Панель управления / Личный кабинет (только для авторизованных) */}
-                        {isAuthenticated && userData && (userData.role === 'admin' || userData.role === 'moderator') && (
-                            <Link
-                                to="/panel"
-                                className="btn btn-primary btn-sm"
-                            >
-                                Панель управления
-                            </Link>
-                        )}
-                        {isAuthenticated && userData && userData.role === 'user' && (
-                            <Link
-                                to="/profile"
-                                className="btn btn-primary btn-sm"
-                            >
-                                Личный кабинет
-                            </Link>
-                        )}
+                        {/* Dropdown меню пользователя */}
+                        {isAuthenticated && userData ? (
+                            <Menu as="div" className="relative">
+                                <Menu.Button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                                    {/* Аватар с инициалами */}
+                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                        {userData.username.charAt(0).toUpperCase()}
+                                    </div>
+                                    <span className="hidden sm:inline">{userData.username}</span>
+                                    <FaChevronDown className="w-3 h-3 text-gray-500" />
+                                </Menu.Button>
 
-                        {/* Войти/Выйти */}
-                        {isAuthenticated ? (
-                            <button
-                                onClick={() => {
-                                    localStorage.removeItem('access_token');
-                                    localStorage.removeItem('refresh_token');
-                                    window.dispatchEvent(new Event('authChanged'));
-                                    navigate('/');
-                                }}
-                                className="btn btn-outline btn-sm"
-                            >
-                                Выйти
-                            </button>
+                                <Transition
+                                    as={Fragment}
+                                    enter="transition ease-out duration-100"
+                                    enterFrom="transform opacity-0 scale-95"
+                                    enterTo="transform opacity-100 scale-100"
+                                    leave="transition ease-in duration-75"
+                                    leaveFrom="transform opacity-100 scale-100"
+                                    leaveTo="transform opacity-0 scale-95"
+                                >
+                                    <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y divide-gray-100">
+                                        <div className="px-4 py-3">
+                                            <p className="text-sm text-gray-500">Вы вошли как</p>
+                                            <p className="text-sm font-semibold text-gray-900 truncate">{userData.username}</p>
+                                        </div>
+
+                                        <div className="py-1">
+                                            {userData.role === 'admin' || userData.role === 'moderator' ? (
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <Link
+                                                            to="/panel"
+                                                            className={`${
+                                                                active ? 'bg-gray-100' : ''
+                                                            } flex items-center px-4 py-2 text-sm text-gray-700`}
+                                                        >
+                                                            <FaCog className="mr-3 w-4 h-4 text-gray-400" />
+                                                            Панель управления
+                                                        </Link>
+                                                    )}
+                                                </Menu.Item>
+                                            ) : (
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <Link
+                                                            to="/profile"
+                                                            className={`${
+                                                                active ? 'bg-gray-100' : ''
+                                                            } flex items-center px-4 py-2 text-sm text-gray-700`}
+                                                        >
+                                                            <FaUser className="mr-3 w-4 h-4 text-gray-400" />
+                                                            Личный кабинет
+                                                        </Link>
+                                                    )}
+                                                </Menu.Item>
+                                            )}
+                                        </div>
+
+                                        <div className="py-1">
+                                            <Menu.Item>
+                                                {({ active }) => (
+                                                    <button
+                                                        onClick={() => {
+                                                            localStorage.removeItem('access_token');
+                                                            localStorage.removeItem('refresh_token');
+                                                            window.dispatchEvent(new Event('authChanged'));
+                                                            navigate('/');
+                                                        }}
+                                                        className={`${
+                                                            active ? 'bg-gray-100' : ''
+                                                        } flex items-center w-full px-4 py-2 text-sm text-red-600`}
+                                                    >
+                                                        <FaSignOutAlt className="mr-3 w-4 h-4" />
+                                                        Выйти
+                                                    </button>
+                                                )}
+                                            </Menu.Item>
+                                        </div>
+                                    </Menu.Items>
+                                </Transition>
+                            </Menu>
                         ) : (
                             <Link
                                 to="/login"
