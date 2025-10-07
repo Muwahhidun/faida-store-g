@@ -12,7 +12,14 @@ export const EditPhoneModal: React.FC<EditPhoneModalProps> = ({
     onSave,
     onClose
 }) => {
-    const [phone, setPhone] = useState(currentPhone);
+    // Извлекаем только цифры из текущего телефона (без +7)
+    const extractDigits = (phone: string): string => {
+        const digits = phone.replace(/\D/g, '');
+        // Убираем 7 в начале если есть
+        return digits.startsWith('7') ? digits.slice(1) : digits;
+    };
+
+    const [phone, setPhone] = useState(extractDigits(currentPhone));
 
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
@@ -26,17 +33,30 @@ export const EditPhoneModal: React.FC<EditPhoneModalProps> = ({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave(phone);
+        // Сохраняем с +7
+        onSave(`+7${phone.replace(/\D/g, '')}`);
     };
 
-    const formatPhone = (value: string): string => {
+    const formatPhoneDisplay = (value: string): string => {
+        // Убираем все нецифровые символы
         const cleaned = value.replace(/\D/g, '');
-        return cleaned;
+
+        // Ограничиваем 10 цифрами
+        const limited = cleaned.slice(0, 10);
+
+        // Форматируем: (XXX) XXX-XX-XX
+        if (limited.length === 0) return '';
+        if (limited.length <= 3) return `(${limited}`;
+        if (limited.length <= 6) return `(${limited.slice(0, 3)}) ${limited.slice(3)}`;
+        if (limited.length <= 8) return `(${limited.slice(0, 3)}) ${limited.slice(3, 6)}-${limited.slice(6)}`;
+        return `(${limited.slice(0, 3)}) ${limited.slice(3, 6)}-${limited.slice(6, 8)}-${limited.slice(8)}`;
     };
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const formatted = formatPhone(e.target.value);
-        setPhone(formatted);
+        const value = e.target.value;
+        // Убираем все нецифровые символы для хранения
+        const cleaned = value.replace(/\D/g, '');
+        setPhone(cleaned.slice(0, 10)); // Ограничиваем 10 цифрами
     };
 
     return (
@@ -58,16 +78,21 @@ export const EditPhoneModal: React.FC<EditPhoneModalProps> = ({
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Номер телефона
                             </label>
-                            <input
-                                type="tel"
-                                value={phone}
-                                onChange={handlePhoneChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="+7 (999) 123-45-67"
-                                autoFocus
-                            />
+                            <div className="flex items-center">
+                                <span className="inline-flex items-center px-3 py-2 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-700 text-sm font-medium">
+                                    +7
+                                </span>
+                                <input
+                                    type="tel"
+                                    value={formatPhoneDisplay(phone)}
+                                    onChange={handlePhoneChange}
+                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="(928) 557-57-74"
+                                    autoFocus
+                                />
+                            </div>
                             <p className="mt-1 text-xs text-gray-500">
-                                Введите номер телефона
+                                Введите номер в формате (XXX) XXX-XX-XX
                             </p>
                         </div>
                     </div>

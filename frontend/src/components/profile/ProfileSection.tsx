@@ -23,6 +23,24 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
     const [editPhoneOpen, setEditPhoneOpen] = useState(false);
     const [editPasswordOpen, setEditPasswordOpen] = useState(false);
 
+    // Форматирование телефона для отображения
+    const formatPhoneDisplay = (phone: string): string => {
+        if (!phone) return 'Не указан';
+
+        // Убираем все нецифровые символы
+        const cleaned = phone.replace(/\D/g, '');
+
+        // Проверяем, начинается ли с 7 (российский номер)
+        const number = cleaned.startsWith('7') ? cleaned.slice(1) : cleaned;
+
+        // Форматируем: +7 (XXX) XXX-XX-XX
+        if (number.length === 10) {
+            return `+7 (${number.slice(0, 3)}) ${number.slice(3, 6)}-${number.slice(6, 8)}-${number.slice(8)}`;
+        }
+
+        return phone; // Если формат не подходит, возвращаем как есть
+    };
+
     const handleNameUpdate = async (firstName: string, lastName: string) => {
         try {
             const { profileApi } = await import('../../api/client');
@@ -136,7 +154,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                             <div>
                                 <p className="text-sm text-gray-600">Телефон</p>
                                 <p className="text-base font-medium text-gray-900">
-                                    {userData.phone || 'Не указан'}
+                                    {formatPhoneDisplay(userData.phone)}
                                 </p>
                             </div>
                         </div>
