@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaCogs, FaTimes, FaSpinner } from 'react-icons/fa';
 import { Source, AvailableOptions } from '../../../types/admin';
 import { adminClient } from '../../../api/adminClient';
+import { CustomSelect } from '../../CustomSelect';
 
 interface PriceWarehouseModalProps {
     source: Source;
@@ -87,44 +88,36 @@ export const PriceWarehouseModal: React.FC<PriceWarehouseModalProps> = ({
                     ) : (
                         <>
                     <div>
-                        <label htmlFor="price-type" className="block text-sm font-medium text-gray-700 mb-2">
-                            Тип цены по умолчанию
-                        </label>
-                        <select
-                            id="price-type"
+                        <CustomSelect
                             value={selectedPriceType}
-                            onChange={(e) => setSelectedPriceType(e.target.value)}
-                            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        >
-                            <option value="">-- Выберите тип цены --</option>
-                            {availableOptions?.price_types?.map((priceType) => (
-                                <option key={priceType.code} value={priceType.code}>
-                                    {priceType.name}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={setSelectedPriceType}
+                            options={[
+                                { value: '', label: '-- Выберите тип цены --' },
+                                ...(availableOptions?.price_types?.map((priceType) => ({
+                                    value: priceType.code,
+                                    label: priceType.name
+                                })) || [])
+                            ]}
+                            label="Тип цены по умолчанию"
+                        />
                         <p className="mt-2 text-xs text-gray-500">
                             Цена, которая будет использоваться для отображения товаров из этого источника
                         </p>
                     </div>
 
                     <div>
-                        <label htmlFor="warehouse" className="block text-sm font-medium text-gray-700 mb-2">
-                            Склад по умолчанию
-                        </label>
-                        <select
-                            id="warehouse"
+                        <CustomSelect
                             value={selectedWarehouse}
-                            onChange={(e) => setSelectedWarehouse(e.target.value)}
-                            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        >
-                            <option value="">-- Выберите склад --</option>
-                            {availableOptions?.warehouses?.map((warehouse) => (
-                                <option key={warehouse.code} value={warehouse.code}>
-                                    {warehouse.name}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={setSelectedWarehouse}
+                            options={[
+                                { value: '', label: '-- Выберите склад --' },
+                                ...(availableOptions?.warehouses?.map((warehouse) => ({
+                                    value: warehouse.code,
+                                    label: warehouse.name
+                                })) || [])
+                            ]}
+                            label="Склад по умолчанию"
+                        />
                         <p className="mt-2 text-xs text-gray-500">
                             Склад, остатки которого будут использоваться для отображения наличия товаров
                         </p>

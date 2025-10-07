@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaCog, FaSave, FaSpinner } from 'react-icons/fa';
 import { GlobalSettings } from '../../../types/admin';
 import { adminClient } from '../../../api/adminClient';
+import { CustomSelect } from '../../CustomSelect';
 
 interface SettingsSectionProps {
     initialSettings: {
@@ -111,18 +112,16 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
 
                         {/* Стиль отображения остатков по умолчанию */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Стиль отображения остатков по умолчанию
-                            </label>
-                            <select
+                            <CustomSelect
                                 value={defaultStockDisplayStyle}
-                                onChange={(e) => setDefaultStockDisplayStyle(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value="exact">Показывать точное количество</option>
-                                <option value="status">Показывать статус (В наличии / Нет)</option>
-                                <option value="detailed_status">Показывать детальный статус (В наличии / Мало / Нет)</option>
-                            </select>
+                                onChange={setDefaultStockDisplayStyle}
+                                options={[
+                                    { value: 'exact', label: 'Показывать точное количество' },
+                                    { value: 'status', label: 'Показывать статус (В наличии / Нет)' },
+                                    { value: 'detailed_status', label: 'Показывать детальный статус (В наличии / Мало / Нет)' }
+                                ]}
+                                label="Стиль отображения остатков по умолчанию"
+                            />
                             <p className="mt-1 text-xs text-gray-500">
                                 Применяется ко всем товарам, использующим общие настройки
                             </p>

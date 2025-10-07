@@ -6,12 +6,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-import { MagnifyingGlassIcon, XMarkIcon, ChevronUpDownIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, XMarkIcon, HeartIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ProductImage from '../components/ProductImage';
 import CategorySidebar from '../components/CategorySidebar';
 import CartButton from '../components/CartButton';
+import { CustomSelect } from '../components/CustomSelect';
 
 interface Product {
   id: number;
@@ -508,20 +509,18 @@ const ProductsPage: React.FC = () => {
                   {/* Сортировка справа */}
                   <div className="flex items-center space-x-3">
                     <span className="text-sm font-medium text-gray-700">Сортировка:</span>
-                    <div className="relative">
-                      <select
-                        value={sortBy}
-                        onChange={(e) => handleSortChange(e.target.value)}
-                        className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-sm focus:ring-emerald-500 focus:border-emerald-500 cursor-pointer"
-                      >
-                        <option value="">По умолчанию</option>
-                        <option value="price">Цена: по возрастанию</option>
-                        <option value="-price">Цена: по убыванию</option>
-                        <option value="name">По алфавиту: А-Я</option>
-                        <option value="-name">По алфавиту: Я-А</option>
-                      </select>
-                      <ChevronUpDownIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                    </div>
+                    <CustomSelect
+                      value={sortBy}
+                      onChange={handleSortChange}
+                      options={[
+                        { value: '', label: 'По умолчанию' },
+                        { value: 'price', label: 'Цена: по возрастанию' },
+                        { value: '-price', label: 'Цена: по убыванию' },
+                        { value: 'name', label: 'По алфавиту: А-Я' },
+                        { value: '-name', label: 'По алфавиту: Я-А' },
+                      ]}
+                      className="min-w-[200px]"
+                    />
                   </div>
                 </div>
               </div>
