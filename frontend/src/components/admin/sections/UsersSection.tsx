@@ -4,6 +4,7 @@ import {
 } from 'react-icons/fa';
 import { User } from '../../../types/admin';
 import { adminClient } from '../../../api/adminClient';
+import { CustomSelect } from '../../CustomSelect';
 
 interface UsersSectionProps {
     onError: (message: string) => void;
@@ -194,16 +195,17 @@ export const UsersSection: React.FC<UsersSectionProps> = ({
                             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         />
                     </div>
-                    <select
+                    <CustomSelect
                         value={roleFilter}
-                        onChange={(e) => setRoleFilter(e.target.value)}
-                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    >
-                        <option value="all">Все роли</option>
-                        <option value="admin">Администраторы</option>
-                        <option value="moderator">Модераторы</option>
-                        <option value="user">Пользователи</option>
-                    </select>
+                        onChange={setRoleFilter}
+                        options={[
+                            { value: 'all', label: 'Все роли' },
+                            { value: 'admin', label: 'Администраторы' },
+                            { value: 'moderator', label: 'Модераторы' },
+                            { value: 'user', label: 'Пользователи' }
+                        ]}
+                        className="min-w-[180px]"
+                    />
                 </div>
 
                 {/* Список пользователей */}
@@ -423,19 +425,16 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Роль *
-                            </label>
-                            <select
+                            <CustomSelect
                                 value={formData.role}
-                                onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                required
-                            >
-                                <option value="user">Пользователь</option>
-                                <option value="moderator">Модератор</option>
-                                <option value="admin">Администратор</option>
-                            </select>
+                                onChange={(value) => setFormData({ ...formData, role: value as any })}
+                                options={[
+                                    { value: 'user', label: 'Пользователь' },
+                                    { value: 'moderator', label: 'Модератор' },
+                                    { value: 'admin', label: 'Администратор' }
+                                ]}
+                                label="Роль *"
+                            />
                         </div>
                         <div className="flex items-center">
                             <input

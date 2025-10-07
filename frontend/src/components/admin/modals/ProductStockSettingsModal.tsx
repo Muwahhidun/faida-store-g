@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaSlidersH, FaTimes } from 'react-icons/fa';
 import { ProductStockSettingsModalProps } from '../../../types/admin';
+import { CustomSelect } from '../../CustomSelect';
 
 /**
  * Модальное окно настроек остатков товара
@@ -106,18 +107,16 @@ export const ProductStockSettingsModal: React.FC<ProductStockSettingsModalProps>
                     {!useDefaultSettings && (
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Стиль отображения остатков
-                                </label>
-                                <select
+                                <CustomSelect
                                     value={stockDisplayStyle}
-                                    onChange={(e) => setStockDisplayStyle(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                >
-                                    <option value="exact">Показывать точное количество</option>
-                                    <option value="status">Показывать статус (В наличии / Нет)</option>
-                                    <option value="detailed_status">Показывать детальный статус (В наличии / Мало / Нет)</option>
-                                </select>
+                                    onChange={setStockDisplayStyle}
+                                    options={[
+                                        { value: 'exact', label: 'Показывать точное количество' },
+                                        { value: 'status', label: 'Показывать статус (В наличии / Нет)' },
+                                        { value: 'detailed_status', label: 'Показывать детальный статус (В наличии / Мало / Нет)' }
+                                    ]}
+                                    label="Стиль отображения остатков"
+                                />
                             </div>
 
                             <div>

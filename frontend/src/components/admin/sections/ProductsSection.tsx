@@ -4,6 +4,7 @@ import { Product, Category, Source, GlobalSettings } from '../../../types/admin'
 import { adminClient } from '../../../api/adminClient';
 import { VisibilityIndicator } from '../indicators/VisibilityIndicator';
 import { ProductStockSettingsModal } from '../modals/ProductStockSettingsModal';
+import { CustomSelect } from '../../CustomSelect';
 
 interface ProductsSectionProps {
     categories: Category[];
@@ -210,79 +211,78 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
 
                     {/* Источник */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Источник</label>
-                        <select
+                        <CustomSelect
                             value={filters.source}
-                            onChange={(e) => {
-                                const newFilters = { ...filters, source: e.target.value };
+                            onChange={(value) => {
+                                const newFilters = { ...filters, source: value };
                                 setFilters(newFilters);
                                 fetchProducts(1, searchTerm, newFilters);
                             }}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500"
-                        >
-                            <option value="">Все источники</option>
-                            {sources.map(source => (
-                                <option key={source.id} value={source.id}>{source.name}</option>
-                            ))}
-                        </select>
+                            options={[
+                                { value: '', label: 'Все источники' },
+                                ...sources.map(source => ({
+                                    value: String(source.id),
+                                    label: source.name
+                                }))
+                            ]}
+                            label="Источник"
+                        />
                     </div>
 
                     {/* Категория */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Категория</label>
-                        <select
+                        <CustomSelect
                             value={filters.category}
-                            onChange={(e) => {
-                                const newFilters = { ...filters, category: e.target.value };
+                            onChange={(value) => {
+                                const newFilters = { ...filters, category: value };
                                 setFilters(newFilters);
                                 fetchProducts(1, searchTerm, newFilters);
                             }}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500"
-                        >
-                            <option value="">Все категории</option>
-                            {getFlattenedCategories(categories).map(category => (
-                                <option key={category.id} value={category.id}>
-                                    {'└ '.repeat(category.level)}
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
+                            options={[
+                                { value: '', label: 'Все категории' },
+                                ...getFlattenedCategories(categories).map(category => ({
+                                    value: String(category.id),
+                                    label: `${'└ '.repeat(category.level)}${category.name}`
+                                }))
+                            ]}
+                            label="Категория"
+                        />
                     </div>
 
                     {/* Статус товара */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Статус товара</label>
-                        <select
+                        <CustomSelect
                             value={filters.is_visible_on_site}
-                            onChange={(e) => {
-                                const newFilters = { ...filters, is_visible_on_site: e.target.value };
+                            onChange={(value) => {
+                                const newFilters = { ...filters, is_visible_on_site: value };
                                 setFilters(newFilters);
                                 fetchProducts(1, searchTerm, newFilters);
                             }}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500"
-                        >
-                            <option value="">Все</option>
-                            <option value="true">Включен</option>
-                            <option value="false">Выключен</option>
-                        </select>
+                            options={[
+                                { value: '', label: 'Все' },
+                                { value: 'true', label: 'Включен' },
+                                { value: 'false', label: 'Выключен' }
+                            ]}
+                            label="Статус товара"
+                        />
                     </div>
 
                     {/* Настройки остатков */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Настройки остатков</label>
-                        <select
+                        <CustomSelect
                             value={filters.use_default_stock_settings}
-                            onChange={(e) => {
-                                const newFilters = { ...filters, use_default_stock_settings: e.target.value };
+                            onChange={(value) => {
+                                const newFilters = { ...filters, use_default_stock_settings: value };
                                 setFilters(newFilters);
                                 fetchProducts(1, searchTerm, newFilters);
                             }}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500"
-                        >
-                            <option value="">Все</option>
-                            <option value="true">Общие</option>
-                            <option value="false">Индивидуальные</option>
-                        </select>
+                            options={[
+                                { value: '', label: 'Все' },
+                                { value: 'true', label: 'Общие' },
+                                { value: 'false', label: 'Индивидуальные' }
+                            ]}
+                            label="Настройки остатков"
+                        />
                     </div>
                     </div>
 
