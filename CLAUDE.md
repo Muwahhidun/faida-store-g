@@ -23,6 +23,8 @@
 - Zustand (управление состоянием)
 - Tailwind CSS + Headless UI
 - Axios (HTTP клиент)
+- React Icons (иконки)
+- React Helmet Async (управление meta-тегами)
 
 **Инфраструктура:**
 - Docker Compose (5 сервисов: db, redis, backend, frontend, scheduler)
@@ -145,13 +147,13 @@ backend/
 ```
 
 **Основные модели:**
-- `User` (apps/users): Кастомная модель пользователя с полем role (user/moderator/admin)
-- `Product`: code (уникальный), name, price, stock_quantity, in_stock, category FK, images (через ProductImage), prices_data JSONField, stocks_data JSONField, source FK
-- `ProductImage`: product FK, image FileField, file_hash (для дедупликации), display_order
+- `User` (apps/users): Наследуется от AbstractUser, с полем role (user/moderator/admin). Автоматически синхронизирует role с is_staff и is_superuser при сохранении
+- `Product`: code (уникальный), article, name, barcodes, price, currency, unit, stock_quantity, in_stock, category FK, images (через ProductImage), prices_data JSONField, stocks_data JSONField, source FK
+- `ProductImage`: product FK, image FileField, file_hash MD5 (для дедупликации), display_order
 - `Category`: code_1c (уникальный), name, slug, parent FK (самоссылающаяся иерархия), is_visible_on_site
 - `IntegrationSource`: name, json_file_path, media_dir_path, is_active, show_on_site, auto_sync_enabled, import_status
-- `SyncLog`: sync_type, status, source FK, временные метки, счетчики
-- `SiteSettings`: Singleton модель для настроек всего сайта
+- `SyncLog`: sync_type (full/partial), status, source FK, временные метки, счетчики, errors
+- `SiteSettings`: Singleton модель для настроек всего сайта (пороги остатков и т.д.)
 
 **Интеграция с 1С:**
 - Сервис `ProductImporter` в [apps/sync1c/services.py](backend/apps/sync1c/services.py)
@@ -163,11 +165,18 @@ backend/
 - Сервис планировщика выполняет автосинхронизацию через интервалы
 
 **Структура API:**
-- ViewSets: `ProductViewSet`, `CategoryViewSet`, `IntegrationSourceViewSet` и т.д.
-- Пользовательские действия: `import_data`, `quick_sync`, `popular`, `bulk_update`
+- ViewSets: `ProductViewSet`, `CategoryViewSet`, `IntegrationSourceViewSet`, `UserViewSet`
+- Пользовательские действия (через @action декоратор):
+  - `import_data` - запуск импорта из источника
+  - `quick_sync` - быстрая синхронизация (без медиа)
+  - `popular` - популярные товары
+  - `bulk_update` - массовое обновление
 - Фильтрация: DjangoFilterBackend + кастомные ProductFilter, CategoryFilter
-- Пагинация: LimitOffsetPagination (24 на страницу)
-- Кэширование: Django cache framework с бэкендом Redis
+- Поиск: SearchFilter для текстового поиска
+- Сортировка: OrderingFilter
+- Пагинация: LimitOffsetPagination (24 товара на страницу)
+- Кэширование: Django cache framework с бэкендом Redis (декоратор @cache_page)
+- Permissions: AllowAny для публичных эндпоинтов, IsAdminUser для административных
 
 ### Структура фронтенда
 
@@ -175,11 +184,14 @@ backend/
 frontend/src/
 ├── components/         # Переиспользуемые UI компоненты
 │   ├── Layout.tsx      # Основная обертка layout
-│   ├── Header.tsx      # Навигация, кнопка корзины
+│   ├── Header.tsx      # Навигация, кнопка корзины, dropdown меню пользователя
 │   ├── Footer.tsx
 │   ├── CategorySidebar.tsx
 │   ├── ProductImage.tsx  # Изображение с fallback
-│   └── CartButton.tsx
+│   ├── CartButton.tsx
+│   ├── ProtectedRoute.tsx  # HOC для защищенных маршрутов
+│   ├── ErrorBoundary.tsx
+│   └── LoadingSpinner.tsx
 ├── pages/             # Страницы маршрутов
 │   ├── HomePage.tsx
 │   ├── ProductsPage.tsx
@@ -187,6 +199,7 @@ frontend/src/
 │   ├── CategoryPage.tsx
 │   ├── CartPage.tsx
 │   ├── AdminPanelPage.tsx
+│   ├── ProfilePage.tsx
 │   └── LoginPage.tsx
 ├── contexts/          # React Context провайдеры
 │   └── CartContext.tsx
@@ -203,9 +216,17 @@ frontend/src/
 
 **Управление состоянием:**
 - TanStack Query для серверного состояния (товары, категории)
-- Zustand для состояния корзины
+- Zustand для состояния корзины (с persist middleware для сохранения в localStorage)
 - React Context для операций с корзиной
 - JWT токен хранится в localStorage
+- ProtectedRoute компонент для защищенных маршрутов
+
+**Аутентификация и авторизация:**
+- JWT-based аутентификация через rest_framework_simplejwt
+- Роли пользователей: user, moderator, admin
+- Автосинхронизация role с is_staff/is_superuser в модели User
+- Защищенные маршруты через ProtectedRoute компонент
+- Компонент Header с dropdown меню пользователя (см. FaUser, FaCog, FaSignOutAlt иконки)
 
 **Маршрутизация:**
 - `/` - HomePage (избранные товары)
@@ -213,8 +234,9 @@ frontend/src/
 - `/products/:id` - ProductDetailPage
 - `/category/:slug` - CategoryPage (товары по категории)
 - `/cart` - CartPage
-- `/panel` - AdminPanelPage (защищенный маршрут, только админ)
 - `/login` - LoginPage
+- `/panel` - AdminPanelPage (защищенный маршрут, требует аутентификации)
+- `/profile` - ProfilePage (защищенный маршрут, требует аутентификации)
 
 ### Поток данных
 

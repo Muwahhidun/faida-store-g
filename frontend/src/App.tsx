@@ -21,6 +21,7 @@ import ImageTest from './pages/ImageTest';
 import NotFoundPage from './pages/NotFoundPage';
 import LoginPage from "./pages/LoginPage";
 import AdminPanelPage from "./pages/AdminPanelPage";
+import ProfilePage from "./pages/ProfilePage";
 import CartPage from "./pages/CartPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -67,9 +68,10 @@ const App: React.FC = () => {
             {/* Тест изображений */}
             <Route path="/test-images" element={<ImageTest />} />
             <Route path="/login" element={<LoginPage />} />
-            
+
             <Route element={<ProtectedRoute />}>
               <Route path="/panel" element={<AdminPanelPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
             </Route>
 
             {/* 404 страница */}

@@ -122,6 +122,50 @@ export const categoriesApi = {
   },
 };
 
+// API методы для профиля пользователя
+export const profileApi = {
+  // Получить данные текущего пользователя
+  getMe: async (): Promise<any> => {
+    const token = localStorage.getItem('access_token');
+    const response = await apiClient.get('/users-management/me/', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+  // Обновить профиль текущего пользователя
+  updateProfile: async (data: {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    phone?: string;
+  }): Promise<any> => {
+    const token = localStorage.getItem('access_token');
+    const response = await apiClient.patch('/users-management/update_profile/', data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+  // Изменить пароль
+  changePassword: async (data: {
+    current_password: string;
+    new_password: string;
+  }): Promise<any> => {
+    const token = localStorage.getItem('access_token');
+    const response = await apiClient.post('/users-management/change_password/', data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+};
+
 // Общие API методы
 export const commonApi = {
   // Получить информацию об API

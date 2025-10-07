@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from django.core.management import call_command
 from django.utils import timezone
 import threading
+from rest_framework import permissions
 from rest_framework.permissions import IsAdminUser, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -823,6 +824,44 @@ class UserManagementViewSet(mixins.ListModelMixin,
     def get_queryset(self):
         """Возвращает всех пользователей."""
         return User.objects.all()
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def me(self, request):
+        """Получить данные текущего пользователя."""
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['patch'], permission_classes=[permissions.IsAuthenticated])
+    def update_profile(self, request):
+        """Обновить данные профиля текущего пользователя."""
+        user = request.user
+        serializer = self.get_serializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def change_password(self, request):
+        """Изменить пароль текущего пользователя."""
+        user = request.user
+        current_password = request.data.get('current_password')
+        new_password = request.data.get('new_password')
+
+        if not current_password or not new_password:
+            return Response(
+                {'error': 'Both current_password and new_password are required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not user.check_password(current_password):
+            return Response(
+                {'error': 'Current password is incorrect'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user.set_password(new_password)
+        user.save()
+        return Response({'message': 'Password changed successfully'})
 
 
 # JWT Token View с кастомным сериализатором
