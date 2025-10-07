@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-    FaUsers, FaPlus, FaEdit, FaTrash, FaSearch, FaCheckCircle, FaTimesCircle
+    FaUsers, FaPlus, FaEdit, FaTrash, FaSearch, FaCheckCircle, FaTimesCircle, FaTimes
 } from 'react-icons/fa';
 import { User } from '../../../types/admin';
 import { adminClient } from '../../../api/adminClient';
