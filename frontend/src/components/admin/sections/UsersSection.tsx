@@ -338,6 +338,17 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
     });
     const [saving, setSaving] = useState(false);
 
+    // Обработчик Escape для закрытия модального окна
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && !saving) {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [onClose, saving]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
@@ -361,6 +372,16 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
                     className="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6"
                     onClick={(e) => e.stopPropagation()}
                 >
+                    {/* Кнопка закрытия */}
+                    <button
+                        onClick={onClose}
+                        disabled={saving}
+                        className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+                        aria-label="Закрыть"
+                    >
+                        <FaTimes className="w-5 h-5" />
+                    </button>
+
                     <h3 className="text-lg font-semibold mb-4">
                         {user ? 'Редактировать пользователя' : 'Создать пользователя'}
                     </h3>
@@ -484,6 +505,17 @@ interface DeleteUserModalProps {
 const DeleteUserModal: React.FC<DeleteUserModalProps> = ({ user, onClose, onConfirm }) => {
     const [deleting, setDeleting] = useState(false);
 
+    // Обработчик Escape для закрытия модального окна
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && !deleting) {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [onClose, deleting]);
+
     const handleConfirm = async () => {
         setDeleting(true);
         try {
@@ -501,6 +533,16 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({ user, onClose, onConf
                     className="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6"
                     onClick={(e) => e.stopPropagation()}
                 >
+                    {/* Кнопка закрытия */}
+                    <button
+                        onClick={onClose}
+                        disabled={deleting}
+                        className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+                        aria-label="Закрыть"
+                    >
+                        <FaTimes className="w-5 h-5" />
+                    </button>
+
                     <h3 className="text-lg font-semibold mb-4 text-red-600">
                         Удалить пользователя?
                     </h3>
