@@ -150,7 +150,20 @@ const Header: React.FC = () => {
                                         </div>
 
                                         <div className="py-1">
-                                            {userData.role === 'admin' || userData.role === 'moderator' ? (
+                                            <Menu.Item>
+                                                {({ active }) => (
+                                                    <Link
+                                                        to="/profile"
+                                                        className={`${
+                                                            active ? 'bg-gray-100' : ''
+                                                        } flex items-center px-4 py-2 text-sm text-gray-700`}
+                                                    >
+                                                        <FaUser className="mr-3 w-4 h-4 text-gray-400" />
+                                                        Личный кабинет
+                                                    </Link>
+                                                )}
+                                            </Menu.Item>
+                                            {(userData.role === 'admin' || userData.role === 'moderator') && (
                                                 <Menu.Item>
                                                     {({ active }) => (
                                                         <Link
@@ -161,20 +174,6 @@ const Header: React.FC = () => {
                                                         >
                                                             <FaCog className="mr-3 w-4 h-4 text-gray-400" />
                                                             Панель управления
-                                                        </Link>
-                                                    )}
-                                                </Menu.Item>
-                                            ) : (
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <Link
-                                                            to="/profile"
-                                                            className={`${
-                                                                active ? 'bg-gray-100' : ''
-                                                            } flex items-center px-4 py-2 text-sm text-gray-700`}
-                                                        >
-                                                            <FaUser className="mr-3 w-4 h-4 text-gray-400" />
-                                                            Личный кабинет
                                                         </Link>
                                                     )}
                                                 </Menu.Item>
