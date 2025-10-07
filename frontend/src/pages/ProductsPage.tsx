@@ -42,6 +42,11 @@ interface Product {
     alt_text: string;
     is_main: boolean;
   }>;
+  stock_status?: {
+    status: string;
+    text: string;
+    quantity: number | null;
+  };
 }
 
 interface ProductsResponse {
@@ -620,20 +625,34 @@ const ProductsPage: React.FC = () => {
                           </p>
                         )}
                         
-                        <div className="flex items-start justify-between mb-3 gap-2">
-                          <div className="flex-1">
+                        <div className="mb-3">
+                          <div className="mb-1">
                             <span className="text-base font-bold text-emerald-600">
                               {product.price} {product.currency}
                             </span>
-                            <br />
+                          </div>
+                          <div className="flex items-center justify-between gap-2">
                             <span className="text-xs text-gray-500">
                               за {product.unit}
                             </span>
+                            <span className={`text-xs ${
+                              product.stock_status
+                                ? product.stock_status.status === 'in_stock'
+                                  ? 'text-green-600'
+                                  : product.stock_status.status === 'low_stock'
+                                  ? 'text-yellow-600'
+                                  : 'text-red-600'
+                                : product.in_stock
+                                ? 'text-green-600'
+                                : 'text-red-600'
+                            }`}>
+                              {product.stock_status
+                                ? product.stock_status.text
+                                : product.in_stock
+                                ? 'В наличии'
+                                : 'Нет'}
+                            </span>
                           </div>
-                          
-                          <span className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${product.in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                            {product.in_stock ? 'В наличии' : 'Нет'}
-                          </span>
                         </div>
                         
                         <div

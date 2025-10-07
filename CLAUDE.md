@@ -25,8 +25,8 @@
 - Axios (HTTP клиент)
 
 **Инфраструктура:**
-- Docker Compose (4 сервиса: db, redis, backend, frontend)
-- Scheduler сервис для автоматической синхронизации с 1С
+- Docker Compose (5 сервисов: db, redis, backend, frontend, scheduler)
+- Scheduler - отдельный контейнер для автоматической синхронизации с 1С
 
 ## Основные команды
 
@@ -48,6 +48,10 @@ docker-compose down
 # Просмотр логов
 docker-compose logs -f backend
 docker-compose logs -f frontend
+docker-compose logs -f scheduler
+
+# Просмотр логов всех сервисов
+docker-compose logs -f
 ```
 
 ### Команды бэкенда (Django)
@@ -83,18 +87,24 @@ docker-compose exec backend python manage.py collectstatic --noinput
 
 ### Команды фронтенда
 
+Все команды фронтенда выполняются внутри Docker контейнера или локально в директории frontend/:
+
 ```bash
 # Сервер разработки (запускается автоматически в Docker)
-npm run dev
+docker-compose exec frontend npm run dev
+# или локально:
+cd frontend && npm run dev
 
 # Сборка для продакшена
-npm run build
+docker-compose exec frontend npm run build
+# или локально:
+cd frontend && npm run build
 
 # Линтинг
-npm run lint
+docker-compose exec frontend npm run lint
 
 # Предпросмотр production сборки
-npm run preview
+docker-compose exec frontend npm run preview
 ```
 
 ### Полная настройка проекта
@@ -124,7 +134,9 @@ backend/
 │   ├── products/       # Модели товаров, админка
 │   ├── categories/     # Иерархия категорий
 │   ├── sync1c/         # Интеграция с 1С (сервис импорта, планировщик, модели)
+│   │   └── management/commands/  # import_1c_data, run_scheduler, reset_import_status
 │   ├── api/            # REST API (views, serializers, filters, URLs)
+│   ├── users/          # Кастомная модель пользователя с ролями
 │   └── core/           # Настройки сайта, общие модели
 ├── config/
 │   ├── settings.py     # Настройки Django
@@ -133,6 +145,7 @@ backend/
 ```
 
 **Основные модели:**
+- `User` (apps/users): Кастомная модель пользователя с полем role (user/moderator/admin)
 - `Product`: code (уникальный), name, price, stock_quantity, in_stock, category FK, images (через ProductImage), prices_data JSONField, stocks_data JSONField, source FK
 - `ProductImage`: product FK, image FileField, file_hash (для дедупликации), display_order
 - `Category`: code_1c (уникальный), name, slug, parent FK (самоссылающаяся иерархия), is_visible_on_site
@@ -228,6 +241,7 @@ frontend/src/
 ### Настройки Django
 
 Ключевые настройки в [backend/config/settings.py](backend/config/settings.py):
+- `AUTH_USER_MODEL = 'users.User'` - кастомная модель пользователя
 - `SYNC_1C_SETTINGS`: JSON_FILE_PATH, MEDIA_DIR_PATH, BATCH_SIZE, AUTO_SYNC_INTERVAL
 - `GOODS_DATA_DIR = BASE_DIR / 'goods_data'`
 - `CORS_ALLOW_ALL_ORIGINS = True` (разработка)

@@ -332,18 +332,28 @@ class Product(models.Model):
             return site_settings.default_low_stock_threshold
         return self.low_stock_threshold
     
+    def format_quantity(self, quantity):
+        """Форматирование количества в зависимости от единицы измерения."""
+        if self.unit == 'кг':
+            # Для килограммов - 3 знака после запятой
+            return f'{float(quantity):.3f}'
+        else:
+            # Для штучных товаров - целое число
+            return str(int(round(float(quantity))))
+
     def get_stock_status(self):
         """Получить статус остатков с учетом настроек."""
         display_style = self.get_effective_stock_display_style()
         threshold = self.get_effective_low_stock_threshold()
-        
+
         if not self.in_stock or self.stock_quantity <= 0:
             return {'status': 'out_of_stock', 'text': 'Нет в наличии', 'quantity': 0}
-        
+
         if display_style == 'exact':
+            formatted_qty = self.format_quantity(self.stock_quantity)
             return {
-                'status': 'in_stock', 
-                'text': f'{self.stock_quantity} {self.unit}', 
+                'status': 'in_stock',
+                'text': f'{formatted_qty} {self.unit}',
                 'quantity': self.stock_quantity
             }
         elif display_style == 'status':
@@ -353,7 +363,7 @@ class Product(models.Model):
                 return {'status': 'low_stock', 'text': 'Мало', 'quantity': None}
             else:
                 return {'status': 'in_stock', 'text': 'В наличии', 'quantity': None}
-        
+
         # Fallback
         return {'status': 'in_stock', 'text': 'В наличии', 'quantity': None}
 
