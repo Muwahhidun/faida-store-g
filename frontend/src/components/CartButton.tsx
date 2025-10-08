@@ -79,14 +79,14 @@ const CartButton: React.FC<CartButtonProps> = ({
     md: {
       button: 'px-3 py-2 text-sm',
       icon: 'w-4 h-4',
-      counter: 'px-2 py-2 text-sm min-w-[70px]',
+      counter: 'px-2 py-2 text-sm min-w-[70px] flex-1',
       counterButton: 'w-8 h-8 flex-shrink-0',
       counterIcon: 'w-4 h-4',
     },
     lg: {
       button: 'px-6 py-3 text-base',
       icon: 'w-5 h-5',
-      counter: 'px-4 py-3 text-base min-w-[90px]',
+      counter: 'px-4 py-3 text-base min-w-[90px] flex-1',
       counterButton: 'w-12 h-12 flex-shrink-0',
       counterIcon: 'w-5 h-5',
     },
@@ -122,7 +122,7 @@ const CartButton: React.FC<CartButtonProps> = ({
     );
   }
 
-  // Счетчик с кнопками удаления, -, + 
+  // Счетчик с кнопками удаления, -, +
   return (
     <div className={`flex items-center ${className}`}>
       <button
