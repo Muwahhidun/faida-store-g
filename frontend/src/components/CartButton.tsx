@@ -24,13 +24,26 @@ interface CartButtonProps {
   className?: string;
 }
 
-const CartButton: React.FC<CartButtonProps> = ({ 
-  product, 
-  size = 'md', 
-  className = '' 
+const CartButton: React.FC<CartButtonProps> = ({
+  product,
+  size = 'md',
+  className = ''
 }) => {
   const { addItem, updateQuantity, getItemQuantity, removeItem } = useCart();
   const quantity = getItemQuantity(product.id);
+
+  const formatQuantity = (qty: number, unit: string) => {
+    // Для штук - целое число
+    if (unit === 'шт' || unit === 'шт.') {
+      return Math.floor(qty).toString();
+    }
+    // Для веса (кг, г) - 3 знака после запятой
+    if (unit === 'кг' || unit === 'г' || unit === 'кг.' || unit === 'г.') {
+      return qty.toFixed(3);
+    }
+    // По умолчанию - 3 знака
+    return qty.toFixed(3);
+  };
 
   const handleAddToCart = () => {
     addItem({
@@ -59,21 +72,21 @@ const CartButton: React.FC<CartButtonProps> = ({
     sm: {
       button: 'px-2 py-1 text-xs',
       icon: 'w-3 h-3',
-      counter: 'px-2 py-1 text-xs',
+      counter: 'px-2 py-1 text-xs min-w-[50px]',
       counterButton: 'w-6 h-6',
       counterIcon: 'w-3 h-3',
     },
     md: {
       button: 'px-3 py-2 text-sm',
       icon: 'w-4 h-4',
-      counter: 'px-2 py-2 text-sm flex-1',
+      counter: 'px-2 py-2 text-sm min-w-[70px]',
       counterButton: 'w-8 h-8 flex-shrink-0',
       counterIcon: 'w-4 h-4',
     },
     lg: {
       button: 'px-6 py-3 text-base',
       icon: 'w-5 h-5',
-      counter: 'px-4 py-3 text-base flex-1',
+      counter: 'px-4 py-3 text-base min-w-[90px]',
       counterButton: 'w-12 h-12 flex-shrink-0',
       counterIcon: 'w-5 h-5',
     },
@@ -128,7 +141,7 @@ const CartButton: React.FC<CartButtonProps> = ({
       </button>
       
       <div className={`flex items-center justify-center bg-white border-t border-b border-gray-300 font-medium text-gray-900 ${sizes.counter}`}>
-        {quantity}
+        {formatQuantity(quantity, product.unit)}
       </div>
       
       <button

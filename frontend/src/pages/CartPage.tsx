@@ -5,15 +5,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { 
-  ShoppingCartIcon, 
-  TrashIcon, 
-  PlusIcon, 
-  MinusIcon,
-  ArrowLeftIcon 
+import {
+  ShoppingCartIcon,
+  TrashIcon,
+  ArrowLeftIcon
 } from '@heroicons/react/24/outline';
 import { useCart } from '../contexts/CartContext';
 import ProductImage from '../components/ProductImage';
+import CartButton from '../components/CartButton';
 
 const CartPage: React.FC = () => {
   const { 
@@ -36,6 +35,23 @@ const CartPage: React.FC = () => {
   const formatPrice = (price: number | string, currency: string) => {
     const numPrice = typeof price === 'string' ? parseFloat(price) : price;
     return `${(numPrice || 0).toFixed(2)} ${currency}`;
+  };
+
+  const formatQuantity = (quantity: number | string, unit: string) => {
+    const numQuantity = typeof quantity === 'string' ? parseFloat(quantity) : quantity;
+
+    // Для штук - целое число
+    if (unit === 'шт' || unit === 'шт.') {
+      return Math.floor(numQuantity).toString();
+    }
+
+    // Для веса (кг, г) - 3 знака после запятой
+    if (unit === 'кг' || unit === 'г' || unit === 'кг.' || unit === 'г.') {
+      return numQuantity.toFixed(3);
+    }
+
+    // По умолчанию - 3 знака
+    return numQuantity.toFixed(3);
   };
 
   if (items.length === 0) {
@@ -135,7 +151,7 @@ const CartPage: React.FC = () => {
                         <div className="mt-2">
                           {item.in_stock ? (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              В наличии ({item.stock_quantity} {item.unit})
+                              В наличии ({formatQuantity(item.stock_quantity, item.unit)} {item.unit})
                             </span>
                           ) : (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
@@ -144,39 +160,24 @@ const CartPage: React.FC = () => {
                           )}
                         </div>
                       </div>
-
-                      {/* Кнопка удаления */}
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className="flex-shrink-0 p-1 text-gray-400 hover:text-red-500 transition-colors ml-4"
-                        title="Удалить товар"
-                      >
-                        <TrashIcon className="w-5 h-5" />
-                      </button>
                     </div>
 
                     {/* Управление количеством */}
                     <div className="flex items-center justify-between mt-4">
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                          className="flex items-center justify-center w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 rounded-lg transition-colors"
-                        >
-                          <MinusIcon className="w-4 h-4" />
-                        </button>
-                        
-                        <div className="flex items-center justify-center bg-white border-t border-b border-gray-300 font-medium text-gray-900 min-w-[60px] px-3 py-2">
-                          {item.quantity}
-                        </div>
-                        
-                        <button
-                          onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                          disabled={item.quantity >= item.stock_quantity}
-                          className="flex items-center justify-center w-8 h-8 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white border border-emerald-600 disabled:border-gray-300 rounded-lg transition-colors"
-                        >
-                          <PlusIcon className="w-4 h-4" />
-                        </button>
-                      </div>
+                      <CartButton
+                        product={{
+                          id: item.id,
+                          name: item.name,
+                          price: item.price,
+                          currency: item.currency,
+                          in_stock: item.in_stock,
+                          stock_quantity: item.stock_quantity,
+                          unit: item.unit,
+                          is_weighted: item.is_weighted || false,
+                          main_image: item.image
+                        }}
+                        size="md"
+                      />
 
                       {/* Общая стоимость позиции */}
                       <div className="text-right">
@@ -185,7 +186,7 @@ const CartPage: React.FC = () => {
                         </p>
                         {item.quantity > 1 && (
                           <p className="text-sm text-gray-500">
-                            {formatPrice(item.price, item.currency)} × {item.quantity}
+                            {formatPrice(item.price, item.currency)} × {formatQuantity(item.quantity, item.unit)}
                           </p>
                         )}
                       </div>
