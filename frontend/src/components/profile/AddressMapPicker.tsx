@@ -142,8 +142,9 @@ const AddressMapPicker: React.FC<AddressMapPickerProps> = ({
 
         onAddressSelect(addressData);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка геокодирования:', error);
+      console.error('Детали ошибки:', error?.message, error?.toString());
       setAddress('Не удалось определить адрес');
     }
   };
@@ -173,8 +174,9 @@ const AddressMapPicker: React.FC<AddressMapPickerProps> = ({
           await geocodeCoordinates(coords as [number, number]);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка поиска адреса:', error);
+      console.error('Детали ошибки поиска:', error?.message, error?.toString());
     } finally {
       setIsSearching(false);
     }

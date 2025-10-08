@@ -3,12 +3,15 @@ import { FaMapMarkerAlt, FaPlus, FaEdit, FaTrash, FaStar } from 'react-icons/fa'
 import { addressApi } from '@/api/client';
 import { toast } from 'react-hot-toast';
 import AddEditAddressModal from './AddEditAddressModal';
+import DeleteAddressModal from './DeleteAddressModal';
 
 const AddressesSection: React.FC = () => {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<any>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingAddress, setDeletingAddress] = useState<any>(null);
 
   const loadAddresses = async () => {
     try {
@@ -36,13 +39,16 @@ const AddressesSection: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteAddress = async (id: number) => {
-    if (!confirm('Вы уверены, что хотите удалить этот адрес?')) {
-      return;
-    }
+  const handleDeleteClick = (address: any) => {
+    setDeletingAddress(address);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingAddress) return;
 
     try {
-      await addressApi.deleteAddress(id);
+      await addressApi.deleteAddress(deletingAddress.id);
       toast.success('Адрес успешно удален');
       loadAddresses();
     } catch (error: any) {
@@ -167,7 +173,7 @@ const AddressesSection: React.FC = () => {
                     <FaEdit className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleDeleteAddress(address.id)}
+                    onClick={() => handleDeleteClick(address)}
                     className="p-2 text-gray-400 hover:text-red-600 transition"
                     title="Удалить"
                   >
@@ -189,6 +195,17 @@ const AddressesSection: React.FC = () => {
         }}
         address={editingAddress}
         onSuccess={loadAddresses}
+      />
+
+      {/* Модалка подтверждения удаления */}
+      <DeleteAddressModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingAddress(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        addressName={deletingAddress?.full_address || ''}
       />
     </div>
   );
