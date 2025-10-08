@@ -5,6 +5,7 @@
 import React, { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { Toaster } from 'react-hot-toast';
 
 // Layout компоненты
 import Layout from './components/Layout';
@@ -29,6 +30,7 @@ const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <CartProvider>
+        <Toaster position="top-right" />
         <Helmet
         defaultTitle="Faida Group Store - Качественные халяль продукты"
         titleTemplate="%s | Faida Group Store"

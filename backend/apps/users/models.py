@@ -57,3 +57,110 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
+
+
+class DeliveryAddress(models.Model):
+    """
+    Модель адреса доставки пользователя с координатами.
+    """
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='delivery_addresses',
+        verbose_name='Пользователь'
+    )
+
+    # Основные поля адреса (заполняются автоматически с карты)
+    full_address = models.CharField(
+        max_length=500,
+        verbose_name='Полный адрес'
+    )
+    city = models.CharField(
+        max_length=100,
+        verbose_name='Город'
+    )
+    street = models.CharField(
+        max_length=200,
+        verbose_name='Улица'
+    )
+    house = models.CharField(
+        max_length=20,
+        verbose_name='Номер дома'
+    )
+
+    # Дополнительные поля (пользователь вводит сам)
+    apartment = models.CharField(
+        max_length=20,
+        blank=True,
+        verbose_name='Квартира'
+    )
+    entrance = models.CharField(
+        max_length=10,
+        blank=True,
+        verbose_name='Подъезд'
+    )
+    floor = models.CharField(
+        max_length=10,
+        blank=True,
+        verbose_name='Этаж'
+    )
+    comment = models.TextField(
+        blank=True,
+        verbose_name='Комментарий'
+    )
+
+    # Координаты (обязательные)
+    # max_digits=11, decimal_places=8 дает точность ~1мм (вполне достаточно для адресов)
+    # Пример: 42.86550099 (2 цифры до точки + 8 после = 10, с запасом 11)
+    latitude = models.DecimalField(
+        max_digits=11,
+        decimal_places=8,
+        verbose_name='Широта'
+    )
+    longitude = models.DecimalField(
+        max_digits=11,
+        decimal_places=8,
+        verbose_name='Долгота'
+    )
+
+    # Метки
+    label = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name='Метка адреса'
+    )
+    is_default = models.BooleanField(
+        default=False,
+        verbose_name='Основной адрес'
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата создания'
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Дата обновления'
+    )
+
+    class Meta:
+        verbose_name = 'Адрес доставки'
+        verbose_name_plural = 'Адреса доставки'
+        ordering = ['-is_default', '-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.full_address}"
+
+    def save(self, *args, **kwargs):
+        """
+        Если адрес устанавливается как основной,
+        снимаем флаг is_default со всех других адресов пользователя.
+        """
+        if self.is_default:
+            DeliveryAddress.objects.filter(
+                user=self.user,
+                is_default=True
+            ).exclude(pk=self.pk).update(is_default=False)
+
+        super().save(*args, **kwargs)

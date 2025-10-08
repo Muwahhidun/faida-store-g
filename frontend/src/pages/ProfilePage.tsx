@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaUser, FaShoppingBag, FaMapMarkerAlt, FaSignOutAlt } from 'react-icons/fa';
 import { Toast } from '../components/Toast';
 import { ProfileSection } from '../components/profile/ProfileSection';
+import AddressesSection from '../components/profile/AddressesSection';
 
 /**
  * Личный кабинет пользователя
@@ -197,11 +198,7 @@ const ProfilePage: React.FC = () => {
                     )}
 
                     {selectedTab === 'addresses' && (
-                        <div className="text-center py-12">
-                            <FaMapMarkerAlt className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Адреса доставки</h3>
-                            <p className="text-gray-600">Функционал адресов будет доступен скоро</p>
-                        </div>
+                        <AddressesSection />
                     )}
                 </div>
             </div>

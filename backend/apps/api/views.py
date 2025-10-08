@@ -22,12 +22,12 @@ from apps.products.models import Product, ProductImage
 from apps.categories.models import Category
 from apps.core.models import SiteSettings
 from apps.sync1c.models import IntegrationSource, SyncLog
-from apps.users.models import User
+from apps.users.models import User, DeliveryAddress
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer, ProductImageSerializer,
     CategorySerializer, CategoryDetailSerializer,
     SiteSettingsSerializer, IntegrationSourceSerializer, CategoryManagementSerializer,
-    ProductManagementSerializer, SyncLogSerializer, UserSerializer
+    ProductManagementSerializer, SyncLogSerializer, UserSerializer, DeliveryAddressSerializer
 )
 from .filters import ProductFilter, CategoryFilter
 
@@ -874,3 +874,39 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     Использует CustomTokenObtainPairSerializer для добавления роли пользователя в токен.
     """
     serializer_class = CustomTokenObtainPairSerializer
+
+
+class DeliveryAddressViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet для управления адресами доставки пользователя.
+    Пользователь может просматривать только свои адреса.
+    """
+    serializer_class = DeliveryAddressSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = None  # Отключаем пагинацию для адресов
+
+    def get_queryset(self):
+        """Возвращает только адреса текущего пользователя."""
+        return DeliveryAddress.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        """Автоматически привязывает адрес к текущему пользователю."""
+        serializer.save(user=self.request.user)
+
+    @action(detail=True, methods=['post'])
+    def set_default(self, request, pk=None):
+        """Установить адрес как основной."""
+        address = self.get_object()
+
+        # Снять is_default со всех адресов пользователя
+        DeliveryAddress.objects.filter(
+            user=request.user,
+            is_default=True
+        ).update(is_default=False)
+
+        # Установить текущий адрес как основной
+        address.is_default = True
+        address.save()
+
+        serializer = self.get_serializer(address)
+        return Response(serializer.data)

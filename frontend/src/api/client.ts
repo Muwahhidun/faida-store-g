@@ -166,6 +166,100 @@ export const profileApi = {
   },
 };
 
+// API методы для адресов доставки
+export const addressApi = {
+  // Получить список адресов текущего пользователя
+  getAddresses: async (): Promise<any[]> => {
+    const token = localStorage.getItem('access_token');
+    const response = await apiClient.get('/delivery-addresses/', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+  // Получить адрес по ID
+  getAddress: async (id: number): Promise<any> => {
+    const token = localStorage.getItem('access_token');
+    const response = await apiClient.get(`/delivery-addresses/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+  // Создать новый адрес
+  createAddress: async (data: {
+    full_address: string;
+    city: string;
+    street: string;
+    house: string;
+    apartment?: string;
+    entrance?: string;
+    floor?: string;
+    comment?: string;
+    latitude: number;
+    longitude: number;
+    label?: string;
+    is_default?: boolean;
+  }): Promise<any> => {
+    const token = localStorage.getItem('access_token');
+    const response = await apiClient.post('/delivery-addresses/', data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+  // Обновить адрес
+  updateAddress: async (id: number, data: {
+    full_address?: string;
+    city?: string;
+    street?: string;
+    house?: string;
+    apartment?: string;
+    entrance?: string;
+    floor?: string;
+    comment?: string;
+    latitude?: number;
+    longitude?: number;
+    label?: string;
+    is_default?: boolean;
+  }): Promise<any> => {
+    const token = localStorage.getItem('access_token');
+    const response = await apiClient.patch(`/delivery-addresses/${id}/`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+  // Удалить адрес
+  deleteAddress: async (id: number): Promise<void> => {
+    const token = localStorage.getItem('access_token');
+    await apiClient.delete(`/delivery-addresses/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  // Установить адрес как основной
+  setDefaultAddress: async (id: number): Promise<any> => {
+    const token = localStorage.getItem('access_token');
+    const response = await apiClient.post(`/delivery-addresses/${id}/set_default/`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+};
+
 // Общие API методы
 export const commonApi = {
   // Получить информацию об API

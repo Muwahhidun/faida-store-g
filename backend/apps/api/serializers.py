@@ -7,7 +7,7 @@ from apps.products.models import Product, ProductImage
 from apps.categories.models import Category
 from apps.core.models import SiteSettings
 from apps.sync1c.models import IntegrationSource, SyncLog
-from apps.users.models import User
+from apps.users.models import User, DeliveryAddress
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -379,3 +379,17 @@ class UserSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class DeliveryAddressSerializer(serializers.ModelSerializer):
+    """Сериализатор для адресов доставки."""
+
+    class Meta:
+        model = DeliveryAddress
+        fields = (
+            'id', 'user', 'full_address', 'city', 'street', 'house',
+            'apartment', 'entrance', 'floor', 'comment',
+            'latitude', 'longitude', 'label', 'is_default',
+            'created_at', 'updated_at'
+        )
+        read_only_fields = ('id', 'user', 'created_at', 'updated_at')
