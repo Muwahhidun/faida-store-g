@@ -1,5 +1,5 @@
 /**
- * Главная страница сайта.
+ * Страница "О компании".
  */
 
 import React from 'react';
@@ -10,8 +10,8 @@ const HomePage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Главная</title>
-        <meta name="description" content="Faida Group - качественные халяль продукты с доставкой по России" />
+        <title>О компании</title>
+        <meta name="description" content="Faida Group - качественные халяль продукты с доставкой по Дагестану" />
       </Helmet>
 
       {/* Hero секция */}

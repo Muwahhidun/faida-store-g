@@ -86,37 +86,45 @@ const Header: React.FC = () => {
                     
                     {/* Навигация */}
                     <nav className="hidden md:flex items-center space-x-8">
-                        <NavLink 
-                            to="/" 
-                            className={({ isActive }) => 
+                        <NavLink
+                            to="/"
+                            className={({ isActive }) =>
                                 `nav-link ${isActive ? 'nav-link-active' : ''}`
                             }
                         >
-                            Главная
+                            О компании
                         </NavLink>
-                        <NavLink 
-                            to="/products" 
-                            className={({ isActive }) => 
+                        <NavLink
+                            to="/products"
+                            className={({ isActive }) =>
                                 `nav-link ${isActive ? 'nav-link-active' : ''}`
                             }
                         >
                             Каталог
                         </NavLink>
-                        <NavLink 
-                            to="/about" 
-                            className={({ isActive }) => 
+                        <NavLink
+                            to="/news"
+                            className={({ isActive }) =>
                                 `nav-link ${isActive ? 'nav-link-active' : ''}`
                             }
                         >
-                            О нас
+                            Новости
                         </NavLink>
-                        <NavLink 
-                            to="/contacts" 
-                            className={({ isActive }) => 
+                        <NavLink
+                            to="/contacts"
+                            className={({ isActive }) =>
                                 `nav-link ${isActive ? 'nav-link-active' : ''}`
                             }
                         >
                             Контакты
+                        </NavLink>
+                        <NavLink
+                            to="/jobs"
+                            className={({ isActive }) =>
+                                `nav-link ${isActive ? 'nav-link-active' : ''}`
+                            }
+                        >
+                            Вакансии
                         </NavLink>
                     </nav>
                     

@@ -18,6 +18,9 @@ import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CategoryPage from './pages/CategoryPage';
+import NewsPage from './pages/NewsPage';
+import ContactsPage from './pages/ContactsPage';
+import JobsPage from './pages/JobsPage';
 import ImageTest from './pages/ImageTest';
 import NotFoundPage from './pages/NotFoundPage';
 import LoginPage from "./pages/LoginPage";
@@ -66,7 +69,16 @@ const App: React.FC = () => {
             
             {/* Категории */}
             <Route path="/category/:slug" element={<CategoryPage />} />
-            
+
+            {/* Новости */}
+            <Route path="/news" element={<NewsPage />} />
+
+            {/* Контакты и доставка */}
+            <Route path="/contacts" element={<ContactsPage />} />
+
+            {/* Вакансии */}
+            <Route path="/jobs" element={<JobsPage />} />
+
             {/* Тест изображений */}
             <Route path="/test-images" element={<ImageTest />} />
             <Route path="/login" element={<LoginPage />} />
