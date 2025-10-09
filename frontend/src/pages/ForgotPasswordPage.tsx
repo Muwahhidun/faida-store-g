@@ -95,8 +95,12 @@ const ForgotPasswordPage: React.FC = () => {
                                         type="email"
                                         id="email"
                                         value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className="input pl-10"
+                                        onChange={(e) => {
+                                            setEmail(e.target.value);
+                                            // Очистка ошибки при вводе
+                                            if (error) setError('');
+                                        }}
+                                        className={`input pl-10 ${error ? 'border-red-500' : ''}`}
                                         placeholder="Введите ваш email"
                                         autoComplete="email"
                                         required
