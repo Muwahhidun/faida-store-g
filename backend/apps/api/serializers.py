@@ -454,10 +454,11 @@ class JobCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
         fields = (
-            'title', 'short_description', 'content', 'content_delta', 'preview_image',
+            'slug', 'title', 'short_description', 'content', 'content_delta', 'preview_image',
             'employment_type', 'location', 'work_schedule', 'salary_from', 'salary_to',
             'hr_email', 'hr_phone', 'is_active', 'is_closed'
         )
+        read_only_fields = ('slug',)
 
     def update(self, instance, validated_data):
         """
@@ -537,9 +538,10 @@ class NewsCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = (
-            'title', 'category', 'short_description', 'content', 'content_delta',
+            'slug', 'title', 'category', 'short_description', 'content', 'content_delta',
             'preview_image', 'is_published', 'published_at'
         )
+        read_only_fields = ('slug',)
 
     def update(self, instance, validated_data):
         """
