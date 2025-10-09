@@ -77,7 +77,33 @@ export default {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
         'heading': ['Poppins', 'system-ui', 'sans-serif'],
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            lineHeight: '1.25',
+            p: {
+              lineHeight: '1.25',
+            },
+            li: {
+              lineHeight: '1.25',
+            },
+          },
+        },
+        lg: {
+          css: {
+            lineHeight: '1.25',
+            p: {
+              lineHeight: '1.25',
+            },
+            li: {
+              lineHeight: '1.25',
+            },
+          },
+        },
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }

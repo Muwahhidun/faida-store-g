@@ -214,3 +214,60 @@ export interface ModalProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
 }
+
+// Вакансии
+export interface JobMedia {
+  id: number;
+  media_type: 'image' | 'video';
+  file?: string;
+  video_url?: string;
+  caption: string;
+  display_order: number;
+  created_at: string;
+}
+
+export interface JobListItem {
+  id: number;
+  title: string;
+  slug: string;
+  short_description: string;
+  employment_type: 'full_time' | 'part_time' | 'remote' | 'internship';
+  employment_type_display: string;
+  location: string;
+  work_schedule: string;
+  salary_from?: number;
+  salary_to?: number;
+  is_active: boolean;
+  is_closed: boolean;
+  author_name?: string;
+  preview_image?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JobDetail extends JobListItem {
+  content: string;  // HTML контент
+  content_delta?: any;  // Quill Delta формат
+  preview_image?: string | null;
+  author?: number;
+  media: JobMedia[];
+  hr_email: string;
+  hr_phone: string;
+}
+
+export interface JobFormData {
+  title: string;
+  short_description: string;
+  content: string;
+  content_delta?: any;  // Quill Delta формат
+  preview_image?: File | string | null;
+  employment_type: 'full_time' | 'part_time' | 'remote' | 'internship';
+  location: string;
+  work_schedule: string;
+  salary_from?: number;
+  salary_to?: number;
+  hr_email: string;
+  hr_phone: string;
+  is_active: boolean;
+  is_closed: boolean;
+}

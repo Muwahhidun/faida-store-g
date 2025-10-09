@@ -23,9 +23,25 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
+// Интерцептор для добавления токена авторизации
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Интерцептор для обработки ошибок
 apiClient.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response: AxiosResponse) => {
+    return response;
+  },
   (error: AxiosError) => {
     const apiError: ApiError = {
       message: 'Произошла ошибка при выполнении запроса',
@@ -41,13 +57,16 @@ apiClient.interceptors.response.use(
       } else if (typeof data === 'string') {
         apiError.message = data;
       }
-      
+
       if (data.errors) {
         apiError.details = data.errors;
       }
     } else if (error.message) {
       apiError.message = error.message;
     }
+
+    // Сохраняем оригинальный объект ошибки для дебага
+    (apiError as any).originalError = error;
 
     return Promise.reject(apiError);
   }

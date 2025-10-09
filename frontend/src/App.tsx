@@ -21,6 +21,8 @@ import CategoryPage from './pages/CategoryPage';
 import NewsPage from './pages/NewsPage';
 import ContactsPage from './pages/ContactsPage';
 import JobsPage from './pages/JobsPage';
+import JobDetailPage from './pages/JobDetailPage';
+import JobEditorPage from './pages/JobEditorPage';
 import ImageTest from './pages/ImageTest';
 import NotFoundPage from './pages/NotFoundPage';
 import LoginPage from "./pages/LoginPage";
@@ -78,6 +80,15 @@ const App: React.FC = () => {
 
             {/* Вакансии */}
             <Route path="/jobs" element={<JobsPage />} />
+
+            {/* Создание и редактирование вакансий (защищенные маршруты, должны быть ДО :slug) */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/jobs/new" element={<JobEditorPage />} />
+              <Route path="/jobs/edit/:slug" element={<JobEditorPage />} />
+            </Route>
+
+            {/* Детальная страница вакансии (последняя, чтобы не конфликтовать) */}
+            <Route path="/jobs/:slug" element={<JobDetailPage />} />
 
             {/* Тест изображений */}
             <Route path="/test-images" element={<ImageTest />} />

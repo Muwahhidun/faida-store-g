@@ -127,7 +127,7 @@ const Header: React.FC = () => {
                             Вакансии
                         </NavLink>
                     </nav>
-                    
+
                     {/* Действия */}
                     <div className="flex items-center space-x-4">
                         {/* Dropdown меню пользователя */}

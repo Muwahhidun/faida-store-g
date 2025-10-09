@@ -8,6 +8,7 @@ from apps.categories.models import Category
 from apps.core.models import SiteSettings
 from apps.sync1c.models import IntegrationSource, SyncLog
 from apps.users.models import User, DeliveryAddress
+from apps.jobs.models import Job, JobMedia
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -163,7 +164,7 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteSettings
         fields = [
-            'min_stock_for_display', 'default_stock_display_style', 
+            'min_stock_for_display', 'default_stock_display_style',
             'default_low_stock_threshold', 'show_stock_quantities_globally'
         ]
 
@@ -393,3 +394,79 @@ class DeliveryAddressSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at'
         )
         read_only_fields = ('id', 'user', 'created_at', 'updated_at')
+
+
+class JobMediaSerializer(serializers.ModelSerializer):
+    """Сериализатор для медиа-файлов вакансии."""
+
+    class Meta:
+        model = JobMedia
+        fields = (
+            'id', 'media_type', 'file', 'video_url', 'caption', 'display_order', 'created_at'
+        )
+
+
+class JobListSerializer(serializers.ModelSerializer):
+    """Сериализатор для списка вакансий."""
+
+    employment_type_display = serializers.CharField(source='get_employment_type_display', read_only=True)
+    author_name = serializers.CharField(source='author.username', read_only=True)
+    preview_image = serializers.SerializerMethodField()
+
+    def get_preview_image(self, obj):
+        """Получить превью изображение."""
+        return obj.get_preview_image_url()
+
+    class Meta:
+        model = Job
+        fields = (
+            'id', 'title', 'slug', 'short_description', 'employment_type',
+            'employment_type_display', 'location', 'work_schedule', 'salary_from', 'salary_to',
+            'is_active', 'is_closed', 'author_name', 'preview_image', 'created_at', 'updated_at'
+        )
+
+
+class JobDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для детального просмотра вакансии."""
+
+    employment_type_display = serializers.CharField(source='get_employment_type_display', read_only=True)
+    author_name = serializers.CharField(source='author.username', read_only=True)
+    media = JobMediaSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Job
+        fields = (
+            'id', 'title', 'slug', 'short_description', 'content', 'content_delta', 'preview_image',
+            'employment_type', 'employment_type_display', 'location', 'work_schedule',
+            'salary_from', 'salary_to', 'hr_email', 'hr_phone',
+            'is_active', 'is_closed', 'author', 'author_name',
+            'media', 'created_at', 'updated_at'
+        )
+        read_only_fields = ('id', 'slug', 'author', 'created_at', 'updated_at')
+
+
+class JobCreateUpdateSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания и редактирования вакансии."""
+
+    preview_image = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = Job
+        fields = (
+            'title', 'short_description', 'content', 'content_delta', 'preview_image',
+            'employment_type', 'location', 'work_schedule', 'salary_from', 'salary_to',
+            'hr_email', 'hr_phone', 'is_active', 'is_closed'
+        )
+
+    def update(self, instance, validated_data):
+        """
+        Обновление вакансии с правильной обработкой изображения.
+        Если preview_image не передан - сохраняем существующее.
+        """
+        # Если preview_image пришло как пустая строка - это команда удалить изображение
+        if validated_data.get('preview_image') == '':
+            if instance.preview_image:
+                instance.preview_image.delete(save=False)
+            validated_data['preview_image'] = None
+
+        return super().update(instance, validated_data)

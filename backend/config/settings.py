@@ -40,6 +40,7 @@ LOCAL_APPS = [
     'apps.sync1c',
     'apps.api',
     'apps.core',
+    'apps.jobs',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -151,6 +152,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework.parsers.FormParser',
+    ],
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
@@ -254,3 +260,7 @@ LOGGING = {
         },
     },
 }
+
+# Настройки загрузки файлов
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB в байтах
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB в байтах

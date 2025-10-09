@@ -23,11 +23,13 @@ from apps.categories.models import Category
 from apps.core.models import SiteSettings
 from apps.sync1c.models import IntegrationSource, SyncLog
 from apps.users.models import User, DeliveryAddress
+from apps.jobs.models import Job, JobMedia
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer, ProductImageSerializer,
     CategorySerializer, CategoryDetailSerializer,
     SiteSettingsSerializer, IntegrationSourceSerializer, CategoryManagementSerializer,
-    ProductManagementSerializer, SyncLogSerializer, UserSerializer, DeliveryAddressSerializer
+    ProductManagementSerializer, SyncLogSerializer, UserSerializer, DeliveryAddressSerializer,
+    JobListSerializer, JobDetailSerializer, JobCreateUpdateSerializer, JobMediaSerializer
 )
 from .filters import ProductFilter, CategoryFilter
 
@@ -910,3 +912,62 @@ class DeliveryAddressViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(address)
         return Response(serializer.data)
+
+
+class JobViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet для управления вакансиями.
+
+    Публичные действия (AllowAny):
+    - list: Просмотр списка активных вакансий
+    - retrieve: Детальный просмотр вакансии
+
+    Действия для админов/модераторов:
+    - create: Создание вакансии
+    - update/partial_update: Редактирование вакансии
+    - destroy: Удаление вакансии
+    """
+    permission_classes = [AllowAny]
+    lookup_field = 'slug'  # Используем slug вместо pk для URL
+
+    def get_queryset(self):
+        """Возвращает вакансии в зависимости от прав пользователя."""
+        user = self.request.user
+
+        # Для админов и модераторов показываем все вакансии
+        if user.is_authenticated and (user.role in ['admin', 'moderator']):
+            return Job.objects.select_related('author').prefetch_related('media').all()
+
+        # Для обычных пользователей только активные
+        return Job.objects.filter(is_active=True).select_related('author').prefetch_related('media').all()
+
+    def get_serializer_class(self):
+        """Выбор сериализатора в зависимости от действия."""
+        if self.action == 'retrieve':
+            return JobDetailSerializer
+        elif self.action in ['create', 'update', 'partial_update']:
+            return JobCreateUpdateSerializer
+        return JobListSerializer
+
+    def get_permissions(self):
+        """Настройка permissions в зависимости от действия."""
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            # Только админы и модераторы могут создавать/редактировать/удалять
+            return [permissions.IsAuthenticated(), IsAdminOrModerator()]
+        return [AllowAny()]
+
+    def perform_create(self, serializer):
+        """Автоматически привязываем автора при создании."""
+        serializer.save(author=self.request.user)
+
+
+class IsAdminOrModerator(permissions.BasePermission):
+    """
+    Разрешение только для администраторов и модераторов.
+    """
+    def has_permission(self, request, view):
+        return (
+            request.user and
+            request.user.is_authenticated and
+            request.user.role in ['admin', 'moderator']
+        )
