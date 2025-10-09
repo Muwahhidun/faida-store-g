@@ -24,12 +24,14 @@ from apps.core.models import SiteSettings
 from apps.sync1c.models import IntegrationSource, SyncLog
 from apps.users.models import User, DeliveryAddress
 from apps.jobs.models import Job, JobMedia
+from apps.news.models import News, NewsCategory, NewsMedia
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer, ProductImageSerializer,
     CategorySerializer, CategoryDetailSerializer,
     SiteSettingsSerializer, IntegrationSourceSerializer, CategoryManagementSerializer,
     ProductManagementSerializer, SyncLogSerializer, UserSerializer, DeliveryAddressSerializer,
-    JobListSerializer, JobDetailSerializer, JobCreateUpdateSerializer, JobMediaSerializer
+    JobListSerializer, JobDetailSerializer, JobCreateUpdateSerializer, JobMediaSerializer,
+    NewsListSerializer, NewsDetailSerializer, NewsCreateUpdateSerializer, NewsCategorySerializer, NewsMediaSerializer
 )
 from .filters import ProductFilter, CategoryFilter
 
@@ -971,3 +973,91 @@ class IsAdminOrModerator(permissions.BasePermission):
             request.user.is_authenticated and
             request.user.role in ['admin', 'moderator']
         )
+
+
+class NewsCategoryViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet для управления категориями новостей.
+    Только для админов и модераторов.
+    """
+    queryset = NewsCategory.objects.all()
+    serializer_class = NewsCategorySerializer
+    permission_classes = [IsAdminUser]
+    lookup_field = 'slug'
+
+
+class NewsViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet для управления новостями.
+
+    Публичные действия (AllowAny):
+    - list: Просмотр списка опубликованных новостей
+    - retrieve: Детальный просмотр новости
+
+    Действия для админов/модераторов:
+    - create: Создание новости
+    - update/partial_update: Редактирование новости
+    - destroy: Удаление новости
+    """
+    permission_classes = [AllowAny]
+    lookup_field = 'slug'
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['title', 'short_description', 'content']
+    ordering_fields = ['published_at', 'created_at', 'views_count']
+    ordering = ['-published_at']
+
+    def get_queryset(self):
+        """Возвращает новости в зависимости от прав пользователя."""
+        user = self.request.user
+
+        # Для админов и модераторов показываем все новости
+        if user.is_authenticated and (user.role in ['admin', 'moderator']):
+            return News.objects.select_related('author', 'category').prefetch_related('media').all()
+
+        # Для обычных пользователей только опубликованные
+        return News.objects.filter(is_published=True).select_related('author', 'category').prefetch_related('media').all()
+
+    def get_serializer_class(self):
+        """Выбор сериализатора в зависимости от действия."""
+        if self.action == 'retrieve':
+            return NewsDetailSerializer
+        elif self.action in ['create', 'update', 'partial_update']:
+            return NewsCreateUpdateSerializer
+        return NewsListSerializer
+
+    def get_permissions(self):
+        """Настройка permissions в зависимости от действия."""
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            # Только админы и модераторы могут создавать/редактировать/удалять
+            return [permissions.IsAuthenticated(), IsAdminOrModerator()]
+        return [AllowAny()]
+
+    def perform_create(self, serializer):
+        """Автоматически привязываем автора при создании."""
+        serializer.save(author=self.request.user)
+
+    def retrieve(self, request, *args, **kwargs):
+        """Увеличиваем счетчик просмотров при просмотре новости."""
+        instance = self.get_object()
+
+        # Увеличиваем счетчик просмотров только для обычных пользователей
+        if not (request.user.is_authenticated and request.user.role in ['admin', 'moderator']):
+            instance.views_count += 1
+            instance.save(update_fields=['views_count'])
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def popular(self, request):
+        """Получить популярные новости (топ-10 по просмотрам)."""
+        popular_news = self.get_queryset().order_by('-views_count')[:10]
+        serializer = self.get_serializer(popular_news, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def recent(self, request):
+        """Получить последние новости (топ-10)."""
+        recent_news = self.get_queryset().order_by('-published_at')[:10]
+        serializer = self.get_serializer(recent_news, many=True)
+        return Response(serializer.data)

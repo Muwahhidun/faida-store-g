@@ -19,6 +19,8 @@ import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CategoryPage from './pages/CategoryPage';
 import NewsPage from './pages/NewsPage';
+import NewsDetailPage from './pages/NewsDetailPage';
+import NewsEditorPage from './pages/NewsEditorPage';
 import ContactsPage from './pages/ContactsPage';
 import JobsPage from './pages/JobsPage';
 import JobDetailPage from './pages/JobDetailPage';
@@ -74,6 +76,15 @@ const App: React.FC = () => {
 
             {/* Новости */}
             <Route path="/news" element={<NewsPage />} />
+
+            {/* Создание и редактирование новостей (защищенные маршруты, должны быть ДО :slug) */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/news/new" element={<NewsEditorPage />} />
+              <Route path="/news/edit/:slug" element={<NewsEditorPage />} />
+            </Route>
+
+            {/* Детальная страница новости (последняя, чтобы не конфликтовать) */}
+            <Route path="/news/:slug" element={<NewsDetailPage />} />
 
             {/* Контакты и доставка */}
             <Route path="/contacts" element={<ContactsPage />} />

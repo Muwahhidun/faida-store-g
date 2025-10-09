@@ -271,3 +271,55 @@ export interface JobFormData {
   is_active: boolean;
   is_closed: boolean;
 }
+
+// Новости
+export interface NewsCategory {
+  id: number;
+  name: string;
+  slug: string;
+  display_order: number;
+}
+
+export interface NewsMedia {
+  id: number;
+  media_type: 'image' | 'video';
+  file?: string;
+  video_url?: string;
+  caption: string;
+  display_order: number;
+  created_at: string;
+}
+
+export interface NewsListItem {
+  id: number;
+  title: string;
+  slug: string;
+  category?: number;
+  category_name?: string;
+  short_description: string;
+  preview_image?: string | null;
+  author_name?: string;
+  is_published: boolean;
+  published_at?: string;
+  views_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NewsDetail extends NewsListItem {
+  content: string;  // HTML контент
+  content_delta?: any;  // Quill Delta формат
+  author?: number;
+  media: NewsMedia[];
+}
+
+export interface NewsFormData {
+  title: string;
+  category?: number | null;
+  short_description: string;
+  content: string;
+  content_delta?: any;  // Quill Delta формат
+  preview_image?: File | string | null;
+  is_published: boolean;
+  published_at?: string | null;
+}

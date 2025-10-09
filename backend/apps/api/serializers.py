@@ -9,6 +9,7 @@ from apps.core.models import SiteSettings
 from apps.sync1c.models import IntegrationSource, SyncLog
 from apps.users.models import User, DeliveryAddress
 from apps.jobs.models import Job, JobMedia
+from apps.news.models import News, NewsCategory, NewsMedia
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -461,6 +462,88 @@ class JobCreateUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """
         Обновление вакансии с правильной обработкой изображения.
+        Если preview_image не передан - сохраняем существующее.
+        """
+        # Если preview_image пришло как пустая строка - это команда удалить изображение
+        if validated_data.get('preview_image') == '':
+            if instance.preview_image:
+                instance.preview_image.delete(save=False)
+            validated_data['preview_image'] = None
+
+        return super().update(instance, validated_data)
+
+
+class NewsCategorySerializer(serializers.ModelSerializer):
+    """Сериализатор для категорий новостей."""
+
+    class Meta:
+        model = NewsCategory
+        fields = ('id', 'name', 'slug', 'display_order')
+
+
+class NewsMediaSerializer(serializers.ModelSerializer):
+    """Сериализатор для медиа-файлов новости."""
+
+    class Meta:
+        model = NewsMedia
+        fields = (
+            'id', 'media_type', 'file', 'video_url', 'caption', 'display_order', 'created_at'
+        )
+
+
+class NewsListSerializer(serializers.ModelSerializer):
+    """Сериализатор для списка новостей."""
+
+    category_name = serializers.CharField(source='category.name', read_only=True, allow_null=True)
+    author_name = serializers.CharField(source='author.username', read_only=True)
+    preview_image = serializers.SerializerMethodField()
+
+    def get_preview_image(self, obj):
+        """Получить превью изображение."""
+        return obj.get_preview_image_url()
+
+    class Meta:
+        model = News
+        fields = (
+            'id', 'title', 'slug', 'category', 'category_name', 'short_description',
+            'preview_image', 'author_name', 'is_published', 'published_at',
+            'views_count', 'created_at', 'updated_at'
+        )
+
+
+class NewsDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для детального просмотра новости."""
+
+    category_name = serializers.CharField(source='category.name', read_only=True, allow_null=True)
+    author_name = serializers.CharField(source='author.username', read_only=True)
+    media = NewsMediaSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = News
+        fields = (
+            'id', 'title', 'slug', 'category', 'category_name', 'short_description',
+            'content', 'content_delta', 'preview_image', 'author', 'author_name',
+            'is_published', 'published_at', 'views_count', 'media',
+            'created_at', 'updated_at'
+        )
+        read_only_fields = ('id', 'slug', 'author', 'views_count', 'created_at', 'updated_at')
+
+
+class NewsCreateUpdateSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания и редактирования новости."""
+
+    preview_image = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = News
+        fields = (
+            'title', 'category', 'short_description', 'content', 'content_delta',
+            'preview_image', 'is_published', 'published_at'
+        )
+
+    def update(self, instance, validated_data):
+        """
+        Обновление новости с правильной обработкой изображения.
         Если preview_image не передан - сохраняем существующее.
         """
         # Если preview_image пришло как пустая строка - это команда удалить изображение

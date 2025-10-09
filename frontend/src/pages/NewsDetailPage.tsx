@@ -2,22 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
-  FaMapMarkerAlt,
-  FaMoneyBillWave,
-  FaClock,
   FaCalendarAlt,
+  FaEye,
   FaEdit,
   FaTrash,
   FaArrowLeft,
+  FaTag,
+  FaUser,
 } from 'react-icons/fa';
-import { JobDetail } from '../types';
+import { NewsDetail } from '../types';
 import api from '../api/client';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
-const JobDetailPage: React.FC = () => {
+const NewsDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [job, setJob] = useState<JobDetail | null>(null);
+  const [news, setNews] = useState<NewsDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -26,7 +26,7 @@ const JobDetailPage: React.FC = () => {
 
   useEffect(() => {
     if (slug) {
-      fetchJob();
+      fetchNews();
     }
     checkUserRole();
   }, [slug]);
@@ -51,15 +51,15 @@ const JobDetailPage: React.FC = () => {
     }
   };
 
-  const fetchJob = async () => {
+  const fetchNews = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/jobs/${slug}/`);
-      setJob(response.data);
+      const response = await api.get(`/news/${slug}/`);
+      setNews(response.data);
       setError(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Ошибка загрузки вакансии');
-      console.error('Error fetching job:', err);
+      setError(err.response?.data?.message || 'Ошибка загрузки новости');
+      console.error('Error fetching news:', err);
     } finally {
       setLoading(false);
     }
@@ -70,32 +70,32 @@ const JobDetailPage: React.FC = () => {
   };
 
   const handleDeleteConfirm = async () => {
-    if (!job) return;
+    if (!news) return;
 
     try {
       setDeleting(true);
-      await api.delete(`/jobs/${slug}/`);
-      navigate('/jobs');
+      await api.delete(`/news/${slug}/`);
+      navigate('/news');
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Ошибка удаления вакансии');
-      console.error('Error deleting job:', err);
+      alert(err.response?.data?.message || 'Ошибка удаления новости');
+      console.error('Error deleting news:', err);
       setDeleting(false);
     }
   };
 
-  const formatSalary = () => {
-    if (!job) return '';
-    if (job.salary_from && job.salary_to) {
-      return `${job.salary_from.toLocaleString()} - ${job.salary_to.toLocaleString()} ₽`;
-    } else if (job.salary_from) {
-      return `от ${job.salary_from.toLocaleString()} ₽`;
-    } else if (job.salary_to) {
-      return `до ${job.salary_to.toLocaleString()} ₽`;
-    }
-    return 'По договоренности';
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Не опубликовано';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
-  const canManageJobs = userRole === 'admin' || userRole === 'moderator';
+  const canManageNews = userRole === 'admin' || userRole === 'moderator';
 
   if (loading) {
     return (
@@ -115,13 +115,13 @@ const JobDetailPage: React.FC = () => {
     );
   }
 
-  if (error || !job) {
+  if (error || !news) {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-red-600 text-lg">{error || 'Вакансия не найдена'}</div>
-          <Link to="/jobs" className="text-emerald-600 hover:text-emerald-700 mt-4 inline-block">
-            ← Вернуться к списку вакансий
+          <div className="text-red-600 text-lg">{error || 'Новость не найдена'}</div>
+          <Link to="/news" className="text-emerald-600 hover:text-emerald-700 mt-4 inline-block">
+            ← Вернуться к новостям
           </Link>
         </div>
       </div>
@@ -131,48 +131,62 @@ const JobDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <Helmet>
-        <title>{job.title} - Вакансии Faida Group</title>
-        <meta name="description" content={job.short_description} />
+        <title>{news.title} - Новости Faida Group</title>
+        <meta name="description" content={news.short_description} />
       </Helmet>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Навигация */}
         <div className="mb-6">
           <Link
-            to="/jobs"
+            to="/news"
             className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
           >
             <FaArrowLeft className="w-4 h-4 mr-2" />
-            Все вакансии
+            Все новости
           </Link>
         </div>
 
-        {/* Карточка вакансии */}
+        {/* Карточка новости */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          {/* Заголовок */}
+          {/* Превью изображение */}
+          {news.preview_image && (
+            <div className="w-full h-96 overflow-hidden">
+              <img
+                src={news.preview_image}
+                alt={news.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+
+          {/* Заголовок и мета */}
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{job.title}</h1>
-                <p className="text-lg text-gray-600 mb-3">{job.short_description}</p>
-                <div className="flex gap-2">
-                  {job.is_closed && (
-                    <span className="inline-block px-3 py-1 text-sm bg-red-100 text-red-700 rounded-full">
-                      Вакансия закрыта
+                {/* Категория и статус */}
+                <div className="flex items-center gap-2 mb-3">
+                  {news.category_name && (
+                    <span className="inline-flex items-center px-3 py-1 text-sm bg-emerald-100 text-emerald-700 rounded-full">
+                      <FaTag className="w-3 h-3 mr-2" />
+                      {news.category_name}
                     </span>
                   )}
-                  {!job.is_active && (
-                    <span className="inline-block px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full">
-                      Неактивная вакансия
+                  {!news.is_published && canManageNews && (
+                    <span className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full">
+                      Черновик
                     </span>
                   )}
                 </div>
+
+                <h1 className="text-3xl font-bold text-gray-900 mb-3">{news.title}</h1>
+                <p className="text-lg text-gray-600 mb-4">{news.short_description}</p>
               </div>
 
-              {canManageJobs && (
+              {canManageNews && (
                 <div className="flex gap-2 ml-4">
                   <Link
-                    to={`/jobs/edit/${job.slug}`}
+                    to={`/news/edit/${news.slug}`}
                     className="p-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                     title="Редактировать"
                   >
@@ -191,26 +205,23 @@ const JobDetailPage: React.FC = () => {
             </div>
 
             {/* Мета информация */}
-            <div className="flex flex-wrap gap-4 text-gray-600">
-              <div className="flex items-center">
-                <FaClock className="w-4 h-4 mr-2 text-gray-400" />
-                {job.employment_type_display}
-              </div>
-
-              <div className="flex items-center">
-                <FaMapMarkerAlt className="w-4 h-4 mr-2 text-gray-400" />
-                {job.location}
-              </div>
-
+            <div className="flex flex-wrap gap-4 text-sm text-gray-600">
               <div className="flex items-center">
                 <FaCalendarAlt className="w-4 h-4 mr-2 text-gray-400" />
-                {job.work_schedule}
+                {formatDate(news.published_at)}
               </div>
 
               <div className="flex items-center">
-                <FaMoneyBillWave className="w-4 h-4 mr-2 text-gray-400" />
-                {formatSalary()}
+                <FaEye className="w-4 h-4 mr-2 text-gray-400" />
+                {news.views_count} просмотров
               </div>
+
+              {news.author_name && (
+                <div className="flex items-center">
+                  <FaUser className="w-4 h-4 mr-2 text-gray-400" />
+                  {news.author_name}
+                </div>
+              )}
             </div>
           </div>
 
@@ -218,23 +229,23 @@ const JobDetailPage: React.FC = () => {
           <div className="p-6">
             <style>{`
               /* Базовые стили для контента */
-              .job-content {
+              .news-content {
                 color: #374151;
                 font-size: 1.125rem;
                 line-height: 1.4;
               }
 
-              .job-content p {
+              .news-content p {
                 margin-bottom: 0;
                 line-height: 1.2;
               }
 
-              .job-content h1,
-              .job-content h2,
-              .job-content h3,
-              .job-content h4,
-              .job-content h5,
-              .job-content h6 {
+              .news-content h1,
+              .news-content h2,
+              .news-content h3,
+              .news-content h4,
+              .news-content h5,
+              .news-content h6 {
                 color: #111827;
                 font-weight: 600;
                 line-height: 1.3;
@@ -242,121 +253,121 @@ const JobDetailPage: React.FC = () => {
                 margin-bottom: 0.75em;
               }
 
-              .job-content h1 { font-size: 2em; }
-              .job-content h2 { font-size: 1.75em; }
-              .job-content h3 { font-size: 1.5em; }
-              .job-content h4 { font-size: 1.25em; }
+              .news-content h1 { font-size: 2em; }
+              .news-content h2 { font-size: 1.75em; }
+              .news-content h3 { font-size: 1.5em; }
+              .news-content h4 { font-size: 1.25em; }
 
-              .job-content strong {
+              .news-content strong {
                 color: #111827;
                 font-weight: 600;
               }
 
-              .job-content ul,
-              .job-content ol {
+              .news-content ul,
+              .news-content ol {
                 margin-left: 1.5rem;
                 margin-bottom: 1em;
                 line-height: 1.2;
               }
 
-              .job-content ul {
+              .news-content ul {
                 list-style-type: disc;
               }
 
-              .job-content ol {
+              .news-content ol {
                 list-style-type: decimal;
               }
 
-              .job-content li {
+              .news-content li {
                 margin-bottom: 0.25em;
                 line-height: 1.2;
               }
 
-              .job-content a {
+              .news-content a {
                 color: #059669;
                 text-decoration: none;
               }
 
-              .job-content a:hover {
+              .news-content a:hover {
                 color: #047857;
                 text-decoration: underline;
               }
 
-              .job-content img {
+              .news-content img {
                 border-radius: 0.5rem;
                 box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
                 max-width: 100%;
                 height: auto;
               }
 
-              .job-content iframe {
+              .news-content iframe {
                 max-width: 100%;
               }
 
               /* Поддержка классов Quill для выравнивания текста */
-              .job-content .ql-align-center:not(iframe):not(img):not(video) {
+              .news-content .ql-align-center:not(iframe):not(img):not(video) {
                 text-align: center;
               }
-              .job-content .ql-align-right:not(iframe):not(img):not(video) {
+              .news-content .ql-align-right:not(iframe):not(img):not(video) {
                 text-align: right;
               }
-              .job-content .ql-align-left:not(iframe):not(img):not(video) {
+              .news-content .ql-align-left:not(iframe):not(img):not(video) {
                 text-align: left;
               }
-              .job-content .ql-align-justify {
+              .news-content .ql-align-justify {
                 text-align: justify;
               }
 
               /* Центрирование iframe (видео) */
-              .job-content iframe.ql-align-center {
+              .news-content iframe.ql-align-center {
                 display: block;
                 margin-left: auto;
                 margin-right: auto;
               }
 
-              .job-content iframe.ql-align-right {
+              .news-content iframe.ql-align-right {
                 display: block;
                 margin-left: auto;
                 margin-right: 0;
               }
 
-              .job-content iframe.ql-align-left {
+              .news-content iframe.ql-align-left {
                 display: block;
                 margin-left: 0;
                 margin-right: auto;
               }
 
               /* Центрирование изображений */
-              .job-content img.ql-align-center {
+              .news-content img.ql-align-center {
                 display: block;
                 margin-left: auto;
                 margin-right: auto;
               }
 
-              /* Clearfix для блока контента чтобы он не наезжал на другие элементы */
-              .job-content::after {
+              /* Clearfix для блока контента */
+              .news-content::after {
                 content: "";
                 display: table;
                 clear: both;
               }
             `}</style>
             <div
-              className="job-content"
-              dangerouslySetInnerHTML={{ __html: job.content }}
+              className="news-content"
+              dangerouslySetInnerHTML={{ __html: news.content }}
             />
           </div>
 
           {/* Медиа файлы */}
-          {job.media && job.media.length > 0 && (
+          {news.media && news.media.length > 0 && (
             <div className="p-6 border-t border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Дополнительные материалы</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {job.media.map((media) => (
+                {news.media.map((media) => (
                   <div key={media.id} className="rounded-lg overflow-hidden">
                     {media.media_type === 'image' && media.file && (
                       <img
                         src={media.file}
-                        alt={media.caption || job.title}
+                        alt={media.caption || news.title}
                         className="w-full h-auto"
                       />
                     )}
@@ -378,33 +389,14 @@ const JobDetailPage: React.FC = () => {
               </div>
             </div>
           )}
-
-          {/* Контакты для откликов */}
-          <div className="p-6 bg-emerald-50 border-t border-emerald-100">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Контакты</h2>
-            <div className="space-y-2">
-              <p className="text-gray-800">
-                <strong>Email:</strong>{' '}
-                <a href={`mailto:${job.hr_email}`} className="text-emerald-600 hover:text-emerald-700">
-                  {job.hr_email}
-                </a>
-              </p>
-              <p className="text-gray-800">
-                <strong>Телефон:</strong>{' '}
-                <a href={`tel:${job.hr_phone.replace(/[^+\d]/g, '')}`} className="text-emerald-600 hover:text-emerald-700">
-                  {job.hr_phone}
-                </a>
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 
       {/* Модалка подтверждения удаления */}
-      {showDeleteModal && job && (
+      {showDeleteModal && news && (
         <DeleteConfirmModal
-          title={job.title}
-          itemType="вакансию"
+          title={news.title}
+          itemType="новость"
           onClose={() => setShowDeleteModal(false)}
           onConfirm={handleDeleteConfirm}
           deleting={deleting}
@@ -414,4 +406,4 @@ const JobDetailPage: React.FC = () => {
   );
 };
 
-export default JobDetailPage;
+export default NewsDetailPage;
