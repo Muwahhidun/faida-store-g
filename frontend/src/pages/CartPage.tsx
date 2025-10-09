@@ -45,13 +45,18 @@ const CartPage: React.FC = () => {
       return Math.floor(numQuantity).toString();
     }
 
-    // Для веса (кг, г) - 3 знака после запятой
+    // Для веса (кг, г) - показываем с точностью, но убираем лишние нули
     if (unit === 'кг' || unit === 'г' || unit === 'кг.' || unit === 'г.') {
-      return numQuantity.toFixed(3);
+      return numQuantity.toFixed(3).replace(/\.?0+$/, '');
     }
 
-    // По умолчанию - 3 знака
-    return numQuantity.toFixed(3);
+    // По умолчанию - если целое число, показываем без дробной части
+    if (Number.isInteger(numQuantity)) {
+      return numQuantity.toString();
+    }
+
+    // Для дробных - убираем лишние нули
+    return numQuantity.toFixed(3).replace(/\.?0+$/, '');
   };
 
   if (items.length === 0) {
@@ -184,11 +189,9 @@ const CartPage: React.FC = () => {
                         <p className="text-lg font-bold text-gray-900">
                           {formatPrice(item.price * item.quantity, item.currency)}
                         </p>
-                        {item.quantity > 1 && (
-                          <p className="text-sm text-gray-500">
-                            {formatPrice(item.price, item.currency)} × {formatQuantity(item.quantity, item.unit)}
-                          </p>
-                        )}
+                        <p className="text-sm text-gray-500">
+                          {formatPrice(item.price, item.currency)} × {formatQuantity(item.quantity, item.unit)}
+                        </p>
                       </div>
                     </div>
                   </div>

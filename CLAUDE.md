@@ -25,6 +25,9 @@
 - Axios (HTTP клиент)
 - React Icons (иконки)
 - React Helmet Async (управление meta-тегами)
+- Quill / React Quill (WYSIWYG редактор)
+- React Hot Toast (уведомления)
+- React Intersection Observer (ленивая загрузка)
 
 **Инфраструктура:**
 - Docker Compose (5 сервисов: db, redis, backend, frontend, scheduler)
@@ -138,7 +141,9 @@ backend/
 │   ├── sync1c/         # Интеграция с 1С (сервис импорта, планировщик, модели)
 │   │   └── management/commands/  # import_1c_data, run_scheduler, reset_import_status
 │   ├── api/            # REST API (views, serializers, filters, URLs)
-│   ├── users/          # Кастомная модель пользователя с ролями
+│   ├── users/          # Кастомная модель пользователя с ролями, адреса доставки
+│   ├── jobs/           # Управление вакансиями с WYSIWYG редактором
+│   ├── news/           # Управление новостями с WYSIWYG редактором
 │   └── core/           # Настройки сайта, общие модели
 ├── config/
 │   ├── settings.py     # Настройки Django
@@ -147,12 +152,28 @@ backend/
 ```
 
 **Основные модели:**
+
+*Пользователи и аутентификация:*
 - `User` (apps/users): Наследуется от AbstractUser, с полем role (user/moderator/admin). Автоматически синхронизирует role с is_staff и is_superuser при сохранении
+- `DeliveryAddress`: Адреса доставки пользователей с координатами (latitude, longitude)
+
+*Каталог товаров:*
 - `Product`: code (уникальный), article, name, barcodes, price, currency, unit, stock_quantity, in_stock, category FK, images (через ProductImage), prices_data JSONField, stocks_data JSONField, source FK
 - `ProductImage`: product FK, image FileField, file_hash MD5 (для дедупликации), display_order
 - `Category`: code_1c (уникальный), name, slug, parent FK (самоссылающаяся иерархия), is_visible_on_site
+
+*Интеграция с 1С:*
 - `IntegrationSource`: name, json_file_path, media_dir_path, is_active, show_on_site, auto_sync_enabled, import_status
 - `SyncLog`: sync_type (full/partial), status, source FK, временные метки, счетчики, errors
+
+*Контент-менеджмент:*
+- `Job`: title, slug, short_description, content (HTML), content_delta (Quill JSON), preview_image, employment_type, location, work_schedule, salary_from/to, hr_email, hr_phone, is_active, is_closed, author FK
+- `JobMedia`: job FK, media_type (image/video), file, video_url, caption, display_order
+- `News`: title, slug, category FK, preview_image, short_description, content (HTML), content_delta (Quill JSON), author FK, is_published, published_at, views_count
+- `NewsCategory`: name, slug, display_order
+- `NewsMedia`: news FK, media_type (image/video), file, video_url, caption, display_order
+
+*Настройки:*
 - `SiteSettings`: Singleton модель для настроек всего сайта (пороги остатков и т.д.)
 
 **Интеграция с 1С:**
@@ -165,7 +186,7 @@ backend/
 - Сервис планировщика выполняет автосинхронизацию через интервалы
 
 **Структура API:**
-- ViewSets: `ProductViewSet`, `CategoryViewSet`, `IntegrationSourceViewSet`, `UserViewSet`
+- ViewSets: `ProductViewSet`, `CategoryViewSet`, `IntegrationSourceViewSet`, `UserViewSet`, `JobViewSet`, `NewsViewSet`
 - Пользовательские действия (через @action декоратор):
   - `import_data` - запуск импорта из источника
   - `quick_sync` - быстрая синхронизация (без медиа)
@@ -177,6 +198,33 @@ backend/
 - Пагинация: LimitOffsetPagination (24 товара на страницу)
 - Кэширование: Django cache framework с бэкендом Redis (декоратор @cache_page)
 - Permissions: AllowAny для публичных эндпоинтов, IsAdminUser для административных
+
+### Приложения для управления контентом
+
+**Jobs (Вакансии) - apps/jobs:**
+- Полноценная система публикации вакансий с WYSIWYG редактором Quill
+- Модели: `Job`, `JobMedia`
+- Поля: employment_type (full_time/part_time/remote/internship), location, work_schedule, диапазон зарплаты, контакты HR
+- Автогенерация slug с поддержкой транслитерации кириллицы
+- Превью изображения для списков вакансий
+- Двойное хранение формата: HTML (content) + Quill Delta (content_delta) для сохранения форматирования
+- Статусы: is_active (активна на сайте), is_closed (закрыта для откликов)
+
+**News (Новости) - apps/news:**
+- Система новостей/блога с категориями и WYSIWYG редактором
+- Модели: `News`, `NewsCategory`, `NewsMedia`
+- Функции: счетчик просмотров, планирование публикации, превью изображения
+- Отслеживание автора, организация по категориям
+- Двойное хранение формата: HTML + Quill Delta
+- Автоматическая установка даты публикации при первой публикации
+
+**Общие паттерны:**
+- Оба используют JSON формат Quill Delta для редактирования форматированного текста
+- Превью изображения для отображения в списках
+- Автогенерация slug с проверкой уникальности (с fallback на UUID при необходимости)
+- Управление дополнительными медиа через связанные модели (JobMedia, NewsMedia)
+- Атрибуция автора через FK на User
+- Поддержка изображений и видео (с URL или загрузка файла)
 
 ### Структура фронтенда
 
@@ -191,7 +239,13 @@ frontend/src/
 │   ├── CartButton.tsx
 │   ├── ProtectedRoute.tsx  # HOC для защищенных маршрутов
 │   ├── ErrorBoundary.tsx
-│   └── LoadingSpinner.tsx
+│   ├── LoadingSpinner.tsx
+│   ├── RichTextEditor.tsx  # Quill WYSIWYG редактор для новостей/вакансий
+│   ├── DeleteConfirmModal.tsx  # Переиспользуемое модальное окно
+│   ├── CustomSelect.tsx  # Кастомный выпадающий список
+│   ├── Toast.tsx       # Компонент всплывающих уведомлений
+│   ├── admin/          # Компоненты для админ-панели
+│   └── profile/        # Компоненты профиля пользователя
 ├── pages/             # Страницы маршрутов
 │   ├── HomePage.tsx
 │   ├── ProductsPage.tsx
@@ -200,7 +254,15 @@ frontend/src/
 │   ├── CartPage.tsx
 │   ├── AdminPanelPage.tsx
 │   ├── ProfilePage.tsx
-│   └── LoginPage.tsx
+│   ├── LoginPage.tsx
+│   ├── JobsPage.tsx
+│   ├── JobDetailPage.tsx
+│   ├── JobEditorPage.tsx  # Создание/редактирование вакансий
+│   ├── NewsPage.tsx
+│   ├── NewsDetailPage.tsx
+│   ├── NewsEditorPage.tsx  # Создание/редактирование новостей
+│   ├── ContactsPage.tsx
+│   └── NotFoundPage.tsx
 ├── contexts/          # React Context провайдеры
 │   └── CartContext.tsx
 ├── hooks/             # Кастомные React хуки
@@ -215,7 +277,7 @@ frontend/src/
 ```
 
 **Управление состоянием:**
-- TanStack Query для серверного состояния (товары, категории)
+- TanStack Query для серверного состояния (товары, категории, вакансии, новости)
 - Zustand для состояния корзины (с persist middleware для сохранения в localStorage)
 - React Context для операций с корзиной
 - JWT токен хранится в localStorage
@@ -237,6 +299,16 @@ frontend/src/
 - `/login` - LoginPage
 - `/panel` - AdminPanelPage (защищенный маршрут, требует аутентификации)
 - `/profile` - ProfilePage (защищенный маршрут, требует аутентификации)
+- `/jobs` - JobsPage (список вакансий)
+- `/jobs/:slug` - JobDetailPage (детальная страница вакансии)
+- `/jobs/new` - JobEditorPage (создание вакансии, защищенный маршрут)
+- `/jobs/:slug/edit` - JobEditorPage (редактирование вакансии, защищенный маршрут)
+- `/news` - NewsPage (список новостей)
+- `/news/:slug` - NewsDetailPage (детальная страница новости)
+- `/news/new` - NewsEditorPage (создание новости, защищенный маршрут)
+- `/news/:slug/edit` - NewsEditorPage (редактирование новости, защищенный маршрут)
+- `/contacts` - ContactsPage
+- `/about` - AboutPage (страница о компании)
 
 ### Поток данных
 
@@ -314,22 +386,36 @@ PostgreSQL доступна по адресу `localhost:5432`:
    - Настройки порога для всего сайта в singleton SiteSettings
    - Переопределение для отдельного товара через `use_default_stock_settings`
 
-7. **Производительность API**:
+7. **WYSIWYG редактор (Quill)**:
+   - Используется для вакансий (Jobs) и новостей (News)
+   - Двойное хранение: HTML для отображения + Quill Delta JSON для редактирования
+   - Поле `content` содержит HTML
+   - Поле `content_delta` содержит Quill Delta формат для сохранения форматирования
+   - RichTextEditor компонент обрабатывает оба формата
+   - Поддержка изображений, видео, форматирования текста
+
+8. **Slug генерация**:
+   - Автоматическая генерация slug из названия/заголовка
+   - Транслитерация кириллицы в латиницу
+   - Fallback на UUID если транслитерация невозможна
+   - Автоматическая проверка уникальности с добавлением счетчика при дубликатах
+
+9. **Производительность API**:
    - Prefetch связанных данных (изображения, категория) в ViewSets
    - Redis кэширование для дорогих запросов
    - Пагинация предотвращает большие наборы результатов
    - Фильтрация снижает нагрузку на базу данных
 
-8. **Производительность фронтенда**:
-   - React Query кэширование (обычно 5 мин stale time)
-   - Ленивая загрузка для маршрутов
-   - Оптимизация изображений (ProductImage с error boundaries)
-   - Intersection Observer для бесконечной прокрутки (если реализовано)
+10. **Производительность фронтенда**:
+    - React Query кэширование (обычно 5 мин stale time)
+    - Ленивая загрузка для маршрутов
+    - Оптимизация изображений (ProductImage с error boundaries)
+    - Intersection Observer для бесконечной прокрутки (если реализовано)
 
 ## Рабочий процесс разработки
 
 1. **Добавление новых полей товара**:
-   - Обновить модель `Product`
+   - Обновить модель `Product` в `apps/products/models.py`
    - Создать миграцию: `docker-compose exec backend python manage.py makemigrations`
    - Применить: `docker-compose exec backend python manage.py migrate`
    - Обновить `ProductImporter._process_product()` в services.py
@@ -354,6 +440,19 @@ PostgreSQL доступна по адресу `localhost:5432`:
    - API запросы: использовать хуки TanStack Query, определенные в `hooks/api.ts`
    - Стилизация: утилиты Tailwind + компоненты Headless UI
 
+5. **Работа с WYSIWYG контентом**:
+   - Использовать компонент `RichTextEditor` для редактирования
+   - При сохранении сохранять оба формата: HTML (content) и Quill Delta (content_delta)
+   - Для отображения использовать HTML контент с `dangerouslySetInnerHTML`
+   - Для редактирования загружать Quill Delta в редактор
+
+6. **Добавление новых моделей контента**:
+   - Создать модель с полями `content` (TextField) и `content_delta` (JSONField)
+   - Добавить автогенерацию slug в методе `save()`
+   - Создать сериализаторы для API
+   - Добавить ViewSet с необходимыми permissions
+   - Создать страницы списка, детальную и редактора во фронтенде
+
 ## Устранение неполадок
 
 **Импорт не работает:**
@@ -376,3 +475,9 @@ PostgreSQL доступна по адресу `localhost:5432`:
 - Проверить `VITE_API_URL` в docker-compose.yml
 - Проверить CORS_ALLOWED_ORIGINS в settings.py
 - Проверить работу бэкенда: `curl http://localhost:8000/api/`
+
+**Проблемы с Quill редактором:**
+- Убедиться, что Quill стили импортированы в компоненте
+- Проверить формат сохраняемых данных (Delta должен быть валидным JSON)
+- При загрузке контента проверить, что Delta корректно парсится
+- Для загрузки изображений в редактор нужен отдельный обработчик
