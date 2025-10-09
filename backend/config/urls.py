@@ -18,6 +18,10 @@ urlpatterns = [
     # API эндпоинты
     path('api/', include('apps.api.urls')),
 
+    # Djoser endpoints (регистрация, восстановление пароля)
+    path('api/auth/', include('djoser.urls')),
+    path('api/auth/', include('djoser.urls.jwt')),
+
     # Документация API
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

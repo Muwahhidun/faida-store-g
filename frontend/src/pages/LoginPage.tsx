@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
@@ -109,9 +109,17 @@ const LoginPage: React.FC = () => {
 
                         {/* Поле пароля */}
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                                Пароль
-                            </label>
+                            <div className="flex items-center justify-between mb-2">
+                                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                    Пароль
+                                </label>
+                                <Link
+                                    to="/forgot-password"
+                                    className="text-sm font-medium text-blue-600 hover:text-blue-500"
+                                >
+                                    Забыли пароль?
+                                </Link>
+                            </div>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <FaLock className="h-4 w-4 text-gray-400" />
@@ -170,6 +178,16 @@ const LoginPage: React.FC = () => {
                             )}
                         </button>
                     </form>
+
+                    {/* Ссылка на страницу регистрации */}
+                    <div className="mt-6 text-center">
+                        <p className="text-sm text-gray-600">
+                            Нет аккаунта?{' '}
+                            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+                                Зарегистрироваться
+                            </Link>
+                        </p>
+                    </div>
                 </div>
 
                 {/* Дополнительная информация */}

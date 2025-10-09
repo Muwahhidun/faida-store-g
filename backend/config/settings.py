@@ -28,9 +28,11 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',
+    'rest_framework.authtoken',  # Требуется для djoser
     'corsheaders',
     'django_filters',
     'drf_spectacular',
+    'djoser',  # Регистрация и восстановление пароля
 ]
 
 LOCAL_APPS = [
@@ -265,3 +267,38 @@ LOGGING = {
 # Настройки загрузки файлов
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB в байтах
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB в байтах
+
+# Настройки Email (для разработки - console backend)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Для production раскомментировать и настроить SMTP:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = 'noreply@faida.ru'
+
+# Настройки Djoser
+DJOSER = {
+    'LOGIN_FIELD': 'username',  # Логин по username (email тоже обязателен)
+    'USER_CREATE_PASSWORD_RETYPE': True,  # Подтверждение пароля при регистрации
+    'USERNAME_CHANGED_EMAIL_CONFIRMATION': False,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'SEND_CONFIRMATION_EMAIL': False,  # Пока отключаем подтверждение email
+    'SEND_ACTIVATION_EMAIL': False,  # Активация через email отключена
+    'SET_USERNAME_RETYPE': False,
+    'SET_PASSWORD_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': 'email/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'SERIALIZERS': {
+        'user_create': 'djoser.serializers.UserCreateSerializer',
+        'user': 'djoser.serializers.UserSerializer',
+        'current_user': 'djoser.serializers.UserSerializer',
+    },
+    'PERMISSIONS': {
+        'user': ['rest_framework.permissions.IsAuthenticated'],
+        'user_list': ['rest_framework.permissions.IsAdminUser'],
+    },
+}
