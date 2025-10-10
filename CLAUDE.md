@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Этот файл предоставляет руководство для Claude Code (claude.ai/code) при работе с кодом в этом репозитории.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Обзор проекта
 
@@ -154,7 +154,9 @@ backend/
 **Основные модели:**
 
 *Пользователи и аутентификация:*
-- `User` (apps/users): Наследуется от AbstractUser, с полем role (user/moderator/admin). Автоматически синхронизирует role с is_staff и is_superuser при сохранении
+- `User` (apps/users): Наследуется от AbstractUser, с полем role (user/moderator/admin). **Email уникален и обязателен**. Автоматически синхронизирует role с is_staff и is_superuser при сохранении
+- `EmailOrUsernameBackend` (apps/users/backends.py): Кастомный бэкенд аутентификации - вход по email ИЛИ username (case-insensitive для email)
+- `CustomPasswordResetSerializer`: Валидация email при восстановлении пароля с автоматическим приведением к нижнему регистру
 - `DeliveryAddress`: Адреса доставки пользователей с координатами (latitude, longitude)
 
 *Каталог товаров:*
@@ -284,9 +286,12 @@ frontend/src/
 - ProtectedRoute компонент для защищенных маршрутов
 
 **Аутентификация и авторизация:**
-- JWT-based аутентификация через rest_framework_simplejwt
+- JWT-based аутентификация через rest_framework_simplejwt (30-дневные access токены)
 - Роли пользователей: user, moderator, admin
 - Автосинхронизация role с is_staff/is_superuser в модели User
+- **Гибкая аутентификация**: вход по email ИЛИ username (case-insensitive)
+- **Уникальность**: username и email уникальны, дубликаты блокируются на уровне БД
+- Восстановление пароля через Djoser с красивыми HTML email-шаблонами
 - Защищенные маршруты через ProtectedRoute компонент
 - Компонент Header с dropdown меню пользователя (см. FaUser, FaCog, FaSignOutAlt иконки)
 
@@ -296,7 +301,10 @@ frontend/src/
 - `/products/:id` - ProductDetailPage
 - `/category/:slug` - CategoryPage (товары по категории)
 - `/cart` - CartPage
-- `/login` - LoginPage
+- `/login` - LoginPage (вход по email или username)
+- `/register` - RegisterPage
+- `/forgot-password` - ForgotPasswordPage
+- `/password/reset/confirm/:uid/:token` - ResetPasswordPage
 - `/panel` - AdminPanelPage (защищенный маршрут, требует аутентификации)
 - `/profile` - ProfilePage (защищенный маршрут, требует аутентификации)
 - `/jobs` - JobsPage (список вакансий)
@@ -328,6 +336,8 @@ frontend/src/
 - `REDIS_URL=redis://redis:6379/0`
 - `GOODS_DATA_PATH=/app/goods_data` (монтируется из `./data/goods`)
 - `ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0,backend,*`
+- `FRONTEND_URL=localhost:5173` (для ссылок в email)
+- `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_SSL`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` (опционально, для SMTP)
 
 Фронтенд:
 - `VITE_API_URL=http://localhost:8000/api`
@@ -336,12 +346,17 @@ frontend/src/
 
 Ключевые настройки в [backend/config/settings.py](backend/config/settings.py):
 - `AUTH_USER_MODEL = 'users.User'` - кастомная модель пользователя
+- `AUTHENTICATION_BACKENDS`: EmailOrUsernameBackend + ModelBackend
+- `DOMAIN` и `SITE_NAME`: для правильных ссылок в email (используется templated_mail)
 - `SYNC_1C_SETTINGS`: JSON_FILE_PATH, MEDIA_DIR_PATH, BATCH_SIZE, AUTO_SYNC_INTERVAL
 - `GOODS_DATA_DIR = BASE_DIR / 'goods_data'`
 - `CORS_ALLOW_ALL_ORIGINS = True` (разработка)
 - `REST_FRAMEWORK`: JWT auth, DjangoFilterBackend, LimitOffsetPagination
 - `SIMPLE_JWT`: 30-дневные access токены, 90-дневные refresh токены
 - `CACHES`: Redis бэкенд
+- `EMAIL_BACKEND`: SMTP или console (в зависимости от переменных окружения)
+- `DJOSER`: настройки регистрации, восстановления пароля, email URL-ы
+- `PASSWORD_RESET_TIMEOUT`: 259200 секунд (3 дня) - время жизни токена сброса пароля
 
 ### URL-адреса
 
@@ -412,6 +427,21 @@ PostgreSQL доступна по адресу `localhost:5432`:
     - Оптимизация изображений (ProductImage с error boundaries)
     - Intersection Observer для бесконечной прокрутки (если реализовано)
 
+11. **Email система**:
+    - Кастомные HTML шаблоны в `backend/templates/email/`
+    - Шаблон `password_reset.html`: красивое письмо на русском с градиентами, кнопками
+    - Переменные контекста: `{{ user }}`, `{{ domain }}`, `{{ protocol }}`, `{{ url }}`, `{{ site_name }}`
+    - Djoser автоматически использует кастомные шаблоны если они существуют
+    - Email приводится к нижнему регистру в CustomPasswordResetSerializer для корректной работы
+
+12. **Система аутентификации**:
+    - **Username и email уникальны** - дубликаты блокируются на уровне БД
+    - Вход по email или username через кастомный бэкенд `EmailOrUsernameBackend`
+    - Case-insensitive поиск для email (admin@example.com = ADMIN@EXAMPLE.COM)
+    - LoginPage показывает единое поле "Email или логин"
+    - При регистрации email обязателен (`REQUIRED_FIELDS = ['email']`)
+    - Djoser обрабатывает регистрацию, восстановление пароля, смену пароля
+
 ## Рабочий процесс разработки
 
 1. **Добавление новых полей товара**:
@@ -453,6 +483,21 @@ PostgreSQL доступна по адресу `localhost:5432`:
    - Добавить ViewSet с необходимыми permissions
    - Создать страницы списка, детальную и редактора во фронтенде
 
+7. **Кастомизация email шаблонов**:
+   - Создать файл в `backend/templates/email/{имя_шаблона}.html`
+   - Djoser автоматически использует кастомные шаблоны (перекрывают стандартные)
+   - Доступные шаблоны: `password_reset.html`, `activation.html`, `confirmation.html`, `password_changed_confirmation.html`
+   - Использовать блоки `{% block subject %}`, `{% block text_body %}`, `{% block html_body %}`
+   - Доступные переменные: `{{ user }}`, `{{ domain }}`, `{{ site_name }}`, `{{ protocol }}`, `{{ url }}`, `{{ uid }}`, `{{ token }}`
+   - ВАЖНО: `domain` берется из `settings.DOMAIN`, НЕ из HTTP заголовка request.Host
+
+8. **Работа с аутентификацией**:
+   - Для входа пользователь может использовать email ИЛИ username
+   - Email автоматически приводится к нижнему регистру
+   - При изменении модели User учитывать уникальность username и email
+   - Кастомный serializer для password reset должен возвращать email в нижнем регистре
+   - Тестировать аутентификацию: `authenticate(username='admin@example.com', password='...')` и `authenticate(username='admin', password='...')`
+
 ## Устранение неполадок
 
 **Импорт не работает:**
@@ -481,3 +526,14 @@ PostgreSQL доступна по адресу `localhost:5432`:
 - Проверить формат сохраняемых данных (Delta должен быть валидным JSON)
 - При загрузке контента проверить, что Delta корректно парсится
 - Для загрузки изображений в редактор нужен отдельный обработчик
+
+**Проблемы с восстановлением пароля:**
+- Email не приходит: проверить `EMAIL_HOST` в переменных окружения и логи бэкенда
+- Ссылка ведет на 8000 порт: проверить `FRONTEND_URL` в docker-compose.yml и `DOMAIN` в settings.py
+- Ошибка при сбросе с разным регистром email: убедиться что CustomPasswordResetSerializer возвращает `email.lower()`
+- Токен недействителен: проверить `PASSWORD_RESET_TIMEOUT` (по умолчанию 3 дня), токен одноразовый
+
+**Проблемы с регистрацией:**
+- Дубликат email: проверить уникальность email в модели User (`unique=True`)
+- Дубликат username: username уже уникален по умолчанию в AbstractUser
+- Создать миграцию после изменения полей: `makemigrations` → `migrate`
