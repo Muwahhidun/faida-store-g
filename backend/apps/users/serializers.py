@@ -18,6 +18,7 @@ class CustomPasswordResetSerializer(SendEmailResetSerializer):
     def validate_email(self, value):
         """
         Проверяет, существует ли пользователь с таким email.
+        Возвращает email в нижнем регистре для корректной работы.
         """
         # Приводим к нижнему регистру для проверки
         email = value.lower()
@@ -28,4 +29,5 @@ class CustomPasswordResetSerializer(SendEmailResetSerializer):
                 "Пользователь с таким email не найден. Проверьте правильность адреса или зарегистрируйтесь."
             )
 
-        return value
+        # Возвращаем email в нижнем регистре для корректной работы Djoser
+        return email

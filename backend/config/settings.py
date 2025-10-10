@@ -51,6 +51,12 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # Кастомная модель пользователя
 AUTH_USER_MODEL = 'users.User'
 
+# Кастомные бэкенды аутентификации
+AUTHENTICATION_BACKENDS = [
+    'apps.users.backends.EmailOrUsernameBackend',  # Вход по email или username
+    'django.contrib.auth.backends.ModelBackend',  # Стандартный бэкенд (fallback)
+]
+
 # Middleware
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -268,16 +274,25 @@ LOGGING = {
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB в байтах
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB в байтах
 
-# Настройки Email (для разработки - console backend)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# Для production раскомментировать и настроить SMTP:
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = 'noreply@faida.ru'
+# Настройки Email
+# Если EMAIL_HOST указан в .env, используем SMTP, иначе console backend
+if os.getenv('EMAIL_HOST'):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.mail.ru')
+    EMAIL_PORT = int(os.getenv('EMAIL_PORT', '465'))
+    EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'True').lower() in ['true', '1', 'yes']
+    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'False').lower() in ['true', '1', 'yes']
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@faida.ru')
+else:
+    # Для разработки без настроенного SMTP - console backend
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = 'noreply@faida.ru'
+
+# Настройки для email шаблонов (используется templated_mail)
+DOMAIN = os.getenv('FRONTEND_URL', 'localhost:5173')
+SITE_NAME = 'Faida Group'
 
 # Настройки Djoser
 DJOSER = {
@@ -289,6 +304,10 @@ DJOSER = {
     'SEND_ACTIVATION_EMAIL': False,  # Активация через email отключена
     'SET_USERNAME_RETYPE': False,
     'SET_PASSWORD_RETYPE': True,
+    # URL для фронтенда (не для API!)
+    'DOMAIN': os.getenv('FRONTEND_URL', 'localhost:5173'),
+    'SITE_NAME': 'Faida Group',
+    'PROTOCOL': 'http',  # или 'https' для production
     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': 'email/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': 'activate/{uid}/{token}',

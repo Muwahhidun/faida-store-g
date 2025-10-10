@@ -10,6 +10,7 @@ class User(AbstractUser):
     """
     Кастомная модель пользователя с полем роли.
     Поле role автоматически синхронизируется с is_staff и is_superuser.
+    Email обязателен и уникален.
     """
 
     ROLE_CHOICES = [
@@ -17,6 +18,15 @@ class User(AbstractUser):
         ('moderator', 'Модератор'),
         ('admin', 'Администратор'),
     ]
+
+    # Переопределяем email из AbstractUser, делаем его обязательным и уникальным
+    email = models.EmailField(
+        verbose_name='Email адрес',
+        unique=True,
+        error_messages={
+            'unique': 'Пользователь с таким email уже существует.',
+        }
+    )
 
     role = models.CharField(
         max_length=20,
@@ -31,6 +41,9 @@ class User(AbstractUser):
         null=True,
         verbose_name='Телефон'
     )
+
+    # Указываем, что email обязателен
+    REQUIRED_FIELDS = ['email']  # USERNAME_FIELD уже 'username' по умолчанию
 
     class Meta:
         verbose_name = 'Пользователь'

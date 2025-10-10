@@ -85,10 +85,10 @@ const LoginPage: React.FC = () => {
                 {/* Форма входа */}
                 <div className="card p-8">
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Поле имени пользователя */}
+                        {/* Поле email или имени пользователя */}
                         <div>
                             <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-                                Имя пользователя
+                                Email или логин
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -100,7 +100,7 @@ const LoginPage: React.FC = () => {
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     className="input pl-10"
-                                    placeholder="Введите имя пользователя"
+                                    placeholder="Введите email или логин"
                                     autoComplete="username"
                                     required
                                 />

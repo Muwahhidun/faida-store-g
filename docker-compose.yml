@@ -43,6 +43,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - GOODS_DATA_PATH=/app/goods_data
       - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0,backend,faida_backend,*
+      - FRONTEND_URL=localhost:5173
     networks:
       - faida_network
     command: >
