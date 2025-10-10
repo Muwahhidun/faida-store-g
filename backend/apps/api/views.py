@@ -25,13 +25,15 @@ from apps.sync1c.models import IntegrationSource, SyncLog
 from apps.users.models import User, DeliveryAddress
 from apps.jobs.models import Job, JobMedia
 from apps.news.models import News, NewsCategory, NewsMedia
+from apps.orders.models import Order, OrderItem
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer, ProductImageSerializer,
     CategorySerializer, CategoryDetailSerializer,
     SiteSettingsSerializer, IntegrationSourceSerializer, CategoryManagementSerializer,
     ProductManagementSerializer, SyncLogSerializer, UserSerializer, DeliveryAddressSerializer,
     JobListSerializer, JobDetailSerializer, JobCreateUpdateSerializer, JobMediaSerializer,
-    NewsListSerializer, NewsDetailSerializer, NewsCreateUpdateSerializer, NewsCategorySerializer, NewsMediaSerializer
+    NewsListSerializer, NewsDetailSerializer, NewsCreateUpdateSerializer, NewsCategorySerializer, NewsMediaSerializer,
+    OrderListSerializer, OrderDetailSerializer, OrderCreateSerializer
 )
 from .filters import ProductFilter, CategoryFilter
 
@@ -1065,4 +1067,103 @@ class NewsViewSet(viewsets.ModelViewSet):
         """Получить последние новости (топ-10)."""
         recent_news = self.get_queryset().order_by('-published_at')[:10]
         serializer = self.get_serializer(recent_news, many=True)
+        return Response(serializer.data)
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet для управления заказами.
+
+    Для пользователей:
+    - list: Просмотр своих заказов
+    - retrieve: Детальный просмотр заказа
+    - create: Создание нового заказа
+
+    Для админов/модераторов:
+    - list: Просмотр всех заказов
+    - update/partial_update: Обновление статуса заказа
+    - destroy: Удаление заказа
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['order_number', 'customer_name', 'customer_phone', 'customer_email']
+    ordering_fields = ['created_at', 'total_amount', 'status']
+    ordering = ['-created_at']
+    filterset_fields = ['status', 'payment_method']
+
+    def get_queryset(self):
+        """Возвращает заказы в зависимости от прав пользователя."""
+        user = self.request.user
+
+        # Для админов и модераторов показываем все заказы
+        if user.role in ['admin', 'moderator']:
+            return Order.objects.select_related('user').prefetch_related('items__product').all()
+
+        # Для обычных пользователей только их заказы
+        return Order.objects.filter(user=user).select_related('user').prefetch_related('items__product').all()
+
+    def get_serializer_class(self):
+        """Выбор сериализатора в зависимости от действия."""
+        if self.action == 'create':
+            return OrderCreateSerializer
+        elif self.action == 'retrieve':
+            return OrderDetailSerializer
+        return OrderListSerializer
+
+    def get_permissions(self):
+        """Настройка permissions в зависимости от действия."""
+        if self.action in ['update', 'partial_update', 'destroy']:
+            # Только админы и модераторы могут обновлять/удалять заказы
+            return [permissions.IsAuthenticated(), IsAdminOrModerator()]
+        return [permissions.IsAuthenticated()]
+
+    def create(self, request, *args, **kwargs):
+        """
+        Создание нового заказа.
+        Очистка корзины происходит на фронтенде после успешного создания.
+        """
+        serializer = self.get_serializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+
+        # Возвращаем полную информацию о созданном заказе
+        response_serializer = OrderDetailSerializer(order, context={'request': request})
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['patch'], permission_classes=[permissions.IsAuthenticated, IsAdminOrModerator])
+    def update_status(self, request, pk=None):
+        """Обновление статуса заказа (только для админов/модераторов)."""
+        order = self.get_object()
+        new_status = request.data.get('status')
+
+        if not new_status:
+            return Response(
+                {'error': 'Поле status обязательно'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Проверяем, что статус валидный
+        valid_statuses = dict(Order.STATUS_CHOICES).keys()
+        if new_status not in valid_statuses:
+            return Response(
+                {'error': f'Невалидный статус. Доступные: {", ".join(valid_statuses)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        order.status = new_status
+        order.save()
+
+        serializer = self.get_serializer(order)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def my_orders(self, request):
+        """Получить заказы текущего пользователя (дубликат list для удобства)."""
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

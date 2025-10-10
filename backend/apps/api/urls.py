@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from .views import ProductViewSet, CategoryViewSet, ProductImageViewSet, SiteSettingsViewSet, IntegrationSourceViewSet, AvailableOptionsAPIView, CategoryManagementViewSet, ProductManagementViewSet, SyncLogViewSet, UserManagementViewSet, DeliveryAddressViewSet, JobViewSet, NewsViewSet, NewsCategoryViewSet
+from .views import ProductViewSet, CategoryViewSet, ProductImageViewSet, SiteSettingsViewSet, IntegrationSourceViewSet, AvailableOptionsAPIView, CategoryManagementViewSet, ProductManagementViewSet, SyncLogViewSet, UserManagementViewSet, DeliveryAddressViewSet, JobViewSet, NewsViewSet, NewsCategoryViewSet, OrderViewSet
 
 
 # Создаем роутер для API
@@ -27,6 +27,7 @@ router.register(r'delivery-addresses', DeliveryAddressViewSet, basename='deliver
 router.register(r'jobs', JobViewSet, basename='jobs')
 router.register(r'news', NewsViewSet, basename='news')
 router.register(r'news-categories', NewsCategoryViewSet, basename='news-categories')
+router.register(r'orders', OrderViewSet, basename='orders')
 
 
 @api_view(['GET'])

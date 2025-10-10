@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
   ShoppingCartIcon,
@@ -14,8 +14,10 @@ import { useCart } from '../contexts/CartContext';
 import ProductImage from '../components/ProductImage';
 import CartButton from '../components/CartButton';
 import { useSiteSettings } from '../hooks/api';
+import OrderStepper from '../components/OrderStepper';
 
 const CartPage: React.FC = () => {
+  const navigate = useNavigate();
   const {
     items,
     updateQuantity,
@@ -28,12 +30,20 @@ const CartPage: React.FC = () => {
   // Получаем настройки сайта
   const { data: siteSettings } = useSiteSettings();
 
+  // Состояние для модального окна подтверждения очистки корзины
+  const [showClearConfirm, setShowClearConfirm] = React.useState(false);
+
   const handleQuantityChange = (productId: number, newQuantity: number) => {
     if (newQuantity <= 0) {
       removeItem(productId);
     } else {
       updateQuantity(productId, newQuantity);
     }
+  };
+
+  const handleClearCart = () => {
+    clearCart();
+    setShowClearConfirm(false);
   };
 
   const formatPrice = (price: number | string, currency: string) => {
@@ -133,18 +143,13 @@ const CartPage: React.FC = () => {
         </Helmet>
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Заголовок */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Корзина</h1>
-            <p className="text-gray-600 mt-1">
-              {getTotalItems()} {getTotalItems() === 1 ? 'товар' : 
-               getTotalItems() < 5 ? 'товара' : 'товаров'} на сумму {formatPrice(getTotalPrice(), items[0]?.currency || 'RUB')}
-            </p>
-          </div>
-          
+        {/* Stepper */}
+        <OrderStepper currentStep={1} />
+
+        {/* Кнопка очистить корзину */}
+        <div className="flex justify-end mb-4">
           <button
-            onClick={clearCart}
+            onClick={() => setShowClearConfirm(true)}
             className="flex items-center px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
           >
             <TrashIcon className="w-5 h-5 mr-2" />
@@ -270,10 +275,13 @@ const CartPage: React.FC = () => {
 
               {/* Кнопки действий */}
               <div className="space-y-3">
-                <button className="w-full bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors font-medium">
-                  Оформить заказ
+                <button
+                  onClick={() => navigate('/checkout')}
+                  className="w-full bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors font-medium"
+                >
+                  К оформлению
                 </button>
-                
+
                 <Link
                   to="/products"
                   className="w-full block text-center bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors font-medium"
@@ -293,6 +301,39 @@ const CartPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Модальное окно подтверждения очистки корзины */}
+        {showClearConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-md w-full p-6">
+              <div className="flex items-center mb-4">
+                <TrashIcon className="w-6 h-6 text-red-600 mr-3" />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Очистить корзину?
+                </h3>
+              </div>
+
+              <p className="text-gray-600 mb-6">
+                Вы уверены, что хотите удалить все товары из корзины? Это действие нельзя отменить.
+              </p>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowClearConfirm(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                >
+                  Отмена
+                </button>
+                <button
+                  onClick={handleClearCart}
+                  className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-medium"
+                >
+                  Очистить
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

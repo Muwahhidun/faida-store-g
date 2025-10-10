@@ -10,6 +10,7 @@ from apps.sync1c.models import IntegrationSource, SyncLog
 from apps.users.models import User, DeliveryAddress
 from apps.jobs.models import Job, JobMedia
 from apps.news.models import News, NewsCategory, NewsMedia
+from apps.orders.models import Order, OrderItem
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -555,3 +556,151 @@ class NewsCreateUpdateSerializer(serializers.ModelSerializer):
             validated_data['preview_image'] = None
 
         return super().update(instance, validated_data)
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    """Сериализатор для товара в заказе."""
+
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    product_article = serializers.CharField(source='product.article', read_only=True)
+    product_image = serializers.SerializerMethodField()
+
+    def get_product_image(self, obj):
+        """Получить главное изображение товара."""
+        if obj.product.main_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.product.main_image.image.url)
+        return None
+
+    class Meta:
+        model = OrderItem
+        fields = (
+            'id', 'product', 'product_name', 'product_article', 'product_image',
+            'price', 'quantity', 'subtotal'
+        )
+        read_only_fields = ('id', 'subtotal')
+
+
+class OrderListSerializer(serializers.ModelSerializer):
+    """Сериализатор для списка заказов."""
+
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    payment_method_display = serializers.CharField(source='get_payment_method_display', read_only=True)
+    items_count = serializers.SerializerMethodField()
+
+    def get_items_count(self, obj):
+        """Получить количество товаров в заказе."""
+        return obj.items.count()
+
+    class Meta:
+        model = Order
+        fields = (
+            'id', 'order_number', 'status', 'status_display',
+            'customer_name', 'customer_phone', 'delivery_address',
+            'payment_method', 'payment_method_display', 'total_amount',
+            'items_count', 'created_at', 'updated_at'
+        )
+        read_only_fields = ('id', 'order_number', 'created_at', 'updated_at')
+
+
+class OrderDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для детального просмотра заказа."""
+
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    payment_method_display = serializers.CharField(source='get_payment_method_display', read_only=True)
+    items = OrderItemSerializer(many=True, read_only=True)
+    user_email = serializers.EmailField(source='user.email', read_only=True)
+
+    class Meta:
+        model = Order
+        fields = (
+            'id', 'order_number', 'user', 'user_email', 'status', 'status_display',
+            'customer_name', 'customer_phone', 'customer_email', 'delivery_address',
+            'comment', 'payment_method', 'payment_method_display', 'total_amount',
+            'items', 'created_at', 'updated_at'
+        )
+        read_only_fields = ('id', 'order_number', 'user', 'created_at', 'updated_at')
+
+
+class OrderCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания заказа."""
+
+    items = serializers.ListField(
+        child=serializers.DictField(),
+        write_only=True,
+        help_text="Список товаров в формате: [{'product_id': 1, 'quantity': 2}, ...]"
+    )
+
+    class Meta:
+        model = Order
+        fields = (
+            'customer_name', 'customer_phone', 'customer_email',
+            'delivery_address', 'comment', 'payment_method', 'items'
+        )
+
+    def validate_items(self, value):
+        """Валидация списка товаров."""
+        if not value:
+            raise serializers.ValidationError("Список товаров не может быть пустым")
+
+        for item in value:
+            if 'product_id' not in item:
+                raise serializers.ValidationError("Каждый товар должен иметь product_id")
+            if 'quantity' not in item:
+                raise serializers.ValidationError("Каждый товар должен иметь quantity")
+            if item['quantity'] <= 0:
+                raise serializers.ValidationError("Количество должно быть больше 0")
+
+        return value
+
+    def create(self, validated_data):
+        """Создание заказа с товарами."""
+        items_data = validated_data.pop('items')
+        user = self.context['request'].user
+
+        # Вычисляем общую сумму заказа
+        total_amount = 0
+        order_items = []
+
+        for item_data in items_data:
+            try:
+                product = Product.objects.get(id=item_data['product_id'])
+            except Product.DoesNotExist:
+                raise serializers.ValidationError(
+                    f"Товар с ID {item_data['product_id']} не найден"
+                )
+
+            # Проверяем наличие товара
+            if not product.in_stock:
+                raise serializers.ValidationError(
+                    f"Товар '{product.name}' отсутствует в наличии"
+                )
+
+            quantity = item_data['quantity']
+            price = product.price
+            subtotal = price * quantity
+            total_amount += subtotal
+
+            order_items.append({
+                'product': product,
+                'price': price,
+                'quantity': quantity,
+                'subtotal': subtotal
+            })
+
+        # Создаем заказ
+        order = Order.objects.create(
+            user=user,
+            total_amount=total_amount,
+            **validated_data
+        )
+
+        # Создаем товары заказа
+        for item_data in order_items:
+            OrderItem.objects.create(
+                order=order,
+                **item_data
+            )
+
+        return order

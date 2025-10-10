@@ -34,6 +34,8 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import AdminPanelPage from "./pages/AdminPanelPage";
 import ProfilePage from "./pages/ProfilePage";
 import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import OrderSuccessPage from "./pages/OrderSuccessPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthenticatedRoute from "./components/AuthenticatedRoute";
 
@@ -74,7 +76,13 @@ const App: React.FC = () => {
             
             {/* Корзина */}
             <Route path="/cart" element={<CartPage />} />
-            
+
+            {/* Оформление заказа (защищенный маршрут) */}
+            <Route element={<AuthenticatedRoute />}>
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/order-success/:orderNumber" element={<OrderSuccessPage />} />
+            </Route>
+
             {/* Категории */}
             <Route path="/category/:slug" element={<CategoryPage />} />
 
