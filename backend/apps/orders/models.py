@@ -69,6 +69,12 @@ class Order(models.Model):
         verbose_name='Адрес доставки'
     )
 
+    # Примечание к адресу доставки (например, код домофона)
+    delivery_comment = models.TextField(
+        blank=True,
+        verbose_name='Примечание к адресу'
+    )
+
     # Комментарий к заказу
     comment = models.TextField(
         blank=True,

@@ -587,6 +587,7 @@ class OrderListSerializer(serializers.ModelSerializer):
 
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     payment_method_display = serializers.CharField(source='get_payment_method_display', read_only=True)
+    items = OrderItemSerializer(many=True, read_only=True)
     items_count = serializers.SerializerMethodField()
 
     def get_items_count(self, obj):
@@ -597,9 +598,9 @@ class OrderListSerializer(serializers.ModelSerializer):
         model = Order
         fields = (
             'id', 'order_number', 'status', 'status_display',
-            'customer_name', 'customer_phone', 'delivery_address',
+            'customer_name', 'customer_phone', 'delivery_address', 'delivery_comment', 'comment',
             'payment_method', 'payment_method_display', 'total_amount',
-            'items_count', 'created_at', 'updated_at'
+            'items', 'items_count', 'created_at', 'updated_at'
         )
         read_only_fields = ('id', 'order_number', 'created_at', 'updated_at')
 
@@ -616,7 +617,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         model = Order
         fields = (
             'id', 'order_number', 'user', 'user_email', 'status', 'status_display',
-            'customer_name', 'customer_phone', 'customer_email', 'delivery_address',
+            'customer_name', 'customer_phone', 'customer_email', 'delivery_address', 'delivery_comment',
             'comment', 'payment_method', 'payment_method_display', 'total_amount',
             'items', 'created_at', 'updated_at'
         )
@@ -636,7 +637,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         model = Order
         fields = (
             'customer_name', 'customer_phone', 'customer_email',
-            'delivery_address', 'comment', 'payment_method', 'items'
+            'delivery_address', 'delivery_comment', 'comment', 'payment_method', 'items'
         )
 
     def validate_items(self, value):

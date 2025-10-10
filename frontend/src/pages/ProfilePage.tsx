@@ -4,6 +4,7 @@ import { FaUser, FaShoppingBag, FaMapMarkerAlt, FaSignOutAlt } from 'react-icons
 import { Toast } from '../components/Toast';
 import { ProfileSection } from '../components/profile/ProfileSection';
 import AddressesSection from '../components/profile/AddressesSection';
+import OrdersSection from '../components/profile/OrdersSection';
 
 /**
  * Личный кабинет пользователя
@@ -184,17 +185,7 @@ const ProfilePage: React.FC = () => {
                     )}
 
                     {selectedTab === 'orders' && (
-                        <div className="text-center py-12">
-                            <FaShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">У вас пока нет заказов</h3>
-                            <p className="text-gray-600 mb-6">Начните делать покупки в нашем каталоге</p>
-                            <button
-                                onClick={() => navigate('/products')}
-                                className="btn btn-primary"
-                            >
-                                Перейти в каталог
-                            </button>
-                        </div>
+                        <OrdersSection />
                     )}
 
                     {selectedTab === 'addresses' && (

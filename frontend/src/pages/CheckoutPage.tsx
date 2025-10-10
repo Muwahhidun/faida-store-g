@@ -238,9 +238,14 @@ const CheckoutPage: React.FC = () => {
                 return;
             }
 
+            // Получаем примечание из выбранного адреса
+            const selectedAddress = addresses.find(addr => addr.id === selectedAddressId);
+            const deliveryComment = selectedAddress?.comment || '';
+
             // Формируем данные заказа
             const orderData = {
                 ...formData,
+                delivery_comment: deliveryComment,
                 items: cart.map(item => ({
                     product_id: item.id,
                     quantity: item.quantity,
