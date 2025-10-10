@@ -4,6 +4,7 @@
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.validators import RegexValidator
 
 
 class User(AbstractUser):
@@ -11,6 +12,7 @@ class User(AbstractUser):
     Кастомная модель пользователя с полем роли.
     Поле role автоматически синхронизируется с is_staff и is_superuser.
     Email обязателен и уникален.
+    Username может содержать только латинские буквы, цифры, _ и -.
     """
 
     ROLE_CHOICES = [
@@ -18,6 +20,25 @@ class User(AbstractUser):
         ('moderator', 'Модератор'),
         ('admin', 'Администратор'),
     ]
+
+    # Валидатор для username - только латиница, цифры, _ и -
+    username_validator = RegexValidator(
+        regex=r'^[a-zA-Z0-9_-]+$',
+        message='Имя пользователя может содержать только латинские буквы, цифры, символы подчеркивания (_) и дефисы (-).',
+        code='invalid_username'
+    )
+
+    # Переопределяем username из AbstractUser с нашим валидатором
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+        validators=[username_validator],
+        verbose_name='Имя пользователя',
+        help_text='Обязательное поле. Не более 150 символов. Только латинские буквы, цифры и символы _-',
+        error_messages={
+            'unique': 'Пользователь с таким именем уже существует.',
+        }
+    )
 
     # Переопределяем email из AbstractUser, делаем его обязательным и уникальным
     email = models.EmailField(

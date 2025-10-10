@@ -279,6 +279,15 @@ export const addressApi = {
   },
 };
 
+// API методы для настроек сайта
+export const settingsApi = {
+  // Получить настройки сайта
+  getSiteSettings: async (): Promise<any> => {
+    const response = await apiClient.get('/settings/');
+    return response.data;
+  },
+};
+
 // Общие API методы
 export const commonApi = {
   // Получить информацию об API

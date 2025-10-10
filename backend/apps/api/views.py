@@ -422,11 +422,16 @@ class SiteSettingsViewSet(mixins.ListModelMixin,
     """
     ViewSet для управления настройками сайта.
     Позволяет только просматривать и обновлять единственный экземпляр настроек.
-    Доступно только администраторам.
+    Чтение доступно всем, изменение только администраторам.
     """
     queryset = SiteSettings.objects.all()
     serializer_class = SiteSettingsSerializer
-    permission_classes = [IsAdminUser]
+
+    def get_permissions(self):
+        """Разрешения: чтение для всех, изменение только для админов."""
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return [IsAdminUser()]
 
     def get_object(self):
         # Возвращаем единственный экземпляр настроек

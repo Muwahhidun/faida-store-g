@@ -35,6 +35,7 @@ import AdminPanelPage from "./pages/AdminPanelPage";
 import ProfilePage from "./pages/ProfilePage";
 import CartPage from "./pages/CartPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AuthenticatedRoute from "./components/AuthenticatedRoute";
 
 const App: React.FC = () => {
   return (
@@ -113,9 +114,13 @@ const App: React.FC = () => {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/password/reset/confirm/:uid/:token" element={<ResetPasswordPage />} />
 
-            {/* Защищенные маршруты */}
+            {/* Админ-панель (только для админов и модераторов) */}
             <Route element={<ProtectedRoute />}>
               <Route path="/panel" element={<AdminPanelPage />} />
+            </Route>
+
+            {/* Личный кабинет (для всех авторизованных пользователей) */}
+            <Route element={<AuthenticatedRoute />}>
               <Route path="/profile" element={<ProfilePage />} />
             </Route>
 

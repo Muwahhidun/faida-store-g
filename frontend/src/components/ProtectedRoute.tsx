@@ -21,6 +21,14 @@ const decodeJWT = (token: string): any => {
     }
 };
 
+/**
+ * Компонент для защиты маршрутов админ-панели.
+ * Проверяет авторизацию и роль пользователя (admin или moderator).
+ * Используется для /panel, создания/редактирования новостей и вакансий.
+ *
+ * Для страниц, доступных всем авторизованным пользователям (например, /profile),
+ * используйте AuthenticatedRoute.
+ */
 const ProtectedRoute: React.FC = () => {
     const token = localStorage.getItem('access_token');
 

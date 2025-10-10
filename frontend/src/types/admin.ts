@@ -99,7 +99,8 @@ export interface Product {
 }
 
 export interface GlobalSettings {
-    default_stock_display_style: string;
+    min_stock_for_display: number;
+    default_stock_display_style: 'exact' | 'status' | 'detailed_status';
     default_low_stock_threshold: number;
     show_stock_quantities_globally: boolean;
 }

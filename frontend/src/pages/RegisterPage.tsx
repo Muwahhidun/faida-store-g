@@ -16,17 +16,43 @@ const RegisterPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [usernameValidationError, setUsernameValidationError] = useState('');
+
+    // Валидация username на клиентской стороне
+    const validateUsername = (username: string): boolean => {
+        if (!username) {
+            setUsernameValidationError('');
+            return true;
+        }
+
+        const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+        if (!usernameRegex.test(username)) {
+            setUsernameValidationError('Имя пользователя может содержать только латинские буквы, цифры, _ и -');
+            return false;
+        }
+
+        setUsernameValidationError('');
+        return true;
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value,
+            [name]: value,
         });
+
+        // Валидация username при вводе
+        if (name === 'username') {
+            validateUsername(value);
+        }
+
         // Очистка ошибок при вводе
-        if (fieldErrors[e.target.name]) {
+        if (fieldErrors[name]) {
             setFieldErrors({
                 ...fieldErrors,
-                [e.target.name]: [],
+                [name]: [],
             });
         }
     };
@@ -35,6 +61,13 @@ const RegisterPage: React.FC = () => {
         event.preventDefault();
         setError('');
         setFieldErrors({});
+
+        // Проверка валидации username перед отправкой
+        if (!validateUsername(formData.username)) {
+            setError('Пожалуйста, исправьте ошибки в форме');
+            return;
+        }
+
         setIsLoading(true);
 
         try {
@@ -117,14 +150,29 @@ const RegisterPage: React.FC = () => {
                                     name="username"
                                     value={formData.username}
                                     onChange={handleChange}
-                                    className={`input pl-10 ${fieldErrors.username ? 'border-red-500' : ''}`}
+                                    className={`input pl-10 ${
+                                        fieldErrors.username || usernameValidationError
+                                            ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                                            : ''
+                                    }`}
                                     placeholder="Введите имя пользователя"
                                     autoComplete="username"
                                     required
                                 />
                             </div>
+                            {/* Ошибки от сервера */}
                             {fieldErrors.username && (
                                 <p className="mt-1 text-sm text-red-600">{fieldErrors.username.join(', ')}</p>
+                            )}
+                            {/* Ошибка валидации на клиенте */}
+                            {usernameValidationError && !fieldErrors.username && (
+                                <p className="mt-1 text-sm text-red-600">{usernameValidationError}</p>
+                            )}
+                            {/* Подсказка о формате */}
+                            {!usernameValidationError && !fieldErrors.username && (
+                                <p className="mt-1 text-xs text-gray-500">
+                                    Латинские буквы, цифры, _ и - (например: john_doe или user-123)
+                                </p>
                             )}
                         </div>
 

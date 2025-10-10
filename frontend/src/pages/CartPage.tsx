@@ -13,16 +13,20 @@ import {
 import { useCart } from '../contexts/CartContext';
 import ProductImage from '../components/ProductImage';
 import CartButton from '../components/CartButton';
+import { useSiteSettings } from '../hooks/api';
 
 const CartPage: React.FC = () => {
-  const { 
-    items, 
-    updateQuantity, 
-    removeItem, 
-    clearCart, 
-    getTotalItems, 
-    getTotalPrice 
+  const {
+    items,
+    updateQuantity,
+    removeItem,
+    clearCart,
+    getTotalItems,
+    getTotalPrice
   } = useCart();
+
+  // Получаем настройки сайта
+  const { data: siteSettings } = useSiteSettings();
 
   const handleQuantityChange = (productId: number, newQuantity: number) => {
     if (newQuantity <= 0) {
@@ -57,6 +61,40 @@ const CartPage: React.FC = () => {
 
     // Для дробных - убираем лишние нули
     return numQuantity.toFixed(3).replace(/\.?0+$/, '');
+  };
+
+  /**
+   * Форматирует статус наличия товара в зависимости от настроек сайта
+   */
+  const formatStockStatus = (inStock: boolean, stockQuantity: number, unit: string) => {
+    // Если настройки еще не загружены, используем значение по умолчанию
+    const displayStyle = siteSettings?.default_stock_display_style || 'detailed_status';
+    const lowThreshold = siteSettings?.default_low_stock_threshold || 5;
+
+    if (!inStock) {
+      return 'Нет в наличии';
+    }
+
+    // Режим 'exact' - показываем точное количество
+    if (displayStyle === 'exact') {
+      return `В наличии (${formatQuantity(stockQuantity, unit)} ${unit})`;
+    }
+
+    // Режим 'status' - только статус без количества
+    if (displayStyle === 'status') {
+      return 'В наличии';
+    }
+
+    // Режим 'detailed_status' - детальный статус без количества
+    if (displayStyle === 'detailed_status') {
+      if (stockQuantity <= lowThreshold) {
+        return 'Мало';
+      }
+      return 'В наличии';
+    }
+
+    // По умолчанию возвращаем простой статус
+    return 'В наличии';
   };
 
   if (items.length === 0) {
@@ -154,15 +192,15 @@ const CartPage: React.FC = () => {
                         
                         {/* Статус наличия */}
                         <div className="mt-2">
-                          {item.in_stock ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              В наличии ({formatQuantity(item.stock_quantity, item.unit)} {item.unit})
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                              Нет в наличии
-                            </span>
-                          )}
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            item.in_stock
+                              ? item.stock_quantity <= (siteSettings?.default_low_stock_threshold || 5)
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {formatStockStatus(item.in_stock, item.stock_quantity, item.unit)}
+                          </span>
                         </div>
                       </div>
                     </div>

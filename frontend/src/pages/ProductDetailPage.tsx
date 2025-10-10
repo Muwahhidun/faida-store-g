@@ -11,6 +11,26 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ProductImage from '../components/ProductImage';
 import CartButton from '../components/CartButton';
 
+/**
+ * Декодирует JWT токен без проверки подписи (только для чтения payload)
+ */
+const decodeJWT = (token: string): any => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Error decoding JWT:', error);
+    return null;
+  }
+};
+
 interface ProductDetail {
   id: number;
   code: string;
@@ -112,6 +132,7 @@ const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
   const [showAdminInfo, setShowAdminInfo] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   const formatPrice = (price: number | string) => {
     const numPrice = typeof price === 'string' ? parseFloat(price) : price;
@@ -122,6 +143,17 @@ const ProductDetailPage: React.FC = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
+
+  // Получение роли пользователя из JWT токена
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      const payload = decodeJWT(token);
+      setUserRole(payload?.role || 'user');
+    } else {
+      setUserRole(null);
+    }
+  }, []);
   
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
@@ -343,29 +375,31 @@ const ProductDetailPage: React.FC = () => {
               )}
             </div>
 
-            {/* Кнопка админской информации */}
-            <div className="pt-6 border-t border-gray-200">
-              <button
-                onClick={() => setShowAdminInfo(!showAdminInfo)}
-                className="w-full flex items-center justify-center px-4 py-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-700 hover:bg-orange-100 transition-colors group"
-              >
-                <CogIcon className="w-5 h-5 mr-2" />
-                <span className="font-medium">
-                  {showAdminInfo ? 'Скрыть техническую информацию' : 'Показать техническую информацию'}
-                </span>
-                <svg 
-                  className={`w-4 h-4 ml-2 transition-transform ${showAdminInfo ? 'rotate-180' : ''}`}
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
+            {/* Кнопка админской информации - только для admin и moderator */}
+            {(userRole === 'admin' || userRole === 'moderator') && (
+              <div className="pt-6 border-t border-gray-200">
+                <button
+                  onClick={() => setShowAdminInfo(!showAdminInfo)}
+                  className="w-full flex items-center justify-center px-4 py-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-700 hover:bg-orange-100 transition-colors group"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </div>
+                  <CogIcon className="w-5 h-5 mr-2" />
+                  <span className="font-medium">
+                    {showAdminInfo ? 'Скрыть техническую информацию' : 'Показать техническую информацию'}
+                  </span>
+                  <svg
+                    className={`w-4 h-4 ml-2 transition-transform ${showAdminInfo ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+            )}
 
-            {/* Админская информация */}
-            {showAdminInfo && (
+            {/* Админская информация - только для admin и moderator */}
+            {(userRole === 'admin' || userRole === 'moderator') && showAdminInfo && (
               <div className="space-y-6 pt-6">
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
                   <div className="flex items-center">

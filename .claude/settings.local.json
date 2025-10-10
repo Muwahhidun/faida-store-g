@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker-compose exec backend python manage.py shell:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

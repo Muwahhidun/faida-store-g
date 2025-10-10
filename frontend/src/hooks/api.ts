@@ -13,7 +13,7 @@ import {
   CategoryStats,
   ApiError,
 } from '@/types';
-import { productsApi, categoriesApi, commonApi } from '@/api/client';
+import { productsApi, categoriesApi, commonApi, settingsApi } from '@/api/client';
 
 // Ключи для React Query
 export const queryKeys = {
@@ -34,9 +34,13 @@ export const queryKeys = {
     details: () => [...queryKeys.categories.all, 'detail'] as const,
     detail: (id: number) => [...queryKeys.categories.details(), id] as const,
     tree: () => [...queryKeys.categories.all, 'tree'] as const,
-    products: (id: number, filters?: ProductFilters) => 
+    products: (id: number, filters?: ProductFilters) =>
       [...queryKeys.categories.all, 'products', id, filters] as const,
     stats: () => [...queryKeys.categories.all, 'stats'] as const,
+  },
+  settings: {
+    all: ['settings'] as const,
+    site: () => [...queryKeys.settings.all, 'site'] as const,
   },
 };
 
@@ -166,5 +170,15 @@ export const useApiHealth = (): UseQueryResult<boolean, ApiError> => {
     cacheTime: 5 * 60 * 1000, // 5 минут
     retry: 3,
     retryDelay: 1000,
+  });
+};
+
+// Хуки для настроек сайта
+export const useSiteSettings = (): UseQueryResult<any, ApiError> => {
+  return useQuery({
+    queryKey: queryKeys.settings.site(),
+    queryFn: () => settingsApi.getSiteSettings(),
+    staleTime: 60 * 60 * 1000, // 1 час (настройки редко меняются)
+    cacheTime: 2 * 60 * 60 * 1000, // 2 часа
   });
 };
