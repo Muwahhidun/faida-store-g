@@ -175,6 +175,10 @@ backend/
 - `NewsCategory`: name, slug, display_order
 - `NewsMedia`: news FK, media_type (image/video), file, video_url, caption, display_order
 
+*Заказы:*
+- `Order`: order_number (автогенерируемый ORD-YYYYMMDD-XXXX), user FK, status (pending/confirmed/processing/shipping/delivered/cancelled), customer_name, customer_phone, delivery_address, delivery_comment (примечание к адресу, например код домофона), comment (комментарий к заказу), payment_method, total_amount
+- `OrderItem`: order FK, product FK, price (на момент заказа), quantity, subtotal
+
 *Настройки:*
 - `SiteSettings`: Singleton модель для настроек всего сайта (пороги остатков и т.д.)
 
