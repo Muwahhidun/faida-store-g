@@ -11,7 +11,8 @@ from apps.users.models import User, DeliveryAddress
 from apps.jobs.models import Job, JobMedia
 from apps.news.models import News, NewsCategory, NewsMedia
 from apps.orders.models import Order, OrderItem
-from apps.notifications.models import NotificationSettings, WhatsAppOperator
+# TODO: Обновить после миграции на новую систему уведомлений
+# from apps.notifications.models import NotificationSettings, WhatsAppOperator
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -720,27 +721,28 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         return order
 
 
-class NotificationSettingsSerializer(serializers.ModelSerializer):
-    """Сериализатор для настроек уведомлений."""
-
-    class Meta:
-        model = NotificationSettings
-        fields = (
-            'id', 'enable_email_notifications', 'admin_email',
-            'enable_whatsapp_notifications', 'green_api_instance_id', 'green_api_token',
-            'notify_on_new_order', 'notify_on_status_change',
-            'created_at', 'updated_at'
-        )
-        read_only_fields = ('id', 'created_at', 'updated_at')
-
-
-class WhatsAppOperatorSerializer(serializers.ModelSerializer):
-    """Сериализатор для операторов WhatsApp."""
-
-    class Meta:
-        model = WhatsAppOperator
-        fields = (
-            'id', 'name', 'phone_number', 'is_active',
-            'created_at', 'updated_at'
-        )
-        read_only_fields = ('id', 'created_at', 'updated_at')
+# TODO: Обновить после миграции на новую систему уведомлений
+# class NotificationSettingsSerializer(serializers.ModelSerializer):
+#     """Сериализатор для настроек уведомлений."""
+#
+#     class Meta:
+#         model = NotificationSettings
+#         fields = (
+#             'id', 'enable_email_notifications', 'admin_email',
+#             'enable_whatsapp_notifications', 'green_api_instance_id', 'green_api_token',
+#             'notify_on_new_order', 'notify_on_status_change',
+#             'created_at', 'updated_at'
+#         )
+#         read_only_fields = ('id', 'created_at', 'updated_at')
+#
+#
+# class WhatsAppOperatorSerializer(serializers.ModelSerializer):
+#     """Сериализатор для операторов WhatsApp."""
+#
+#     class Meta:
+#         model = WhatsAppOperator
+#         fields = (
+#             'id', 'name', 'phone_number', 'is_active',
+#             'created_at', 'updated_at'
+#         )
+#         read_only_fields = ('id', 'created_at', 'updated_at')

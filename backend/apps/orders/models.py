@@ -114,7 +114,19 @@ class Order(models.Model):
     def save(self, *args, **kwargs):
         """
         Генерация номера заказа при создании.
+        Отправка уведомлений при создании или изменении статуса.
         """
+        is_new = self.pk is None
+        old_status = None
+
+        # Если это обновление, получаем старый статус
+        if not is_new:
+            try:
+                old_instance = Order.objects.get(pk=self.pk)
+                old_status = old_instance.status
+            except Order.DoesNotExist:
+                pass
+
         if not self.order_number:
             # Генерируем номер заказа в формате ORD-YYYYMMDD-XXXX
             from django.utils import timezone
@@ -136,8 +148,87 @@ class Order(models.Model):
 
         super().save(*args, **kwargs)
 
+        # Отправляем уведомления после сохранения
+        if is_new:
+            # Новый заказ - отправляем уведомление
+            self.send_new_order_notification()
+        elif old_status and old_status != self.status:
+            # Статус изменился - отправляем уведомление
+            self.send_status_changed_notification()
+
     def __str__(self):
         return f"Заказ {self.order_number} - {self.customer_name}"
+
+    def get_items_text(self):
+        """
+        Формирует текстовый список товаров для уведомлений.
+        """
+        items_list = []
+        for item in self.items.all():
+            items_list.append(f"• {item.product.name} x {item.quantity} = {item.subtotal} ₽")
+        return '\n'.join(items_list) if items_list else 'Нет товаров'
+
+    def get_status_display_ru(self):
+        """
+        Возвращает русское название статуса.
+        """
+        status_dict = dict(self.STATUS_CHOICES)
+        return status_dict.get(self.status, self.status)
+
+    def send_new_order_notification(self):
+        """
+        Отправляет уведомление о новом заказе администраторам.
+        """
+        try:
+            from apps.notifications.notification_service import send_notification
+
+            context = {
+                'order_number': self.order_number,
+                'customer_name': self.customer_name,
+                'customer_phone': self.customer_phone,
+                'total_amount': self.total_amount,
+                'items_list': self.get_items_text(),
+                'delivery_address': self.delivery_address,
+                'delivery_comment': self.delivery_comment or '',
+                'comment': self.comment or '',
+            }
+
+            send_notification(
+                notification_type_code='new_order',
+                context=context
+            )
+        except Exception as e:
+            # Не прерываем сохранение заказа если уведомление не отправилось
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Ошибка отправки уведомления о новом заказе {self.order_number}: {e}")
+
+    def send_status_changed_notification(self):
+        """
+        Отправляет уведомление клиенту об изменении статуса заказа.
+        """
+        try:
+            from apps.notifications.notification_service import send_notification
+
+            context = {
+                'order_number': self.order_number,
+                'customer_name': self.customer_name,
+                'status': self.status,
+                'status_display': self.get_status_display_ru(),
+            }
+
+            # Отправляем клиенту (если есть email или телефон)
+            send_notification(
+                notification_type_code='order_status_changed',
+                context=context,
+                recipient_email=self.customer_email if self.customer_email else None,
+                recipient_phone=self.customer_phone if self.customer_phone else None
+            )
+        except Exception as e:
+            # Не прерываем сохранение заказа если уведомление не отправилось
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Ошибка отправки уведомления об изменении статуса заказа {self.order_number}: {e}")
 
 
 class OrderItem(models.Model):

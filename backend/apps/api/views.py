@@ -33,7 +33,8 @@ from apps.users.models import User, DeliveryAddress
 from apps.jobs.models import Job, JobMedia
 from apps.news.models import News, NewsCategory, NewsMedia
 from apps.orders.models import Order, OrderItem
-from apps.notifications.models import NotificationSettings, WhatsAppOperator
+# TODO: Обновить после миграции на новую систему уведомлений
+# from apps.notifications.models import NotificationSettings, WhatsAppOperator
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer, ProductImageSerializer,
     CategorySerializer, CategoryDetailSerializer,
@@ -42,7 +43,8 @@ from .serializers import (
     JobListSerializer, JobDetailSerializer, JobCreateUpdateSerializer, JobMediaSerializer,
     NewsListSerializer, NewsDetailSerializer, NewsCreateUpdateSerializer, NewsCategorySerializer, NewsMediaSerializer,
     OrderListSerializer, OrderDetailSerializer, OrderCreateSerializer,
-    NotificationSettingsSerializer, WhatsAppOperatorSerializer
+    # TODO: Обновить после миграции
+    # NotificationSettingsSerializer, WhatsAppOperatorSerializer
 )
 from .filters import ProductFilter, CategoryFilter, OrderFilter
 
@@ -1179,128 +1181,129 @@ class OrderViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class NotificationSettingsViewSet(mixins.ListModelMixin,
-                                   mixins.RetrieveModelMixin,
-                                   mixins.UpdateModelMixin,
-                                   viewsets.GenericViewSet):
-    """
-    ViewSet для управления настройками уведомлений (singleton).
-    Позволяет только просматривать и обновлять единственный экземпляр настроек.
-    Доступно только администраторам.
-    """
-    queryset = NotificationSettings.objects.all()
-    serializer_class = NotificationSettingsSerializer
-    permission_classes = [IsAdminUser]
-    pagination_class = None  # Отключаем пагинацию
-
-    def get_object(self):
-        """Возвращаем единственный экземпляр настроек."""
-        obj = NotificationSettings.load()
-        return obj
-
-    def list(self, request, *args, **kwargs):
-        """Переопределяем list, чтобы всегда возвращать один объект, а не список."""
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
-    def retrieve(self, request, *args, **kwargs):
-        """Переопределяем retrieve, чтобы всегда возвращать единственный объект настроек."""
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=['post'])
-    def test_whatsapp(self, request):
-        """Тестовая отправка WhatsApp сообщения."""
-        from apps.notifications.services import WhatsAppService
-
-        settings_obj = NotificationSettings.load()
-
-        if not settings_obj.enable_whatsapp_notifications:
-            return Response({
-                'success': False,
-                'message': 'WhatsApp уведомления отключены в настройках'
-            }, status=400)
-
-        # Получаем телефон из запроса
-        phone_number = request.data.get('phone_number')
-        message = request.data.get('message', 'Тестовое сообщение от Faida Group Store')
-
-        if not phone_number:
-            return Response({
-                'success': False,
-                'message': 'Номер телефона не указан'
-            }, status=400)
-
-        try:
-            # Создаем сервис и отправляем сообщение
-            whatsapp = WhatsAppService(
-                instance_id=settings_obj.green_api_instance_id,
-                api_token=settings_obj.green_api_token
-            )
-
-            result = whatsapp.send_message(phone_number, message)
-
-            if 'error' in result:
-                return Response({
-                    'success': False,
-                    'message': f'Ошибка отправки: {result["error"]}'
-                }, status=500)
-
-            return Response({
-                'success': True,
-                'message': 'Тестовое сообщение отправлено',
-                'result': result
-            })
-
-        except Exception as e:
-            return Response({
-                'success': False,
-                'message': f'Ошибка: {str(e)}'
-            }, status=500)
-
-    @action(detail=False, methods=['get'])
-    def check_green_api_status(self, request):
-        """Проверить состояние Green API инстанса."""
-        from apps.notifications.services import WhatsAppService
-
-        settings_obj = NotificationSettings.load()
-
-        try:
-            whatsapp = WhatsAppService(
-                instance_id=settings_obj.green_api_instance_id,
-                api_token=settings_obj.green_api_token
-            )
-
-            status_info = whatsapp.check_state_instance()
-
-            if 'error' in status_info:
-                return Response({
-                    'success': False,
-                    'message': f'Ошибка проверки: {status_info["error"]}'
-                }, status=500)
-
-            return Response({
-                'success': True,
-                'status': status_info
-            })
-
-        except Exception as e:
-            return Response({
-                'success': False,
-                'message': f'Ошибка: {str(e)}'
-            }, status=500)
-
-
-class WhatsAppOperatorViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet для управления операторами WhatsApp.
-    Позволяет создавать, обновлять, удалять операторов.
-    Доступно только администраторам.
-    """
-    queryset = WhatsAppOperator.objects.all()
-    serializer_class = WhatsAppOperatorSerializer
-    permission_classes = [IsAdminUser]
-    pagination_class = None  # Отключаем пагинацию
-    ordering = ['name']
+# TODO: Временно отключено - обновить после миграции на новую систему уведомлений
+# class NotificationSettingsViewSet(mixins.ListModelMixin,
+#                                    mixins.RetrieveModelMixin,
+#                                    mixins.UpdateModelMixin,
+#                                    viewsets.GenericViewSet):
+#     """
+#     ViewSet для управления настройками уведомлений (singleton).
+#     Позволяет только просматривать и обновлять единственный экземпляр настроек.
+#     Доступно только администраторам.
+#     """
+#     queryset = NotificationSettings.objects.all()
+#     serializer_class = NotificationSettingsSerializer
+#     permission_classes = [IsAdminUser]
+#     pagination_class = None  # Отключаем пагинацию
+# 
+#     def get_object(self):
+#         """Возвращаем единственный экземпляр настроек."""
+#         obj = NotificationSettings.load()
+#         return obj
+# 
+#     def list(self, request, *args, **kwargs):
+#         """Переопределяем list, чтобы всегда возвращать один объект, а не список."""
+#         instance = self.get_object()
+#         serializer = self.get_serializer(instance)
+#         return Response(serializer.data)
+# 
+#     def retrieve(self, request, *args, **kwargs):
+#         """Переопределяем retrieve, чтобы всегда возвращать единственный объект настроек."""
+#         instance = self.get_object()
+#         serializer = self.get_serializer(instance)
+#         return Response(serializer.data)
+# 
+#     @action(detail=False, methods=['post'])
+#     def test_whatsapp(self, request):
+#         """Тестовая отправка WhatsApp сообщения."""
+#         from apps.notifications.services import WhatsAppService
+# 
+#         settings_obj = NotificationSettings.load()
+# 
+#         if not settings_obj.enable_whatsapp_notifications:
+#             return Response({
+#                 'success': False,
+#                 'message': 'WhatsApp уведомления отключены в настройках'
+#             }, status=400)
+# 
+#         # Получаем телефон из запроса
+#         phone_number = request.data.get('phone_number')
+#         message = request.data.get('message', 'Тестовое сообщение от Faida Group Store')
+# 
+#         if not phone_number:
+#             return Response({
+#                 'success': False,
+#                 'message': 'Номер телефона не указан'
+#             }, status=400)
+# 
+#         try:
+#             # Создаем сервис и отправляем сообщение
+#             whatsapp = WhatsAppService(
+#                 instance_id=settings_obj.green_api_instance_id,
+#                 api_token=settings_obj.green_api_token
+#             )
+# 
+#             result = whatsapp.send_message(phone_number, message)
+# 
+#             if 'error' in result:
+#                 return Response({
+#                     'success': False,
+#                     'message': f'Ошибка отправки: {result["error"]}'
+#                 }, status=500)
+# 
+#             return Response({
+#                 'success': True,
+#                 'message': 'Тестовое сообщение отправлено',
+#                 'result': result
+#             })
+# 
+#         except Exception as e:
+#             return Response({
+#                 'success': False,
+#                 'message': f'Ошибка: {str(e)}'
+#             }, status=500)
+# 
+#     @action(detail=False, methods=['get'])
+#     def check_green_api_status(self, request):
+#         """Проверить состояние Green API инстанса."""
+#         from apps.notifications.services import WhatsAppService
+# 
+#         settings_obj = NotificationSettings.load()
+# 
+#         try:
+#             whatsapp = WhatsAppService(
+#                 instance_id=settings_obj.green_api_instance_id,
+#                 api_token=settings_obj.green_api_token
+#             )
+# 
+#             status_info = whatsapp.check_state_instance()
+# 
+#             if 'error' in status_info:
+#                 return Response({
+#                     'success': False,
+#                     'message': f'Ошибка проверки: {status_info["error"]}'
+#                 }, status=500)
+# 
+#             return Response({
+#                 'success': True,
+#                 'status': status_info
+#             })
+# 
+#         except Exception as e:
+#             return Response({
+#                 'success': False,
+#                 'message': f'Ошибка: {str(e)}'
+#             }, status=500)
+# 
+# 
+# class WhatsAppOperatorViewSet(viewsets.ModelViewSet):
+#     """
+#     ViewSet для управления операторами WhatsApp.
+#     Позволяет создавать, обновлять, удалять операторов.
+#     Доступно только администраторам.
+#     """
+#     queryset = WhatsAppOperator.objects.all()
+#     serializer_class = WhatsAppOperatorSerializer
+#     permission_classes = [IsAdminUser]
+#     pagination_class = None  # Отключаем пагинацию
+#     ordering = ['name']
