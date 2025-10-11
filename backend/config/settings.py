@@ -45,6 +45,7 @@ LOCAL_APPS = [
     'apps.jobs',
     'apps.news',
     'apps.orders',  # Заказы
+    'apps.notifications',  # Уведомления (Email, WhatsApp)
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

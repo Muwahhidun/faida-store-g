@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCog, FaDatabase, FaList, FaTags, FaPowerOff, FaUsers, FaShoppingBag } from 'react-icons/fa';
+import { FaCog, FaDatabase, FaList, FaTags, FaPowerOff, FaUsers, FaShoppingBag, FaBell } from 'react-icons/fa';
 import { adminClient } from '../api/adminClient';
 import { Source, Category, AvailableOptions } from '../types/admin';
 import {
@@ -11,6 +11,7 @@ import {
     UsersSection,
     OrdersManagementSection
 } from '../components/admin';
+import { NotificationsSection } from '../components/admin/sections/NotificationsSection';
 import { Toast } from '../components/Toast';
 
 /**
@@ -21,16 +22,16 @@ const AdminPanelPage: React.FC = () => {
     const navigate = useNavigate();
 
     // Получаем вкладку из URL hash или используем 'settings' по умолчанию
-    const getInitialTab = (): 'settings' | 'sources' | 'categories' | 'products' | 'users' | 'orders' => {
+    const getInitialTab = (): 'settings' | 'sources' | 'categories' | 'products' | 'users' | 'orders' | 'notifications' => {
         const hash = window.location.hash.slice(1); // Убираем '#'
-        if (hash === 'sources' || hash === 'categories' || hash === 'products' || hash === 'settings' || hash === 'users' || hash === 'orders') {
+        if (hash === 'sources' || hash === 'categories' || hash === 'products' || hash === 'settings' || hash === 'users' || hash === 'orders' || hash === 'notifications') {
             return hash;
         }
         return 'settings';
     };
 
     // Основное состояние
-    const [selectedTab, setSelectedTab] = useState<'settings' | 'sources' | 'categories' | 'products' | 'users' | 'orders'>(getInitialTab());
+    const [selectedTab, setSelectedTab] = useState<'settings' | 'sources' | 'categories' | 'products' | 'users' | 'orders' | 'notifications'>(getInitialTab());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -309,6 +310,17 @@ const AdminPanelPage: React.FC = () => {
                                 <FaShoppingBag className="w-4 h-4" />
                                 <span>Заказы ({ordersCount})</span>
                             </button>
+                            <button
+                                onClick={() => setSelectedTab('notifications')}
+                                className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                                    selectedTab === 'notifications'
+                                        ? 'border-yellow-600 text-yellow-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                }`}
+                            >
+                                <FaBell className="w-4 h-4" />
+                                <span>Уведомления</span>
+                            </button>
                         </div>
                     </div>
 
@@ -385,6 +397,10 @@ const AdminPanelPage: React.FC = () => {
                                     onError={handleError}
                                     onSuccess={handleSuccess}
                                 />
+                            </div>
+
+                            <div style={{ display: selectedTab === 'notifications' ? 'block' : 'none' }}>
+                                <NotificationsSection />
                             </div>
                         </>
                     )}

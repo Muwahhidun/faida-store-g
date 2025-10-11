@@ -184,16 +184,21 @@ export const UsersSection: React.FC<UsersSectionProps> = ({
                 </div>
 
                 {/* Фильтры */}
-                <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                    <div className="flex-1 relative">
-                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <input
-                            type="text"
-                            placeholder="Поиск по имени, email, логину..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div className="relative">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Поиск
+                        </label>
+                        <div className="relative">
+                            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                            <input
+                                type="text"
+                                placeholder="По имени, email, логину..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                            />
+                        </div>
                     </div>
                     <CustomSelect
                         value={roleFilter}
@@ -204,7 +209,7 @@ export const UsersSection: React.FC<UsersSectionProps> = ({
                             { value: 'moderator', label: 'Модераторы' },
                             { value: 'user', label: 'Пользователи' }
                         ]}
-                        className="min-w-[180px]"
+                        label="Роль"
                     />
                 </div>
 
