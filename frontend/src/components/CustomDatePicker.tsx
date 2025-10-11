@@ -89,18 +89,16 @@ export const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
         </label>
       )}
       <div className="relative">
-        {/* Кнопка открытия календаря */}
-        <button
-          type="button"
+        {/* Основной контейнер с видом кнопки */}
+        <div
           onClick={handleButtonClick}
-          disabled={disabled}
           className={`
             relative w-full cursor-default rounded-lg bg-white py-2 pl-10 pr-10 text-left
             border shadow-sm
             border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500
-            disabled:bg-gray-100 disabled:cursor-not-allowed
+            ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'hover:border-gray-400 cursor-pointer'}
             transition-colors duration-200
-            text-sm hover:border-gray-400
+            text-sm
           `}
         >
           {/* Иконка календаря */}
@@ -121,14 +119,14 @@ export const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
             <button
               type="button"
               onClick={handleClear}
-              className="pointer-events-auto absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors z-10"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           )}
-        </button>
+        </div>
 
         {/* Скрытый нативный input date */}
         <input
