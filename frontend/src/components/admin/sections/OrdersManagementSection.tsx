@@ -410,23 +410,22 @@ const OrdersManagementSection: React.FC<OrdersManagementSectionProps> = ({
 
                     {/* Изменение статуса */}
                     <div className="mb-4 pb-4 border-b border-gray-200">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Изменить статус заказа:
-                      </label>
-                      <select
-                        value={order.status}
-                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                        disabled={changingStatus === order.id}
-                        className="w-full md:w-64 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <option value="pending">Ожидает подтверждения</option>
-                        <option value="confirmed">Подтвержден</option>
-                        <option value="processing">Обрабатывается</option>
-                        <option value="shipping">В доставке</option>
-                        <option value="delivered">Доставлен</option>
-                        <option value="cancelled">Отменен</option>
-                      </select>
+                      <div className="w-full md:w-64" onClick={(e) => e.stopPropagation()}>
+                        <CustomSelect
+                          value={order.status}
+                          onChange={(value) => handleStatusChange(order.id, value)}
+                          options={[
+                            { value: 'pending', label: 'Ожидает подтверждения' },
+                            { value: 'confirmed', label: 'Подтвержден' },
+                            { value: 'processing', label: 'Обрабатывается' },
+                            { value: 'shipping', label: 'В доставке' },
+                            { value: 'delivered', label: 'Доставлен' },
+                            { value: 'cancelled', label: 'Отменен' }
+                          ]}
+                          label="Изменить статус заказа:"
+                          disabled={changingStatus === order.id}
+                        />
+                      </div>
                     </div>
 
                     {/* Информация о заказе */}

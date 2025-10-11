@@ -282,15 +282,16 @@ export const addressApi = {
 // API методы для заказов
 export const ordersApi = {
   // Получить список заказов текущего пользователя
-  getOrders: async (): Promise<any[]> => {
+  getOrders: async (params?: { limit?: number; offset?: number }): Promise<any> => {
     const token = localStorage.getItem('access_token');
     const response = await apiClient.get('/orders/', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      params,
     });
-    // API возвращает пагинированный ответ, извлекаем массив results
-    return response.data.results || response.data;
+    // API возвращает пагинированный ответ с count и results
+    return response.data;
   },
 
   // Получить заказ по ID

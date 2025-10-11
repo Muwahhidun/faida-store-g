@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaShoppingBag, FaBox, FaTruck, FaCheckCircle, FaTimesCircle, FaClock, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaShoppingBag, FaBox, FaTruck, FaCheckCircle, FaTimesCircle, FaClock, FaChevronDown, FaChevronUp, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { ordersApi } from '@/api/client';
 import { toast } from 'react-hot-toast';
 import ProductImage from '../ProductImage';
+
+const PAGE_SIZE = 10;
 
 const OrdersSection: React.FC = () => {
   const navigate = useNavigate();
@@ -12,11 +14,30 @@ const OrdersSection: React.FC = () => {
   const [expandedOrders, setExpandedOrders] = useState<Set<number>>(new Set());
   const [expandedOrderDetails, setExpandedOrderDetails] = useState<Set<number>>(new Set());
 
-  const loadOrders = async () => {
+  // Пагинация
+  const [pagination, setPagination] = useState({
+    page: 1,
+    totalPages: 1,
+    count: 0,
+  });
+
+  const loadOrders = async (page: number = 1) => {
     try {
       setIsLoading(true);
-      const data = await ordersApi.getOrders();
-      setOrders(data);
+      const params = {
+        limit: PAGE_SIZE,
+        offset: (page - 1) * PAGE_SIZE,
+      };
+      const data = await ordersApi.getOrders(params);
+      const ordersData = data.results || data;
+      const count = data.count || ordersData.length;
+
+      setOrders(ordersData);
+      setPagination({
+        page,
+        totalPages: Math.ceil(count / PAGE_SIZE),
+        count,
+      });
     } catch (error: any) {
       toast.error(error.message || 'Ошибка загрузки заказов');
     } finally {
@@ -25,7 +46,7 @@ const OrdersSection: React.FC = () => {
   };
 
   useEffect(() => {
-    loadOrders();
+    loadOrders(1);
   }, []);
 
   const getStatusInfo = (status: string) => {
@@ -132,8 +153,10 @@ const OrdersSection: React.FC = () => {
       {/* Заголовок */}
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-900">Мои заказы</h3>
-        {orders.length > 0 && (
-          <span className="text-sm text-gray-600">Всего заказов: {orders.length}</span>
+        {pagination.count > 0 && (
+          <span className="text-sm text-gray-600">
+            Всего заказов: {pagination.count} • Страница {pagination.page} из {pagination.totalPages}
+          </span>
         )}
       </div>
 
@@ -317,6 +340,33 @@ const OrdersSection: React.FC = () => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Пагинация */}
+      {pagination.totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-between bg-white p-4 rounded-lg border border-gray-200">
+          <button
+            onClick={() => loadOrders(pagination.page - 1)}
+            disabled={pagination.page === 1}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <FaChevronLeft className="w-4 h-4" />
+            Предыдущая
+          </button>
+
+          <span className="text-sm text-gray-600">
+            Страница {pagination.page} из {pagination.totalPages}
+          </span>
+
+          <button
+            onClick={() => loadOrders(pagination.page + 1)}
+            disabled={pagination.page === pagination.totalPages}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Следующая
+            <FaChevronRight className="w-4 h-4" />
+          </button>
         </div>
       )}
     </div>
