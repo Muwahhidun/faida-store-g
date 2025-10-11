@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaBell, FaSave, FaSpinner, FaWhatsapp, FaPlus, FaTrash, FaCheckCircle, FaPaperPlane } from 'react-icons/fa';
+import { FaBell, FaSave, FaSpinner, FaWhatsapp, FaPlus, FaTrash, FaCheckCircle, FaPaperPlane, FaEdit, FaTimes } from 'react-icons/fa';
 import { adminClient } from '../../../api/adminClient';
 import toast from 'react-hot-toast';
 
@@ -31,9 +31,11 @@ export const NotificationsSection: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [saveLoading, setSaveLoading] = useState(false);
     const [testLoading, setTestLoading] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     // Настройки уведомлений
     const [settings, setSettings] = useState<NotificationSettings | null>(null);
+    const [editedSettings, setEditedSettings] = useState<NotificationSettings | null>(null);
 
     // Операторы WhatsApp
     const [operators, setOperators] = useState<WhatsAppOperator[]>([]);
@@ -49,6 +51,7 @@ export const NotificationsSection: React.FC = () => {
             // Загружаем настройки
             const settingsResponse = await adminClient.get('/notification-settings/');
             setSettings(settingsResponse.data);
+            setEditedSettings(settingsResponse.data);
 
             // Загружаем операторов
             const operatorsResponse = await adminClient.get('/whatsapp-operators/');
@@ -65,22 +68,35 @@ export const NotificationsSection: React.FC = () => {
         loadData();
     }, []);
 
+    // Начало редактирования
+    const handleStartEdit = () => {
+        setIsEditing(true);
+        setEditedSettings(settings);
+    };
+
+    // Отмена редактирования
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setEditedSettings(settings);
+    };
+
     // Сохранение настроек
     const handleSaveSettings = async () => {
-        if (!settings) return;
+        if (!editedSettings) return;
 
         setSaveLoading(true);
         try {
-            await adminClient.patch(`/notification-settings/${settings.id}/`, {
-                enable_email_notifications: settings.enable_email_notifications,
-                admin_email: settings.admin_email,
-                enable_whatsapp_notifications: settings.enable_whatsapp_notifications,
-                green_api_instance_id: settings.green_api_instance_id,
-                green_api_token: settings.green_api_token,
-                notify_on_new_order: settings.notify_on_new_order,
-                notify_on_status_change: settings.notify_on_status_change,
+            await adminClient.patch(`/notification-settings/${editedSettings.id}/`, {
+                enable_email_notifications: editedSettings.enable_email_notifications,
+                admin_email: editedSettings.admin_email,
+                enable_whatsapp_notifications: editedSettings.enable_whatsapp_notifications,
+                green_api_instance_id: editedSettings.green_api_instance_id,
+                green_api_token: editedSettings.green_api_token,
+                notify_on_new_order: editedSettings.notify_on_new_order,
+                notify_on_status_change: editedSettings.notify_on_status_change,
             });
             toast.success('Настройки уведомлений сохранены!');
+            setIsEditing(false);
             loadData();
         } catch (err) {
             toast.error('Ошибка при сохранении настроек');
@@ -187,7 +203,7 @@ export const NotificationsSection: React.FC = () => {
         );
     }
 
-    if (!settings) {
+    if (!settings || !editedSettings) {
         return (
             <div className="card p-6">
                 <p className="text-red-600">Ошибка загрузки настроек</p>
@@ -199,14 +215,26 @@ export const NotificationsSection: React.FC = () => {
         <div className="space-y-6">
             {/* Основные настройки */}
             <div className="card p-6">
-                <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <FaBell className="w-5 h-5 text-blue-600" />
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <FaBell className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-semibold text-gray-900">Настройки уведомлений</h2>
+                            <p className="text-sm text-gray-600">Управление Email и WhatsApp уведомлениями</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 className="text-lg font-semibold text-gray-900">Настройки уведомлений</h2>
-                        <p className="text-sm text-gray-600">Управление Email и WhatsApp уведомлениями</p>
-                    </div>
+
+                    {!isEditing && (
+                        <button
+                            onClick={handleStartEdit}
+                            className="flex items-center space-x-2 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        >
+                            <FaEdit className="w-4 h-4" />
+                            <span>Изменить</span>
+                        </button>
+                    )}
                 </div>
 
                 <div className="space-y-6">
@@ -215,35 +243,39 @@ export const NotificationsSection: React.FC = () => {
                         <h3 className="text-md font-medium text-gray-900 mb-4">Email уведомления</h3>
 
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <label className="text-sm font-medium text-gray-700">
-                                        Включить Email уведомления
+                            <div className="bg-gray-50 rounded-lg p-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-700">
+                                            Включить Email уведомления
+                                        </label>
+                                        <p className="text-xs text-gray-500">
+                                            Отправка уведомлений на email администратора
+                                        </p>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={editedSettings.enable_email_notifications}
+                                            onChange={(e) => isEditing && setEditedSettings({...editedSettings, enable_email_notifications: e.target.checked})}
+                                            disabled={!isEditing}
+                                            className="sr-only peer"
+                                        />
+                                        <div className={`w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 ${!isEditing ? 'opacity-60 cursor-not-allowed' : ''}`}></div>
                                     </label>
-                                    <p className="text-xs text-gray-500">
-                                        Отправка уведомлений на email администратора
-                                    </p>
                                 </div>
-                                <label className="relative inline-flex items-center cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={settings.enable_email_notifications}
-                                        onChange={(e) => setSettings({...settings, enable_email_notifications: e.target.checked})}
-                                        className="sr-only peer"
-                                    />
-                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                </label>
                             </div>
 
-                            <div>
+                            <div className="bg-gray-50 rounded-lg p-4">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Email администратора
                                 </label>
                                 <input
                                     type="email"
-                                    value={settings.admin_email}
-                                    onChange={(e) => setSettings({...settings, admin_email: e.target.value})}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    value={editedSettings.admin_email}
+                                    onChange={(e) => isEditing && setEditedSettings({...editedSettings, admin_email: e.target.value})}
+                                    disabled={!isEditing}
+                                    className={`w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                                     placeholder="admin@faida.ru"
                                 />
                             </div>
@@ -258,49 +290,54 @@ export const NotificationsSection: React.FC = () => {
                         </h3>
 
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <label className="text-sm font-medium text-gray-700">
-                                        Включить WhatsApp уведомления
+                            <div className="bg-gray-50 rounded-lg p-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-700">
+                                            Включить WhatsApp уведомления
+                                        </label>
+                                        <p className="text-xs text-gray-500">
+                                            Отправка уведомлений операторам в WhatsApp
+                                        </p>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={editedSettings.enable_whatsapp_notifications}
+                                            onChange={(e) => isEditing && setEditedSettings({...editedSettings, enable_whatsapp_notifications: e.target.checked})}
+                                            disabled={!isEditing}
+                                            className="sr-only peer"
+                                        />
+                                        <div className={`w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600 ${!isEditing ? 'opacity-60 cursor-not-allowed' : ''}`}></div>
                                     </label>
-                                    <p className="text-xs text-gray-500">
-                                        Отправка уведомлений операторам в WhatsApp
-                                    </p>
                                 </div>
-                                <label className="relative inline-flex items-center cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={settings.enable_whatsapp_notifications}
-                                        onChange={(e) => setSettings({...settings, enable_whatsapp_notifications: e.target.checked})}
-                                        className="sr-only peer"
-                                    />
-                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                                </label>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
+                                <div className="bg-gray-50 rounded-lg p-4">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Instance ID
                                     </label>
                                     <input
                                         type="text"
-                                        value={settings.green_api_instance_id}
-                                        onChange={(e) => setSettings({...settings, green_api_instance_id: e.target.value})}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                        value={editedSettings.green_api_instance_id}
+                                        onChange={(e) => isEditing && setEditedSettings({...editedSettings, green_api_instance_id: e.target.value})}
+                                        disabled={!isEditing}
+                                        className={`w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                                         placeholder="1103108965"
                                     />
                                 </div>
 
-                                <div>
+                                <div className="bg-gray-50 rounded-lg p-4">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         API Token
                                     </label>
                                     <input
                                         type="text"
-                                        value={settings.green_api_token}
-                                        onChange={(e) => setSettings({...settings, green_api_token: e.target.value})}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono text-xs"
+                                        value={editedSettings.green_api_token}
+                                        onChange={(e) => isEditing && setEditedSettings({...editedSettings, green_api_token: e.target.value})}
+                                        disabled={!isEditing}
+                                        className={`w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono text-xs ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                                         placeholder="API Token..."
                                     />
                                 </div>
@@ -313,90 +350,109 @@ export const NotificationsSection: React.FC = () => {
                         <h3 className="text-md font-medium text-gray-900 mb-4">Типы уведомлений</h3>
 
                         <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <label className="text-sm font-medium text-gray-700">
-                                        Уведомлять о новых заказах
+                            <div className="bg-gray-50 rounded-lg p-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-700">
+                                            Уведомлять о новых заказах
+                                        </label>
+                                        <p className="text-xs text-gray-500">
+                                            Отправлять уведомление при создании нового заказа
+                                        </p>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={editedSettings.notify_on_new_order}
+                                            onChange={(e) => isEditing && setEditedSettings({...editedSettings, notify_on_new_order: e.target.checked})}
+                                            disabled={!isEditing}
+                                            className="sr-only peer"
+                                        />
+                                        <div className={`w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 ${!isEditing ? 'opacity-60 cursor-not-allowed' : ''}`}></div>
                                     </label>
-                                    <p className="text-xs text-gray-500">
-                                        Отправлять уведомление при создании нового заказа
-                                    </p>
                                 </div>
-                                <label className="relative inline-flex items-center cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={settings.notify_on_new_order}
-                                        onChange={(e) => setSettings({...settings, notify_on_new_order: e.target.checked})}
-                                        className="sr-only peer"
-                                    />
-                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                </label>
                             </div>
 
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <label className="text-sm font-medium text-gray-700">
-                                        Уведомлять о смене статуса заказа
+                            <div className="bg-gray-50 rounded-lg p-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-700">
+                                            Уведомлять о смене статуса заказа
+                                        </label>
+                                        <p className="text-xs text-gray-500">
+                                            Отправлять уведомление при изменении статуса заказа
+                                        </p>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={editedSettings.notify_on_status_change}
+                                            onChange={(e) => isEditing && setEditedSettings({...editedSettings, notify_on_status_change: e.target.checked})}
+                                            disabled={!isEditing}
+                                            className="sr-only peer"
+                                        />
+                                        <div className={`w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 ${!isEditing ? 'opacity-60 cursor-not-allowed' : ''}`}></div>
                                     </label>
-                                    <p className="text-xs text-gray-500">
-                                        Отправлять уведомление при изменении статуса заказа
-                                    </p>
                                 </div>
-                                <label className="relative inline-flex items-center cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={settings.notify_on_status_change}
-                                        onChange={(e) => setSettings({...settings, notify_on_status_change: e.target.checked})}
-                                        className="sr-only peer"
-                                    />
-                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                </label>
                             </div>
                         </div>
                     </div>
 
                     {/* Кнопки действий */}
-                    <div className="flex space-x-3">
-                        <button
-                            onClick={handleSaveSettings}
-                            disabled={saveLoading}
-                            className={`flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center space-x-2 ${
-                                saveLoading ? 'opacity-75 cursor-not-allowed' : ''
-                            }`}
-                        >
-                            {saveLoading ? (
-                                <>
-                                    <FaSpinner className="w-4 h-4 animate-spin" />
-                                    <span>Сохранение...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <FaSave className="w-4 h-4" />
-                                    <span>Сохранить настройки</span>
-                                </>
-                            )}
-                        </button>
+                    {isEditing ? (
+                        <div className="flex space-x-3">
+                            <button
+                                onClick={handleSaveSettings}
+                                disabled={saveLoading}
+                                className={`flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center space-x-2 ${
+                                    saveLoading ? 'opacity-75 cursor-not-allowed' : ''
+                                }`}
+                            >
+                                {saveLoading ? (
+                                    <>
+                                        <FaSpinner className="w-4 h-4 animate-spin" />
+                                        <span>Сохранение...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaSave className="w-4 h-4" />
+                                        <span>Сохранить</span>
+                                    </>
+                                )}
+                            </button>
 
-                        <button
-                            onClick={handleTestWhatsApp}
-                            disabled={testLoading || !settings.enable_whatsapp_notifications}
-                            className={`px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg flex items-center space-x-2 ${
-                                testLoading || !settings.enable_whatsapp_notifications ? 'opacity-75 cursor-not-allowed' : ''
-                            }`}
-                        >
-                            {testLoading ? (
-                                <>
-                                    <FaSpinner className="w-4 h-4 animate-spin" />
-                                    <span>Отправка...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <FaPaperPlane className="w-4 h-4" />
-                                    <span>Тест</span>
-                                </>
-                            )}
-                        </button>
-                    </div>
+                            <button
+                                onClick={handleCancelEdit}
+                                disabled={saveLoading}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg flex items-center space-x-2"
+                            >
+                                <FaTimes className="w-4 h-4" />
+                                <span>Отмена</span>
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex justify-end">
+                            <button
+                                onClick={handleTestWhatsApp}
+                                disabled={testLoading || !settings.enable_whatsapp_notifications}
+                                className={`px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg flex items-center space-x-2 ${
+                                    testLoading || !settings.enable_whatsapp_notifications ? 'opacity-75 cursor-not-allowed' : ''
+                                }`}
+                            >
+                                {testLoading ? (
+                                    <>
+                                        <FaSpinner className="w-4 h-4 animate-spin" />
+                                        <span>Отправка...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaPaperPlane className="w-4 h-4" />
+                                        <span>Тестовая отправка</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
