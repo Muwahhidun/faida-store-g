@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaShoppingBag, FaBox, FaTruck, FaCheckCircle, FaTimesCircle, FaClock, FaChevronDown, FaChevronUp, FaSearch, FaCalendarAlt, FaSpinner, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaShoppingBag, FaBox, FaTruck, FaCheckCircle, FaTimesCircle, FaClock, FaChevronDown, FaChevronUp, FaSearch, FaCalendarAlt, FaSpinner, FaChevronLeft, FaChevronRight, FaCopy } from 'react-icons/fa';
 import { adminClient } from '@/api/adminClient';
 import ProductImage from '../../ProductImage';
 import { CustomSelect } from '../../CustomSelect';
@@ -187,6 +187,28 @@ const OrdersManagementSection: React.FC<OrdersManagementSectionProps> = ({
       onError(error.response?.data?.detail || 'Ошибка изменения статуса');
     } finally {
       setChangingStatus(null);
+    }
+  };
+
+  // Копирование названий товаров в буфер обмена
+  const copyProductNames = async (items: any[]) => {
+    try {
+      const names = items.map(item => item.product_name || `Товар #${item.product_id}`).join('\n');
+      await navigator.clipboard.writeText(names);
+      onSuccess(`Скопировано ${items.length} названий товаров`);
+    } catch (error) {
+      onError('Ошибка копирования в буфер обмена');
+    }
+  };
+
+  // Копирование количеств товаров в буфер обмена
+  const copyProductQuantities = async (items: any[]) => {
+    try {
+      const quantities = items.map(item => item.quantity).join('\n');
+      await navigator.clipboard.writeText(quantities);
+      onSuccess(`Скопировано ${items.length} количеств`);
+    } catch (error) {
+      onError('Ошибка копирования в буфер обмена');
     }
   };
 
@@ -473,11 +495,31 @@ const OrdersManagementSection: React.FC<OrdersManagementSectionProps> = ({
                       <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Товар
+                            <th scope="col" className="px-3 py-3 text-left">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  copyProductNames(order.items || []);
+                                }}
+                                className="flex items-center gap-2 text-xs font-medium text-blue-600 uppercase tracking-wider hover:text-blue-800 transition-colors group"
+                                title="Копировать названия товаров"
+                              >
+                                <FaCopy className="w-3 h-3 opacity-70 group-hover:opacity-100" />
+                                Товар
+                              </button>
                             </th>
-                            <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Количество
+                            <th scope="col" className="px-3 py-3 text-left">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  copyProductQuantities(order.items || []);
+                                }}
+                                className="flex items-center gap-2 text-xs font-medium text-blue-600 uppercase tracking-wider hover:text-blue-800 transition-colors group"
+                                title="Копировать количества"
+                              >
+                                <FaCopy className="w-3 h-3 opacity-70 group-hover:opacity-100" />
+                                Количество
+                              </button>
                             </th>
                             <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Цена
