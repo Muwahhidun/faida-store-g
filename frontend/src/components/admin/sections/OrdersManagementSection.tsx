@@ -3,6 +3,7 @@ import { FaShoppingBag, FaBox, FaTruck, FaCheckCircle, FaTimesCircle, FaClock, F
 import { adminClient } from '@/api/adminClient';
 import ProductImage from '../../ProductImage';
 import { CustomSelect } from '../../CustomSelect';
+import { CustomDatePicker } from '../../CustomDatePicker';
 
 interface OrdersManagementSectionProps {
   onError: (message: string) => void;
@@ -291,30 +292,22 @@ const OrdersManagementSection: React.FC<OrdersManagementSectionProps> = ({
 
               {/* Дата от */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Дата от</label>
-                <div className="relative">
-                  <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
-                  <input
-                    type="date"
-                    value={dateFrom}
-                    onChange={(e) => setDateFrom(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
-                  />
-                </div>
+                <CustomDatePicker
+                  value={dateFrom}
+                  onChange={setDateFrom}
+                  label="Дата от"
+                  placeholder="Выберите дату"
+                />
               </div>
 
               {/* Дата до */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Дата до</label>
-                <div className="relative">
-                  <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
-                  <input
-                    type="date"
-                    value={dateTo}
-                    onChange={(e) => setDateTo(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
-                  />
-                </div>
+                <CustomDatePicker
+                  value={dateTo}
+                  onChange={setDateTo}
+                  label="Дата до"
+                  placeholder="Выберите дату"
+                />
               </div>
             </div>
 
