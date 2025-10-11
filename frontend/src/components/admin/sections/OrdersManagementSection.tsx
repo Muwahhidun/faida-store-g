@@ -1,24 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaShoppingBag, FaBox, FaTruck, FaCheckCircle, FaTimesCircle, FaClock, FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import { ordersApi } from '@/api/client';
-import { toast } from 'react-hot-toast';
-import ProductImage from '../ProductImage';
+import { FaShoppingBag, FaBox, FaTruck, FaCheckCircle, FaTimesCircle, FaClock, FaChevronDown, FaChevronUp, FaSearch } from 'react-icons/fa';
+import { adminClient } from '@/api/adminClient';
+import ProductImage from '../../ProductImage';
+import { CustomSelect } from '../../CustomSelect';
 
-const OrdersSection: React.FC = () => {
-  const navigate = useNavigate();
+interface OrdersManagementSectionProps {
+  onError: (message: string) => void;
+  onSuccess: (message: string) => void;
+}
+
+const OrdersManagementSection: React.FC<OrdersManagementSectionProps> = ({
+  onError,
+  onSuccess,
+}) => {
   const [orders, setOrders] = useState<any[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedOrders, setExpandedOrders] = useState<Set<number>>(new Set());
   const [expandedOrderDetails, setExpandedOrderDetails] = useState<Set<number>>(new Set());
 
+  // Фильтры
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [changingStatus, setChangingStatus] = useState<number | null>(null);
+
   const loadOrders = async () => {
     try {
       setIsLoading(true);
-      const data = await ordersApi.getOrders();
-      setOrders(data);
+      const response = await adminClient.get('/orders/');
+      const ordersData = response.data.results || response.data;
+      setOrders(ordersData);
+      setFilteredOrders(ordersData);
     } catch (error: any) {
-      toast.error(error.message || 'Ошибка загрузки заказов');
+      onError(error.response?.data?.detail || 'Ошибка загрузки заказов');
     } finally {
       setIsLoading(false);
     }
@@ -27,6 +41,28 @@ const OrdersSection: React.FC = () => {
   useEffect(() => {
     loadOrders();
   }, []);
+
+  // Фильтрация заказов
+  useEffect(() => {
+    let filtered = [...orders];
+
+    // Фильтр по статусу
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(order => order.status === statusFilter);
+    }
+
+    // Поиск по номеру заказа, имени или телефону
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(order =>
+        order.order_number.toLowerCase().includes(query) ||
+        order.customer_name.toLowerCase().includes(query) ||
+        order.customer_phone.includes(query)
+      );
+    }
+
+    setFilteredOrders(filtered);
+  }, [orders, statusFilter, searchQuery]);
 
   const getStatusInfo = (status: string) => {
     const statusMap: Record<string, { label: string; icon: any; color: string; bgColor: string }> = {
@@ -119,6 +155,24 @@ const OrdersSection: React.FC = () => {
     });
   };
 
+  const handleStatusChange = async (orderId: number, newStatus: string) => {
+    try {
+      setChangingStatus(orderId);
+      await adminClient.patch(`/orders/${orderId}/`, { status: newStatus });
+
+      // Обновляем локальное состояние
+      setOrders(orders.map(order =>
+        order.id === orderId ? { ...order, status: newStatus } : order
+      ));
+
+      onSuccess('Статус заказа успешно изменен');
+    } catch (error: any) {
+      onError(error.response?.data?.detail || 'Ошибка изменения статуса');
+    } finally {
+      setChangingStatus(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -129,29 +183,58 @@ const OrdersSection: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* Заголовок */}
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Мои заказы</h3>
-        {orders.length > 0 && (
-          <span className="text-sm text-gray-600">Всего заказов: {orders.length}</span>
-        )}
+      {/* Заголовок и фильтры */}
+      <div className="bg-white p-4 rounded-lg border border-gray-200">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Управление заказами</h3>
+          <div className="text-sm text-gray-600">
+            Показано: {filteredOrders.length} из {orders.length} заказов
+          </div>
+        </div>
+
+        {/* Поиск и фильтры */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Поиск */}
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Поиск по номеру заказа, имени или телефону..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Фильтр по статусу */}
+          <CustomSelect
+            value={statusFilter}
+            onChange={(value) => setStatusFilter(value)}
+            options={[
+              { value: 'all', label: 'Все статусы' },
+              { value: 'pending', label: 'Ожидает подтверждения' },
+              { value: 'confirmed', label: 'Подтвержден' },
+              { value: 'processing', label: 'Обрабатывается' },
+              { value: 'shipping', label: 'В доставке' },
+              { value: 'delivered', label: 'Доставлен' },
+              { value: 'cancelled', label: 'Отменен' }
+            ]}
+            label="Статус заказа"
+          />
+        </div>
       </div>
 
       {/* Список заказов */}
-      {orders.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
+      {filteredOrders.length === 0 ? (
+        <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
           <FaShoppingBag className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 mb-4">У вас пока нет заказов</p>
-          <button
-            onClick={() => navigate('/products')}
-            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
-          >
-            Перейти в каталог
-          </button>
+          <p className="text-gray-600">
+            {searchQuery || statusFilter !== 'all' ? 'Заказы не найдены' : 'Заказов пока нет'}
+          </p>
         </div>
       ) : (
         <div className="grid gap-4">
-          {orders.map((order) => {
+          {filteredOrders.map((order) => {
             const statusInfo = getStatusInfo(order.status);
             const StatusIcon = statusInfo.icon;
 
@@ -198,6 +281,41 @@ const OrdersSection: React.FC = () => {
                 {/* Детальная информация (раскрывается по клику) */}
                 {expandedOrderDetails.has(order.id) && (
                   <>
+                    {/* Информация о пользователе */}
+                    {order.user && (
+                      <div className="mb-4 pb-4 border-b border-gray-200">
+                        <p className="text-sm text-gray-600">
+                          Пользователь: <span className="font-medium text-gray-900">{order.user.username}</span> (ID: {order.user.id})
+                        </p>
+                        {order.user.email && (
+                          <p className="text-sm text-gray-600">
+                            Email: <span className="font-medium text-gray-900">{order.user.email}</span>
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Изменение статуса */}
+                    <div className="mb-4 pb-4 border-b border-gray-200">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Изменить статус заказа:
+                      </label>
+                      <select
+                        value={order.status}
+                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                        disabled={changingStatus === order.id}
+                        className="w-full md:w-64 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <option value="pending">Ожидает подтверждения</option>
+                        <option value="confirmed">Подтвержден</option>
+                        <option value="processing">Обрабатывается</option>
+                        <option value="shipping">В доставке</option>
+                        <option value="delivered">Доставлен</option>
+                        <option value="cancelled">Отменен</option>
+                      </select>
+                    </div>
+
                     {/* Информация о заказе */}
                     <div className="space-y-2 mb-4 pb-4 border-b border-gray-200">
                   <div className="flex text-sm">
@@ -209,6 +327,13 @@ const OrdersSection: React.FC = () => {
                     <span className="text-gray-600 w-40 flex-shrink-0">Телефон:</span>
                     <span className="text-gray-700">{order.customer_phone}</span>
                   </div>
+
+                  {order.customer_email && (
+                    <div className="flex text-sm">
+                      <span className="text-gray-600 w-40 flex-shrink-0">Email:</span>
+                      <span className="text-gray-700">{order.customer_email}</span>
+                    </div>
+                  )}
 
                   <div className="flex text-sm">
                     <span className="text-gray-600 w-40 flex-shrink-0">Адрес доставки:</span>
@@ -323,4 +448,4 @@ const OrdersSection: React.FC = () => {
   );
 };
 
-export default OrdersSection;
+export default OrdersManagementSection;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCog, FaDatabase, FaList, FaTags, FaPowerOff, FaUsers } from 'react-icons/fa';
+import { FaCog, FaDatabase, FaList, FaTags, FaPowerOff, FaUsers, FaShoppingBag } from 'react-icons/fa';
 import { adminClient } from '../api/adminClient';
 import { Source, Category, AvailableOptions } from '../types/admin';
 import {
@@ -8,7 +8,8 @@ import {
     CategoriesSection,
     ProductsSection,
     SettingsSection,
-    UsersSection
+    UsersSection,
+    OrdersManagementSection
 } from '../components/admin';
 import { Toast } from '../components/Toast';
 
@@ -20,16 +21,16 @@ const AdminPanelPage: React.FC = () => {
     const navigate = useNavigate();
 
     // Получаем вкладку из URL hash или используем 'settings' по умолчанию
-    const getInitialTab = (): 'settings' | 'sources' | 'categories' | 'products' | 'users' => {
+    const getInitialTab = (): 'settings' | 'sources' | 'categories' | 'products' | 'users' | 'orders' => {
         const hash = window.location.hash.slice(1); // Убираем '#'
-        if (hash === 'sources' || hash === 'categories' || hash === 'products' || hash === 'settings' || hash === 'users') {
+        if (hash === 'sources' || hash === 'categories' || hash === 'products' || hash === 'settings' || hash === 'users' || hash === 'orders') {
             return hash;
         }
         return 'settings';
     };
 
     // Основное состояние
-    const [selectedTab, setSelectedTab] = useState<'settings' | 'sources' | 'categories' | 'products' | 'users'>(getInitialTab());
+    const [selectedTab, setSelectedTab] = useState<'settings' | 'sources' | 'categories' | 'products' | 'users' | 'orders'>(getInitialTab());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -39,6 +40,7 @@ const AdminPanelPage: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [productsCount, setProductsCount] = useState<number>(0);
     const [usersCount, setUsersCount] = useState<number>(0);
+    const [ordersCount, setOrdersCount] = useState<number>(0);
     const [availableOptions, setAvailableOptions] = useState<AvailableOptions>({ price_types: [], warehouses: [] });
     const [loadingCategories, setLoadingCategories] = useState(false);
 
@@ -110,6 +112,19 @@ const AdminPanelPage: React.FC = () => {
         }
     };
 
+    // Загрузка количества заказов
+    const fetchOrdersCount = async () => {
+        try {
+            const ordersResponse = await adminClient.get('/orders/', {
+                params: { limit: 1 } // Загружаем только 1 заказ, нам нужен только count
+            });
+            const count = ordersResponse.data.count || 0;
+            setOrdersCount(count);
+        } catch (err) {
+            console.error('Ошибка загрузки количества заказов:', err);
+        }
+    };
+
     // Загрузка настроек
     const fetchSettings = async () => {
         try {
@@ -135,6 +150,7 @@ const AdminPanelPage: React.FC = () => {
             await fetchCategories();
             await fetchProductsCount();
             await fetchUsersCount();
+            await fetchOrdersCount();
             setLoading(false);
             setDataLoaded(true);
         };
@@ -282,6 +298,17 @@ const AdminPanelPage: React.FC = () => {
                                 <FaUsers className="w-4 h-4" />
                                 <span>Пользователи ({usersCount})</span>
                             </button>
+                            <button
+                                onClick={() => setSelectedTab('orders')}
+                                className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                                    selectedTab === 'orders'
+                                        ? 'border-emerald-600 text-emerald-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                }`}
+                            >
+                                <FaShoppingBag className="w-4 h-4" />
+                                <span>Заказы ({ordersCount})</span>
+                            </button>
                         </div>
                     </div>
 
@@ -350,6 +377,13 @@ const AdminPanelPage: React.FC = () => {
                                     onError={handleError}
                                     onSuccess={handleSuccess}
                                     onUsersCountChange={setUsersCount}
+                                />
+                            </div>
+
+                            <div style={{ display: selectedTab === 'orders' ? 'block' : 'none' }}>
+                                <OrdersManagementSection
+                                    onError={handleError}
+                                    onSuccess={handleSuccess}
                                 />
                             </div>
                         </>

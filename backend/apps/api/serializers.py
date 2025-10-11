@@ -589,20 +589,32 @@ class OrderListSerializer(serializers.ModelSerializer):
     payment_method_display = serializers.CharField(source='get_payment_method_display', read_only=True)
     items = OrderItemSerializer(many=True, read_only=True)
     items_count = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
 
     def get_items_count(self, obj):
         """Получить количество товаров в заказе."""
         return obj.items.count()
 
+    def get_user(self, obj):
+        """Получить информацию о пользователе."""
+        if obj.user:
+            return {
+                'id': obj.user.id,
+                'username': obj.user.username,
+                'email': obj.user.email,
+                'role': obj.user.role
+            }
+        return None
+
     class Meta:
         model = Order
         fields = (
-            'id', 'order_number', 'status', 'status_display',
+            'id', 'order_number', 'user', 'status', 'status_display',
             'customer_name', 'customer_phone', 'delivery_address', 'delivery_comment', 'comment',
             'payment_method', 'payment_method_display', 'total_amount',
             'items', 'items_count', 'created_at', 'updated_at'
         )
-        read_only_fields = ('id', 'order_number', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'order_number', 'user', 'created_at', 'updated_at')
 
 
 class OrderDetailSerializer(serializers.ModelSerializer):
