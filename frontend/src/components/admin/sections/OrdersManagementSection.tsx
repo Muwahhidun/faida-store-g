@@ -213,15 +213,6 @@ const OrdersManagementSection: React.FC<OrdersManagementSectionProps> = ({
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="py-12 text-center">
-        <FaSpinner className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
-        <p className="text-gray-600">Загрузка заказов...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
       {/* Заголовок и фильтры */}
@@ -331,8 +322,13 @@ const OrdersManagementSection: React.FC<OrdersManagementSectionProps> = ({
       </div>
 
       {/* Список заказов */}
-      {orders.length === 0 ? (
-        <div className="py-12 text-center">
+      {isLoading ? (
+        <div className="py-12 text-center bg-white rounded-lg border border-gray-200">
+          <FaSpinner className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
+          <p className="text-gray-600">Загрузка заказов...</p>
+        </div>
+      ) : orders.length === 0 ? (
+        <div className="py-12 text-center bg-white rounded-lg border border-gray-200">
           <FaShoppingBag className="w-12 h-12 text-gray-300 mx-auto mb-3" />
           <p className="text-gray-500">
             {searchQuery || statusFilter !== 'all' || dateFrom || dateTo ? 'Заказы не найдены' : 'Заказов пока нет'}
