@@ -6,6 +6,7 @@ from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import LimitOffsetPagination
 from django.core.management import call_command
 from django.utils import timezone
 import threading
@@ -17,6 +18,12 @@ from django.db.models import Q, Count, Avg, Prefetch
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_headers
+
+
+class OrdersPagination(LimitOffsetPagination):
+    """Пагинация для заказов: 10 элементов на страницу."""
+    default_limit = 10
+    max_limit = 100
 
 from apps.products.models import Product, ProductImage
 from apps.categories.models import Category
@@ -35,7 +42,7 @@ from .serializers import (
     NewsListSerializer, NewsDetailSerializer, NewsCreateUpdateSerializer, NewsCategorySerializer, NewsMediaSerializer,
     OrderListSerializer, OrderDetailSerializer, OrderCreateSerializer
 )
-from .filters import ProductFilter, CategoryFilter
+from .filters import ProductFilter, CategoryFilter, OrderFilter
 
 
 class IntegrationSourceViewSet(mixins.CreateModelMixin,
@@ -1085,11 +1092,12 @@ class OrderViewSet(viewsets.ModelViewSet):
     - destroy: Удаление заказа
     """
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = OrdersPagination  # 10 заказов на страницу
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = OrderFilter
     search_fields = ['order_number', 'customer_name', 'customer_phone', 'customer_email']
     ordering_fields = ['created_at', 'total_amount', 'status']
     ordering = ['-created_at']
-    filterset_fields = ['status', 'payment_method']
 
     def get_queryset(self):
         """Возвращает заказы в зависимости от прав пользователя."""

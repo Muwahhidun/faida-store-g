@@ -6,6 +6,7 @@ import django_filters
 from django.db import models
 from apps.products.models import Product
 from apps.categories.models import Category
+from apps.orders.models import Order
 
 
 class ProductFilter(django_filters.FilterSet):
@@ -157,3 +158,21 @@ class CategoryFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(parent__isnull=False)
         return queryset
+
+
+class OrderFilter(django_filters.FilterSet):
+    """Фильтр для заказов."""
+
+    # Фильтр по дате создания
+    date_from = django_filters.DateFilter(field_name='created_at', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='created_at', lookup_expr='lte')
+    date_range = django_filters.DateFromToRangeFilter(field_name='created_at')
+
+    # Фильтр по сумме заказа
+    amount_min = django_filters.NumberFilter(field_name='total_amount', lookup_expr='gte')
+    amount_max = django_filters.NumberFilter(field_name='total_amount', lookup_expr='lte')
+    amount_range = django_filters.RangeFilter(field_name='total_amount')
+
+    class Meta:
+        model = Order
+        fields = ['status', 'payment_method']
