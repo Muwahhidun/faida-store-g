@@ -62,23 +62,26 @@ class Command(BaseCommand):
     def check_and_run_syncs(self):
         """Проверяет расписание и запускает синхронизацию."""
         now = timezone.now()
-        
+
+        # Обрабатываем повторные отправки уведомлений
+        self.process_notification_retries()
+
         # Получаем все источники с включенной автосинхронизацией
         sources = IntegrationSource.objects.filter(
             auto_sync_enabled=True,
             is_active=True
         )
-        
+
         for source in sources:
             try:
                 # Проверяем быструю синхронизацию (только данные)
                 if source.is_data_sync_due() and not source.is_syncing:
                     self.start_data_sync(source)
-                
+
                 # Проверяем полную синхронизацию (данные + медиа)
                 elif source.is_full_sync_due() and not source.is_syncing:
                     self.start_full_sync(source)
-                    
+
             except Exception as e:
                 logger.exception(f'Ошибка при проверке источника {source.code}: {e}')
                 # Записываем ошибку в источник
@@ -86,6 +89,13 @@ class Command(BaseCommand):
                 source.import_error_message = str(e)
                 source.last_error_time = now
                 source.save()
+
+    def process_notification_retries(self):
+        """Обрабатывает повторные отправки уведомлений."""
+        try:
+            call_command('process_notification_retries', '--limit', '50')
+        except Exception as e:
+            logger.exception(f'Ошибка при обработке повторных отправок уведомлений: {e}')
 
     def start_data_sync(self, source):
         """Запускает быструю синхронизацию данных."""

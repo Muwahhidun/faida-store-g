@@ -77,6 +77,22 @@ export const useUpdateChannelSettings = () => {
     });
 };
 
+export const useUpdateChannel = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, data }: { id: number; data: Partial<NotificationChannel> }) => {
+            const response = await adminClient.patch<NotificationChannel>(
+                `${NOTIFICATIONS_BASE}/channels/${id}/`,
+                data
+            );
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['notification-channels'] });
+        },
+    });
+};
+
 export const useCreateChannel = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -98,6 +114,18 @@ export const useDeleteChannel = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notification-channels'] });
+        },
+    });
+};
+
+export const useTestChannelPreview = () => {
+    return useMutation({
+        mutationFn: async ({ channelCode, settings }: { channelCode: string; settings: Record<string, any> }) => {
+            const response = await adminClient.post(`${NOTIFICATIONS_BASE}/channels/test-connection-preview/`, {
+                channel_code: channelCode,
+                settings
+            });
+            return response.data;
         },
     });
 };
@@ -151,6 +179,17 @@ export const useDeleteContact = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notification-contacts'] });
+        },
+    });
+};
+
+export const useSendTestToContact = () => {
+    return useMutation({
+        mutationFn: async ({ contactId, message }: { contactId: number; message?: string }) => {
+            const response = await adminClient.post(`${NOTIFICATIONS_BASE}/contacts/${contactId}/send_test/`, {
+                message
+            });
+            return response.data;
         },
     });
 };
@@ -222,6 +261,58 @@ export const useToggleRule = () => {
     });
 };
 
+export const useSendTestToRule = () => {
+    return useMutation({
+        mutationFn: async ({ ruleId, message }: { ruleId: number; message?: string }) => {
+            const response = await adminClient.post(`${NOTIFICATIONS_BASE}/rules/${ruleId}/send_test/`, {
+                message
+            });
+            return response.data;
+        },
+    });
+};
+
+export const useCreateRule = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (data: Partial<NotificationRule>) => {
+            const response = await adminClient.post<NotificationRule>(`${NOTIFICATIONS_BASE}/rules/`, data);
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['notification-rules'] });
+        },
+    });
+};
+
+export const useUpdateRule = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, data }: { id: number; data: Partial<NotificationRule> }) => {
+            const response = await adminClient.patch<NotificationRule>(
+                `${NOTIFICATIONS_BASE}/rules/${id}/`,
+                data
+            );
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['notification-rules'] });
+        },
+    });
+};
+
+export const useDeleteRule = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (id: number) => {
+            await adminClient.delete(`${NOTIFICATIONS_BASE}/rules/${id}/`);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['notification-rules'] });
+        },
+    });
+};
+
 // ==================== Шаблоны ====================
 
 export const useNotificationTemplates = () => {
@@ -268,6 +359,19 @@ export const useDeleteTemplate = () => {
     return useMutation({
         mutationFn: async (id: number) => {
             await adminClient.delete(`${NOTIFICATIONS_BASE}/templates/${id}/`);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['notification-templates'] });
+        },
+    });
+};
+
+export const useSetDefaultTemplate = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (templateId: number) => {
+            const response = await adminClient.post(`${NOTIFICATIONS_BASE}/templates/${templateId}/set_default/`);
+            return response.data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notification-templates'] });

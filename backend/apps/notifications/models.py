@@ -56,13 +56,14 @@ class NotificationChannel(models.Model):
     """
     code = models.CharField(
         max_length=50,
-        unique=True,
         verbose_name='Код канала',
-        help_text='Уникальный код (например: email, whatsapp, telegram)'
+        help_text='Тип канала (например: email, whatsapp, telegram)'
     )
     name = models.CharField(
         max_length=100,
-        verbose_name='Название канала'
+        unique=True,
+        verbose_name='Название канала',
+        help_text='Уникальное название для идентификации канала'
     )
     icon = models.CharField(
         max_length=50,
@@ -128,6 +129,12 @@ class NotificationType(models.Model):
         default=0,
         verbose_name='Порядок отображения'
     )
+    variables_help = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name='Доступные переменные',
+        help_text='JSON с описанием переменных для этого типа уведомления. Например: {"order_number": "Номер заказа", "customer_name": "Имя клиента"}'
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
 
@@ -142,20 +149,30 @@ class NotificationType(models.Model):
 
 class NotificationTemplate(models.Model):
     """
-    Шаблоны сообщений для каждого типа и канала.
-    Один тип может иметь несколько шаблонов для одного канала (например: короткий, подробный, VIP).
+    Шаблоны сообщений для каждого типа и ТИПА канала (не конкретного канала).
+    Шаблон привязан к типу канала (email, telegram, whatsapp), а не к конкретному экземпляру канала.
+    Это позволяет создавать несколько каналов одного типа (например, несколько email-каналов)
+    и все они будут использовать одни и те же шаблоны.
     """
+    CHANNEL_TYPE_CHOICES = [
+        ('telegram', 'Telegram'),
+        ('whatsapp', 'WhatsApp'),
+        ('email', 'Email'),
+    ]
+
     notification_type = models.ForeignKey(
         NotificationType,
         on_delete=models.CASCADE,
         related_name='templates',
         verbose_name='Тип уведомления'
     )
-    channel = models.ForeignKey(
-        NotificationChannel,
-        on_delete=models.CASCADE,
-        related_name='templates',
-        verbose_name='Канал'
+    channel_type = models.CharField(
+        max_length=50,
+        choices=CHANNEL_TYPE_CHOICES,
+        verbose_name='Тип канала',
+        help_text='Тип канала (email, telegram, whatsapp)',
+        db_index=True,
+        default='email'  # Временный default для миграции
     )
     name = models.CharField(
         max_length=200,
@@ -173,16 +190,15 @@ class NotificationTemplate(models.Model):
         verbose_name='Шаблон сообщения',
         help_text='Текст с переменными: {{order_number}}, {{customer_name}}, {{total_amount}} и т.д.'
     )
-    variables_help = models.JSONField(
-        default=dict,
-        blank=True,
-        verbose_name='Справка по переменным',
-        help_text='JSON с описанием доступных переменных'
-    )
     is_default = models.BooleanField(
         default=False,
         verbose_name='Шаблон по умолчанию',
         help_text='Используется если для контакта не указан конкретный шаблон'
+    )
+    is_system = models.BooleanField(
+        default=False,
+        verbose_name='Системный шаблон',
+        help_text='Системные шаблоны нельзя редактировать или удалять'
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
@@ -190,10 +206,25 @@ class NotificationTemplate(models.Model):
     class Meta:
         verbose_name = 'Шаблон уведомления'
         verbose_name_plural = 'Шаблоны уведомлений'
-        ordering = ['notification_type', 'channel', 'name']
+        ordering = ['notification_type', 'channel_type', 'name']
+        # Ограничения уникальности
+        constraints = [
+            # Один шаблон по умолчанию на тип уведомления + тип канала
+            models.UniqueConstraint(
+                fields=['notification_type', 'channel_type'],
+                condition=models.Q(is_default=True),
+                name='unique_default_template_per_type_and_channel'
+            ),
+            # Уникальное имя шаблона в рамках типа уведомления + типа канала
+            models.UniqueConstraint(
+                fields=['notification_type', 'channel_type', 'name'],
+                name='unique_template_name_per_type_and_channel'
+            )
+        ]
 
     def __str__(self):
-        return f"{self.notification_type.name} - {self.channel.name} - {self.name}"
+        channel_display = dict(self.CHANNEL_TYPE_CHOICES).get(self.channel_type, self.channel_type)
+        return f"{self.notification_type.name} - {channel_display} - {self.name}"
 
     def get_template_variables(self):
         """
@@ -205,19 +236,19 @@ class NotificationTemplate(models.Model):
     def clean(self):
         """
         Валидация шаблона перед сохранением.
-        Проверяет, что все переменные в шаблоне есть в справке.
+        Проверяет, что все переменные в шаблоне есть в справке типа уведомления.
         """
         super().clean()
 
-        # Если справка по переменным пустая, пропускаем валидацию
-        if not self.variables_help:
+        # Если тип уведомления не задан или справка пустая, пропускаем валидацию
+        if not self.notification_type or not self.notification_type.variables_help:
             return
 
         # Извлекаем переменные из шаблона
         template_vars = self.get_template_variables()
 
-        # Извлекаем разрешенные переменные из справки
-        allowed_vars = set(self.variables_help.keys())
+        # Извлекаем разрешенные переменные из типа уведомления
+        allowed_vars = set(self.notification_type.variables_help.keys())
 
         # Находим неизвестные переменные
         unknown_vars = template_vars - allowed_vars
@@ -225,7 +256,7 @@ class NotificationTemplate(models.Model):
         if unknown_vars:
             raise ValidationError({
                 'template': f'Неизвестные переменные в шаблоне: {", ".join(sorted(unknown_vars))}. '
-                           f'Разрешенные переменные: {", ".join(sorted(allowed_vars))}'
+                           f'Разрешенные переменные для типа "{self.notification_type.name}": {", ".join(sorted(allowed_vars))}'
             })
 
     def save(self, *args, **kwargs):
@@ -237,27 +268,35 @@ class NotificationTemplate(models.Model):
 class NotificationContact(models.Model):
     """
     Контакты получателей уведомлений.
+    Привязаны к типу канала (telegram, whatsapp, email), а не к конкретному каналу.
     """
+    CHANNEL_TYPE_CHOICES = [
+        ('telegram', 'Telegram'),
+        ('whatsapp', 'WhatsApp'),
+        ('email', 'Email'),
+    ]
+
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$',
         message="Номер телефона должен быть в формате: '+999999999'. До 15 цифр."
     )
 
-    channel = models.ForeignKey(
-        NotificationChannel,
-        on_delete=models.CASCADE,
-        related_name='contacts',
-        verbose_name='Канал'
-    )
     name = models.CharField(
         max_length=100,
         verbose_name='Имя контакта',
         help_text='Например: Администратор, Менеджер'
     )
+    channel_type = models.CharField(
+        max_length=50,
+        choices=CHANNEL_TYPE_CHOICES,
+        verbose_name='Тип канала',
+        help_text='Тип канала для отправки уведомлений',
+        default='telegram'  # Временный default для миграции
+    )
     value = models.CharField(
         max_length=200,
         verbose_name='Значение',
-        help_text='Email адрес или номер телефона'
+        help_text='Email адрес, номер телефона или username (для Telegram - @username или chat_id)'
     )
     is_active = models.BooleanField(
         default=True,
@@ -269,17 +308,23 @@ class NotificationContact(models.Model):
     class Meta:
         verbose_name = 'Контакт для уведомлений'
         verbose_name_plural = 'Контакты для уведомлений'
-        ordering = ['channel', 'name']
+        ordering = ['channel_type', 'name']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['channel_type', 'value'],
+                name='unique_contact_per_channel_type'
+            )
+        ]
 
     def __str__(self):
-        return f"{self.name} ({self.channel.name}): {self.value}"
+        return f"{self.name} ({self.get_channel_type_display()}): {self.value}"
 
     def get_formatted_value(self):
         """
         Возвращает отформатированное значение для отправки.
         Для WhatsApp убирает все символы кроме цифр.
         """
-        if self.channel.code == 'whatsapp':
+        if self.channel_type == 'whatsapp':
             return self.value.replace('+', '').replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
         return self.value
 
@@ -289,6 +334,24 @@ class NotificationRule(models.Model):
     Правила отправки уведомлений.
     Связывает тип уведомления с каналом и контактами.
     """
+    RULE_TYPE_CHOICES = [
+        ('system', 'Системное'),
+        ('additional', 'Дополнительное'),
+    ]
+
+    name = models.CharField(
+        max_length=200,
+        default='Правило',
+        verbose_name='Название правила',
+        help_text='Например: Отправка администратору, Уведомление менеджерам'
+    )
+    rule_type = models.CharField(
+        max_length=20,
+        choices=RULE_TYPE_CHOICES,
+        default='additional',
+        verbose_name='Тип правила',
+        help_text='Системное - отправка самому пользователю, Дополнительное - отправка контактам из списка'
+    )
     notification_type = models.ForeignKey(
         NotificationType,
         on_delete=models.CASCADE,
@@ -297,9 +360,18 @@ class NotificationRule(models.Model):
     )
     channel = models.ForeignKey(
         NotificationChannel,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name='rules',
         verbose_name='Канал'
+    )
+    default_template = models.ForeignKey(
+        'NotificationTemplate',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='rules_using_as_default',
+        verbose_name='Шаблон по умолчанию',
+        help_text='Шаблон, используемый для всех контактов этого правила (если не указан индивидуальный)'
     )
     is_enabled = models.BooleanField(
         default=True,
@@ -322,7 +394,29 @@ class NotificationRule(models.Model):
         unique_together = ('notification_type', 'channel')
 
     def __str__(self):
-        return f"{self.notification_type.name} → {self.channel.name}"
+        return self.name
+
+    def clean(self):
+        """
+        Валидация правила перед сохранением.
+        Проверяет, что все контакты имеют тот же тип канала, что и выбранный канал.
+        """
+        super().clean()
+
+        # Если правило еще не сохранено (нет pk), пропускаем валидацию контактов
+        # (они будут добавлены после сохранения через ManyToMany)
+        if not self.pk:
+            return
+
+        # Проверяем соответствие типа канала и типов контактов
+        channel_type = self.channel.code
+        for contact in self.contacts.all():
+            if contact.channel_type != channel_type:
+                raise ValidationError(
+                    f"Контакт '{contact.name}' имеет тип '{contact.get_channel_type_display()}', "
+                    f"но выбранный канал '{self.channel.name}' имеет тип '{channel_type}'. "
+                    f"Типы должны совпадать."
+                )
 
 
 class RuleContactTemplate(models.Model):
@@ -407,6 +501,7 @@ class NotificationLog(models.Model):
         help_text='Отправленный текст'
     )
     error_message = models.TextField(
+        null=True,
         blank=True,
         verbose_name='Сообщение об ошибке'
     )

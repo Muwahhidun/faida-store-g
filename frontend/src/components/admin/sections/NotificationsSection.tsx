@@ -38,19 +38,26 @@ import {
     useAssignContacts,
     useToggleRule,
     useUpdateChannelSettings,
+    useUpdateChannel,
     useCreateChannel,
     useDeleteChannel,
     useCreateTemplate,
-    useUpdateTemplate
+    useUpdateTemplate,
+    useTestChannelPreview,
+    useSendTestToRule,
+    useCreateRule,
+    useUpdateRule,
+    useDeleteRule
 } from '../../../hooks/useNotifications';
 import toast from 'react-hot-toast';
-import type { NotificationContact, NotificationTemplate } from '../../../types/notifications';
+import type { NotificationContact, NotificationTemplate, NotificationRule } from '../../../types/notifications';
 import { ContactFormModal } from '../notifications/ContactFormModal';
 import { TemplateFormModal } from '../notifications/TemplateFormModal';
+import { RuleFormModal } from '../notifications/RuleFormModal';
 import RulesTab from '../notifications/RulesTab';
-import ChannelSettingsModal from '../notifications/ChannelSettingsModal';
-import ChannelCreateModal from '../notifications/ChannelCreateModal';
+import ChannelModal from '../notifications/ChannelModal';
 import TemplatesTab from '../notifications/TemplatesTab';
+import DeleteConfirmModal from '../../DeleteConfirmModal';
 
 // Типы для табов
 type Tab = 'overview' | 'channels' | 'contacts' | 'templates' | 'rules' | 'logs';
@@ -240,49 +247,75 @@ const ChannelsTab: React.FC = () => {
     const testChannel = useTestChannel();
     const sendTestMessage = useSendTestMessage();
     const updateSettings = useUpdateChannelSettings();
+    const updateChannel = useUpdateChannel();
     const createChannel = useCreateChannel();
     const deleteChannel = useDeleteChannel();
+    const testChannelPreview = useTestChannelPreview();
 
-    const [settingsModalOpen, setSettingsModalOpen] = useState(false);
-    const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
     const [selectedChannel, setSelectedChannel] = useState<any | null>(null);
     const [deletingChannelId, setDeletingChannelId] = useState<number | null>(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [channelToDelete, setChannelToDelete] = useState<{ id: number; name: string } | null>(null);
 
     const handleOpenSettings = (channel: any) => {
         setSelectedChannel(channel);
-        setSettingsModalOpen(true);
+        setModalMode('edit');
+        setModalOpen(true);
     };
 
-    const handleSaveSettings = async (channelId: number, settings: Record<string, any>) => {
-        await updateSettings.mutateAsync({ channelId, settings });
-        toast.success('Настройки сохранены');
+    const handleOpenCreate = () => {
+        setSelectedChannel(null);
+        setModalMode('create');
+        setModalOpen(true);
     };
 
-    const handleCreateChannel = async (
-        channelData: { code: string; name: string; icon: string; is_active: boolean },
-        settings: Record<string, any>
-    ) => {
+    const handleSaveChannel = async (data: any) => {
         try {
-            console.log('[handleCreateChannel] Creating channel:', channelData);
-            console.log('[handleCreateChannel] Settings to save:', settings);
-
-            // Создаём канал
-            const createdChannel = await createChannel.mutateAsync(channelData);
-            console.log('[handleCreateChannel] Created channel response:', createdChannel);
-
-            // Сохраняем настройки
-            if (Object.keys(settings).length > 0) {
-                console.log('[handleCreateChannel] Updating settings for ID:', createdChannel.id);
-                const result = await updateSettings.mutateAsync({
-                    channelId: createdChannel.id,
-                    settings
+            if (modalMode === 'edit' && data.id) {
+                // Режим редактирования
+                await updateChannel.mutateAsync({
+                    id: data.id,
+                    data: {
+                        name: data.name,
+                        is_active: data.is_active,
+                        settings: data.settings
+                    }
                 });
-                console.log('[handleCreateChannel] Settings update result:', result);
+                toast.success('Настройки сохранены');
+            } else if (modalMode === 'create') {
+                // Режим создания
+                await createChannel.mutateAsync({
+                    code: data.code,
+                    name: data.name,
+                    icon: data.icon,
+                    is_active: data.is_active,
+                    settings: data.settings
+                });
+                toast.success('Канал создан успешно!');
+            }
+        } catch (error: any) {
+            console.error('[handleSaveChannel] Error:', error);
+
+            // Обработка ошибок
+            if (error.response?.data) {
+                const errorData = error.response.data;
+                if (errorData.name) {
+                    toast.error(`Ошибка: ${errorData.name[0] || errorData.name}`);
+                } else if (errorData.settings) {
+                    toast.error(`${errorData.settings}`);
+                } else if (errorData.error) {
+                    toast.error(`Ошибка: ${errorData.error}`);
+                } else if (typeof errorData === 'string') {
+                    toast.error(errorData);
+                } else {
+                    toast.error('Ошибка сохранения канала. Проверьте данные.');
+                }
+            } else {
+                toast.error(error.message || 'Ошибка сохранения канала');
             }
 
-            toast.success('Канал создан и настроен успешно!');
-        } catch (error) {
-            console.error('[handleCreateChannel] Error:', error);
             throw error;
         }
     };
@@ -313,17 +346,35 @@ const ChannelsTab: React.FC = () => {
         }
     };
 
-    const handleDeleteChannel = async (channelId: number, channelName: string) => {
-        if (!confirm(`Удалить канал "${channelName}"? Это действие нельзя отменить.`)) {
-            return;
-        }
+    const handleDeleteChannel = (channelId: number, channelName: string) => {
+        setChannelToDelete({ id: channelId, name: channelName });
+        setDeleteModalOpen(true);
+    };
 
-        setDeletingChannelId(channelId);
+    const confirmDeleteChannel = async () => {
+        if (!channelToDelete) return;
+
+        setDeletingChannelId(channelToDelete.id);
         try {
-            await deleteChannel.mutateAsync(channelId);
-            toast.success(`Канал "${channelName}" удален`);
+            await deleteChannel.mutateAsync(channelToDelete.id);
+            toast.success(`Канал "${channelToDelete.name}" удален`);
+            setDeleteModalOpen(false);
+            setChannelToDelete(null);
         } catch (error: any) {
-            toast.error(error.response?.data?.error || 'Ошибка удаления');
+            // Обработка ошибки защищенного удаления
+            const errorMessage = error.response?.data?.error || error.message || '';
+
+            if (errorMessage.includes('protected') || errorMessage.includes('constraint') ||
+                errorMessage.includes('зависим') || errorMessage.includes('связан')) {
+                toast.error(
+                    `Невозможно удалить канал "${channelToDelete.name}". К нему привязаны контакты или правила. ` +
+                    `Сначала удалите или переназначьте их.`,
+                    { duration: 6000 }
+                );
+            } else {
+                toast.error(errorMessage || 'Ошибка удаления');
+            }
+            // Не закрываем модал при ошибке, чтобы пользователь увидел сообщение
         } finally {
             setDeletingChannelId(null);
         }
@@ -342,7 +393,7 @@ const ChannelsTab: React.FC = () => {
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">Каналы связи</h3>
                 <button
-                    onClick={() => setCreateModalOpen(true)}
+                    onClick={handleOpenCreate}
                     className="btn-secondary text-sm flex items-center space-x-2"
                 >
                     <FaPlus className="w-3 h-3" />
@@ -379,52 +430,15 @@ const ChannelsTab: React.FC = () => {
                                         </p>
                                     </div>
                                 </div>
-
-                                {channel.code === 'whatsapp' && channel.is_active && (
-                                    <button
-                                        onClick={() => handleTestChannel(channel.id, channel.name)}
-                                        disabled={testChannel.isPending}
-                                        className="btn-secondary text-sm flex items-center space-x-2"
-                                    >
-                                        {testChannel.isPending ? (
-                                            <FaSpinner className="w-3 h-3 animate-spin" />
-                                        ) : (
-                                            <FaSyncAlt className="w-3 h-3" />
-                                        )}
-                                        <span>Тест</span>
-                                    </button>
-                                )}
                             </div>
 
-                            {channel.code === 'whatsapp' && channel.settings?.instance_id && (
-                                <div className="mt-3 pt-3 border-t border-gray-200">
-                                    <p className="text-xs text-gray-600">
-                                        Instance ID: <span className="font-mono">{channel.settings.instance_id}</span>
-                                    </p>
-                                </div>
-                            )}
-
                             <div className="mt-3 flex items-center space-x-3">
-                                {channel.is_active && (
-                                    <button
-                                        onClick={() => handleSendTest(channel.id, channel.name)}
-                                        disabled={sendTestMessage.isPending}
-                                        className="text-sm text-green-600 hover:underline flex items-center space-x-1 disabled:opacity-50"
-                                    >
-                                        {sendTestMessage.isPending ? (
-                                            <FaSpinner className="w-3 h-3 animate-spin" />
-                                        ) : (
-                                            <FaBell className="w-3 h-3" />
-                                        )}
-                                        <span>Отправить тест</span>
-                                    </button>
-                                )}
                                 <button
                                     onClick={() => handleOpenSettings(channel)}
                                     className="text-sm text-blue-600 hover:underline flex items-center space-x-1"
                                 >
                                     <FaEdit className="w-3 h-3" />
-                                    <span>Настроить</span>
+                                    <span>Изменить</span>
                                 </button>
                                 <span className="text-gray-300">|</span>
                                 <button
@@ -452,26 +466,51 @@ const ChannelsTab: React.FC = () => {
                 </div>
             )}
 
-            <ChannelSettingsModal
-                isOpen={settingsModalOpen}
+            <ChannelModal
+                isOpen={modalOpen}
                 onClose={() => {
-                    setSettingsModalOpen(false);
+                    setModalOpen(false);
                     setSelectedChannel(null);
                 }}
+                mode={modalMode}
                 channel={selectedChannel}
-                onSave={handleSaveSettings}
-                onTestConnection={async (channelId: number) => {
-                    return await testChannel.mutateAsync(channelId);
+                onSave={handleSaveChannel}
+                onTestConnection={async (channelCodeOrId: string | number, settings: Record<string, any>) => {
+                    try {
+                        if (modalMode === 'edit' && typeof channelCodeOrId === 'number') {
+                            // Режим редактирования - тестируем существующий канал
+                            return await testChannel.mutateAsync(channelCodeOrId);
+                        } else if (modalMode === 'create' && typeof channelCodeOrId === 'string') {
+                            // Режим создания - тестируем с временными настройками
+                            const result = await testChannelPreview.mutateAsync({
+                                channelCode: channelCodeOrId,
+                                settings
+                            });
+                            return result;
+                        }
+                        return { success: false, error: 'Некорректные параметры' };
+                    } catch (error: any) {
+                        return {
+                            success: false,
+                            error: error.response?.data?.error || error.message || 'Ошибка подключения'
+                        };
+                    }
                 }}
-                isSaving={updateSettings.isPending}
+                isSaving={createChannel.isPending || updateChannel.isPending}
             />
 
-            <ChannelCreateModal
-                isOpen={createModalOpen}
-                onClose={() => setCreateModalOpen(false)}
-                onSave={handleCreateChannel}
-                isSaving={createChannel.isPending}
-            />
+            {deleteModalOpen && channelToDelete && (
+                <DeleteConfirmModal
+                    title={channelToDelete.name}
+                    itemType="канал"
+                    onClose={() => {
+                        setDeleteModalOpen(false);
+                        setChannelToDelete(null);
+                    }}
+                    onConfirm={confirmDeleteChannel}
+                    deleting={deletingChannelId === channelToDelete.id}
+                />
+            )}
         </div>
     );
 };
@@ -544,6 +583,8 @@ const ContactsTab: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingContact, setEditingContact] = useState<NotificationContact | null>(null);
     const [deletingContactId, setDeletingContactId] = useState<number | null>(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [contactToDelete, setContactToDelete] = useState<{ id: number; name: string } | null>(null);
 
     const handleCreate = () => {
         setEditingContact(null);
@@ -575,17 +616,23 @@ const ContactsTab: React.FC = () => {
         }
     };
 
-    const handleDelete = async (contactId: number) => {
-        if (!confirm('Удалить этот контакт? Это действие нельзя отменить.')) {
-            return;
-        }
+    const handleDelete = (contact: NotificationContact) => {
+        setContactToDelete({ id: contact.id, name: contact.name });
+        setDeleteModalOpen(true);
+    };
 
-        setDeletingContactId(contactId);
+    const confirmDeleteContact = async () => {
+        if (!contactToDelete) return;
+
+        setDeletingContactId(contactToDelete.id);
         try {
-            await deleteContact.mutateAsync(contactId);
+            await deleteContact.mutateAsync(contactToDelete.id);
             toast.success('Контакт удален');
+            setDeleteModalOpen(false);
+            setContactToDelete(null);
         } catch (error: any) {
             toast.error(error.response?.data?.error || 'Ошибка удаления');
+            // Не закрываем модал при ошибке
         } finally {
             setDeletingContactId(null);
         }
@@ -619,10 +666,9 @@ const ContactsTab: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {contacts?.map((contact) => {
-                    const channel = channels?.find(c => c.id === contact.channel);
-                    const IconComponent = channel?.code === 'email' ? FaEnvelope :
-                                        channel?.code === 'whatsapp' ? FaWhatsapp :
-                                        channel?.code === 'telegram' ? FaTelegram : FaBell;
+                    const IconComponent = contact.channel_type === 'email' ? FaEnvelope :
+                                        contact.channel_type === 'whatsapp' ? FaWhatsapp :
+                                        contact.channel_type === 'telegram' ? FaTelegram : FaBell;
 
                     return (
                         <div
@@ -642,7 +688,7 @@ const ContactsTab: React.FC = () => {
                                     </div>
                                     <div>
                                         <h4 className="font-semibold text-gray-900">{contact.name}</h4>
-                                        <p className="text-xs text-gray-600">{channel?.name}</p>
+                                        <p className="text-xs text-gray-600">{contact.channel_type_display}</p>
                                     </div>
                                 </div>
 
@@ -671,11 +717,11 @@ const ContactsTab: React.FC = () => {
                                     className="text-sm text-blue-600 hover:underline flex items-center space-x-1"
                                 >
                                     <FaEdit className="w-3 h-3" />
-                                    <span>Редактировать</span>
+                                    <span>Изменить</span>
                                 </button>
                                 <span className="text-gray-300">|</span>
                                 <button
-                                    onClick={() => handleDelete(contact.id)}
+                                    onClick={() => handleDelete(contact)}
                                     disabled={deletingContactId === contact.id}
                                     className="text-sm text-red-600 hover:underline flex items-center space-x-1 disabled:opacity-50"
                                 >
@@ -706,13 +752,25 @@ const ContactsTab: React.FC = () => {
             )}
 
             {/* Модальное окно */}
-            {isModalOpen && channels && (
+            {isModalOpen && (
                 <ContactFormModal
                     contact={editingContact}
-                    channels={channels}
                     onClose={handleCloseModal}
                     onSubmit={handleSubmit}
                     isSubmitting={createContact.isPending || updateContact.isPending}
+                />
+            )}
+
+            {deleteModalOpen && contactToDelete && (
+                <DeleteConfirmModal
+                    title={contactToDelete.name}
+                    itemType="контакт"
+                    onClose={() => {
+                        setDeleteModalOpen(false);
+                        setContactToDelete(null);
+                    }}
+                    onConfirm={confirmDeleteContact}
+                    deleting={deletingContactId === contactToDelete.id}
                 />
             )}
         </div>
@@ -726,6 +784,75 @@ const RulesTabWrapper: React.FC = () => {
     const { data: contacts, isLoading: contactsLoading } = useNotificationContacts();
     const assignContacts = useAssignContacts();
     const toggleRule = useToggleRule();
+    const sendTestToRule = useSendTestToRule();
+    const createRule = useCreateRule();
+    const updateRule = useUpdateRule();
+    const deleteRule = useDeleteRule();
+
+    const [isRuleModalOpen, setIsRuleModalOpen] = useState(false);
+    const [editingRule, setEditingRule] = useState<NotificationRule | null>(null);
+    const [deletingRuleId, setDeletingRuleId] = useState<number | null>(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [ruleToDelete, setRuleToDelete] = useState<{ id: number; name: string } | null>(null);
+
+    const handleCreateRule = () => {
+        setEditingRule(null);
+        setIsRuleModalOpen(true);
+    };
+
+    const handleEditRule = (rule: NotificationRule) => {
+        setEditingRule(rule);
+        setIsRuleModalOpen(true);
+    };
+
+    const handleCloseRuleModal = () => {
+        setIsRuleModalOpen(false);
+        setEditingRule(null);
+    };
+
+    const handleSubmitRule = async (data: Partial<NotificationRule>) => {
+        try {
+            if (editingRule) {
+                await updateRule.mutateAsync({ id: editingRule.id, data });
+                toast.success('Правило обновлено!');
+            } else {
+                await createRule.mutateAsync(data);
+                toast.success('Правило создано!');
+            }
+            handleCloseRuleModal();
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.error || error.response?.data?.detail || error.message;
+            if (errorMessage?.includes('already exists') || errorMessage?.includes('уже существует')) {
+                toast.error('Правило для этой комбинации типа уведомления и канала уже существует');
+            } else {
+                toast.error(errorMessage || 'Ошибка сохранения');
+            }
+        }
+    };
+
+    const handleDeleteRule = (rule: NotificationRule) => {
+        setRuleToDelete({
+            id: rule.id,
+            name: `${rule.notification_type.name} - ${rule.channel.name}`
+        });
+        setDeleteModalOpen(true);
+    };
+
+    const confirmDeleteRule = async () => {
+        if (!ruleToDelete) return;
+
+        setDeletingRuleId(ruleToDelete.id);
+        try {
+            await deleteRule.mutateAsync(ruleToDelete.id);
+            toast.success(`Правило удалено`);
+            setDeleteModalOpen(false);
+            setRuleToDelete(null);
+        } catch (error: any) {
+            toast.error(error.response?.data?.error || 'Ошибка удаления');
+        } finally {
+            setDeletingRuleId(null);
+        }
+    };
 
     const handleToggleRule = async (ruleId: number) => {
         try {
@@ -745,6 +872,19 @@ const RulesTabWrapper: React.FC = () => {
         }
     };
 
+    const handleSendTest = async (ruleId: number) => {
+        try {
+            const result = await sendTestToRule.mutateAsync({ ruleId });
+            if (result.success) {
+                toast.success(`Тестовое сообщение отправлено: ${result.sent} из ${result.total} контактов`);
+            } else {
+                toast.error(`Не удалось отправить тест: ${result.failed} ошибок`);
+            }
+        } catch (error: any) {
+            toast.error(error.response?.data?.error || 'Ошибка отправки теста');
+        }
+    };
+
     if (rulesLoading || contactsLoading) {
         return (
             <div className="flex justify-center py-12">
@@ -754,14 +894,42 @@ const RulesTabWrapper: React.FC = () => {
     }
 
     return (
-        <RulesTab
-            rules={rules || []}
-            contacts={contacts || []}
-            onToggleRule={handleToggleRule}
-            onAssignContacts={handleAssignContacts}
-            isToggling={toggleRule.isPending}
-            isAssigning={assignContacts.isPending}
-        />
+        <>
+            <RulesTab
+                rules={rules || []}
+                contacts={contacts || []}
+                onToggleRule={handleToggleRule}
+                onAssignContacts={handleAssignContacts}
+                onSendTest={handleSendTest}
+                onCreateRule={handleCreateRule}
+                onEditRule={handleEditRule}
+                onDeleteRule={handleDeleteRule}
+                isToggling={toggleRule.isPending}
+                isAssigning={assignContacts.isPending}
+            />
+
+            {isRuleModalOpen && (
+                <RuleFormModal
+                    rule={editingRule}
+                    onClose={handleCloseRuleModal}
+                    onSubmit={handleSubmitRule}
+                    isSubmitting={createRule.isPending || updateRule.isPending}
+                />
+            )}
+
+            {deleteModalOpen && ruleToDelete && (
+                <DeleteConfirmModal
+                    title={ruleToDelete.name}
+                    itemType="правило"
+                    onClose={() => {
+                        setDeleteModalOpen(false);
+                        setRuleToDelete(null);
+                    }}
+                    onConfirm={confirmDeleteRule}
+                    deleting={deletingRuleId === ruleToDelete.id}
+                />
+            )}
+        </>
     );
 };
 

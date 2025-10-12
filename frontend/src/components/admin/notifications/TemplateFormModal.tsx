@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaSpinner, FaStar } from 'react-icons/fa';
-import { useNotificationTypes, useNotificationChannels } from '../../../hooks/useNotifications';
+import { useNotificationTypes } from '../../../hooks/useNotifications';
 import type { NotificationTemplate } from '../../../types/notifications';
 
 interface TemplateFormModalProps {
@@ -14,6 +14,12 @@ interface TemplateFormModalProps {
     isSubmitting: boolean;
 }
 
+const CHANNEL_TYPE_OPTIONS = [
+    { value: 'email', label: 'Email' },
+    { value: 'telegram', label: 'Telegram' },
+    { value: 'whatsapp', label: 'WhatsApp' },
+];
+
 export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
     template,
     onClose,
@@ -21,11 +27,17 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
     isSubmitting
 }) => {
     const { data: notificationTypes } = useNotificationTypes();
-    const { data: channels } = useNotificationChannels();
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<{
+        notification_type: number;
+        channel_type: 'telegram' | 'whatsapp' | 'email' | '';
+        name: string;
+        subject: string;
+        template: string;
+        is_default: boolean;
+    }>({
         notification_type: template?.notification_type || 0,
-        channel: template?.channel || 0,
+        channel_type: template?.channel_type || '',
         name: template?.name || '',
         subject: template?.subject || '',
         template: template?.template || '',
@@ -33,6 +45,17 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
     });
 
     const [selectedType, setSelectedType] = useState<any>(null);
+
+    // Обработчик ESC для закрытия модального окна
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && !isSubmitting) {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [onClose, isSubmitting]);
 
     // Обновить выбранный тип при изменении notification_type
     useEffect(() => {
@@ -42,10 +65,11 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
         }
     }, [formData.notification_type, notificationTypes]);
 
-    // Получить доступные переменные (из существующего шаблона при редактировании)
+    // Получить доступные переменные из выбранного типа уведомления
     const getAvailableVariables = (): Record<string, string> => {
-        if (template?.variables_help) {
-            return template.variables_help;
+        // Переменные теперь хранятся в NotificationType, а не в шаблоне
+        if (selectedType?.variables_help) {
+            return selectedType.variables_help;
         }
         return {};
     };
@@ -53,7 +77,7 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!formData.notification_type || !formData.channel || !formData.name || !formData.template) {
+        if (!formData.notification_type || !formData.channel_type || !formData.name || !formData.template) {
             alert('Заполните все обязательные поля');
             return;
         }
@@ -65,8 +89,7 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    const selectedChannel = channels?.find(c => c.id === formData.channel);
-    const showSubjectField = selectedChannel?.code === 'email';
+    const showSubjectField = formData.channel_type === 'email';
 
     const availableVariables = getAvailableVariables();
 
@@ -112,25 +135,28 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
                         )}
                     </div>
 
-                    {/* Канал */}
+                    {/* Тип канала */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Канал отправки <span className="text-red-500">*</span>
+                            Тип канала <span className="text-red-500">*</span>
                         </label>
                         <select
-                            value={formData.channel}
-                            onChange={(e) => handleChange('channel', Number(e.target.value))}
+                            value={formData.channel_type}
+                            onChange={(e) => handleChange('channel_type', e.target.value)}
                             disabled={!!template}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                             required
                         >
-                            <option value={0}>Выберите канал</option>
-                            {channels?.filter(c => c.is_active).map(channel => (
-                                <option key={channel.id} value={channel.id}>
-                                    {channel.name}
+                            <option value="">Выберите тип канала</option>
+                            {CHANNEL_TYPE_OPTIONS.map(option => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
                                 </option>
                             ))}
                         </select>
+                        <p className="mt-1 text-xs text-gray-600">
+                            Шаблон будет работать со всеми каналами этого типа
+                        </p>
                     </div>
 
                     {/* Название шаблона */}
@@ -187,21 +213,38 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
                     </div>
 
                     {/* Доступные переменные */}
-                    {Object.keys(availableVariables).length > 0 && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                                Доступные переменные для этого типа уведомления:
-                            </h4>
-                            <div className="space-y-2">
-                                {Object.entries(availableVariables).map(([varName, description]) => (
-                                    <div key={varName} className="flex items-start space-x-3">
-                                        <code className="px-2 py-1 bg-white border border-blue-300 text-blue-700 text-xs rounded font-mono shrink-0">
-                                            {`{{${varName}}}`}
-                                        </code>
-                                        <span className="text-xs text-gray-700">{description}</span>
-                                    </div>
-                                ))}
+                    {formData.notification_type > 0 ? (
+                        Object.keys(availableVariables).length > 0 ? (
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                                    Доступные переменные для типа "{selectedType?.name}":
+                                </h4>
+                                <p className="text-xs text-gray-600 mb-3">
+                                    Эти переменные будут автоматически заменены на реальные значения при отправке уведомления
+                                </p>
+                                <div className="space-y-2">
+                                    {Object.entries(availableVariables).map(([varName, description]) => (
+                                        <div key={varName} className="flex items-start space-x-3">
+                                            <code className="px-2 py-1 bg-white border border-blue-300 text-blue-700 text-xs rounded font-mono shrink-0">
+                                                {`{{${varName}}}`}
+                                            </code>
+                                            <span className="text-xs text-gray-700">{description}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
+                        ) : (
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <p className="text-sm text-gray-600">
+                                    Для выбранного типа уведомления не определены переменные
+                                </p>
+                            </div>
+                        )
+                    ) : (
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <p className="text-sm text-gray-600">
+                                Выберите тип уведомления, чтобы увидеть доступные переменные
+                            </p>
                         </div>
                     )}
 

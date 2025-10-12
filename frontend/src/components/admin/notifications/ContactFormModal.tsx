@@ -3,38 +3,65 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { FaTimes, FaEnvelope, FaWhatsapp } from 'react-icons/fa';
-import type { NotificationContact, NotificationChannel } from '../../../types/notifications';
+import { FaTimes, FaEnvelope, FaWhatsapp, FaTelegram } from 'react-icons/fa';
+import type { NotificationContact } from '../../../types/notifications';
+import { CustomSelect, SelectOption } from '../../CustomSelect';
 
 interface ContactFormModalProps {
     contact: NotificationContact | null;
-    channels: NotificationChannel[];
     onClose: () => void;
     onSubmit: (data: Partial<NotificationContact>) => void;
     isSubmitting: boolean;
 }
 
+const CHANNEL_TYPE_OPTIONS = [
+    { value: 'telegram', label: 'Telegram', icon: '✈️', emoji: '📱' },
+    { value: 'whatsapp', label: 'WhatsApp', icon: '💬', emoji: '📞' },
+    { value: 'email', label: 'Email', icon: '📧', emoji: '✉️' },
+] as const;
+
+// Опции для CustomSelect с эмодзи
+const SELECT_OPTIONS: SelectOption[] = CHANNEL_TYPE_OPTIONS.map(opt => ({
+    value: opt.value,
+    label: `${opt.icon} ${opt.label}`
+}));
+
 export const ContactFormModal: React.FC<ContactFormModalProps> = ({
     contact,
-    channels,
     onClose,
     onSubmit,
     isSubmitting
 }) => {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<{
+        name: string;
+        channel_type: 'telegram' | 'whatsapp' | 'email' | '';
+        value: string;
+        is_active: boolean;
+    }>({
         name: '',
-        channel: 0,
+        channel_type: '',
         value: '',
         is_active: true
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
+    // Обработчик ESC для закрытия модального окна
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && !isSubmitting) {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [onClose, isSubmitting]);
+
     useEffect(() => {
         if (contact) {
             setFormData({
                 name: contact.name,
-                channel: contact.channel,
+                channel_type: contact.channel_type,
                 value: contact.value,
                 is_active: contact.is_active
             });
@@ -48,21 +75,20 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
             newErrors.name = 'Введите название контакта';
         }
 
-        if (!formData.channel) {
-            newErrors.channel = 'Выберите канал';
+        if (!formData.channel_type) {
+            newErrors.channel_type = 'Выберите тип канала';
         }
 
         if (!formData.value.trim()) {
             newErrors.value = 'Введите контактное значение';
         } else {
-            // Валидация в зависимости от канала
-            const selectedChannel = channels.find(c => c.id === formData.channel);
-            if (selectedChannel?.code === 'email') {
+            // Валидация в зависимости от типа канала
+            if (formData.channel_type === 'email') {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(formData.value)) {
                     newErrors.value = 'Введите корректный email адрес';
                 }
-            } else if (selectedChannel?.code === 'whatsapp') {
+            } else if (formData.channel_type === 'whatsapp') {
                 // Проверяем формат телефона (только цифры, минимум 10)
                 const phoneRegex = /^\d{10,}$/;
                 if (!phoneRegex.test(formData.value.replace(/[^\d]/g, ''))) {
@@ -85,10 +111,18 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
         onSubmit(formData);
     };
 
-    const selectedChannel = channels.find(c => c.id === formData.channel);
+    const handleOverlayClick = (e: React.MouseEvent) => {
+        // Закрываем только если клик был на overlay, а не на содержимое модалки
+        if (e.target === e.currentTarget && !isSubmitting) {
+            onClose();
+        }
+    };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            onClick={handleOverlayClick}
+        >
             <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
                 {/* Заголовок */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
@@ -124,55 +158,43 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                         )}
                     </div>
 
-                    {/* Канал */}
+                    {/* Тип канала */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Канал <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                            value={formData.channel}
-                            onChange={(e) => setFormData({ ...formData, channel: parseInt(e.target.value) })}
-                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                errors.channel ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                        >
-                            <option value={0}>Выберите канал</option>
-                            {channels.map((channel) => (
-                                <option key={channel.id} value={channel.id}>
-                                    {channel.code === 'email' && '📧 '}
-                                    {channel.code === 'whatsapp' && '💬 '}
-                                    {channel.code === 'telegram' && '✈️ '}
-                                    {channel.name}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.channel && (
-                            <p className="mt-1 text-sm text-red-500">{errors.channel}</p>
-                        )}
+                        <CustomSelect
+                            label="Тип канала *"
+                            value={formData.channel_type}
+                            onChange={(value) => setFormData({ ...formData, channel_type: value as any })}
+                            options={SELECT_OPTIONS}
+                            placeholder="Выберите тип канала"
+                            error={errors.channel_type}
+                        />
+                        <p className="mt-1 text-xs text-gray-500">
+                            Выберите тип канала для отправки уведомлений
+                        </p>
                     </div>
 
                     {/* Контактное значение */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {selectedChannel?.code === 'email' && 'Email адрес'}
-                            {selectedChannel?.code === 'whatsapp' && 'Номер телефона'}
-                            {selectedChannel?.code === 'telegram' && 'Telegram Chat ID'}
-                            {!selectedChannel && 'Контактное значение'}
+                            {formData.channel_type === 'email' && 'Email адрес'}
+                            {formData.channel_type === 'whatsapp' && 'Номер телефона'}
+                            {formData.channel_type === 'telegram' && 'Telegram Chat ID'}
+                            {!formData.channel_type && 'Контактное значение'}
                             <span className="text-red-500"> *</span>
                         </label>
                         <input
-                            type={selectedChannel?.code === 'email' ? 'email' : 'text'}
+                            type={formData.channel_type === 'email' ? 'email' : 'text'}
                             value={formData.value}
                             onChange={(e) => setFormData({ ...formData, value: e.target.value })}
                             className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                                 errors.value ? 'border-red-500' : 'border-gray-300'
                             }`}
                             placeholder={
-                                selectedChannel?.code === 'email'
+                                formData.channel_type === 'email'
                                     ? 'admin@example.com'
-                                    : selectedChannel?.code === 'whatsapp'
+                                    : formData.channel_type === 'whatsapp'
                                     ? '79991234567'
-                                    : selectedChannel?.code === 'telegram'
+                                    : formData.channel_type === 'telegram'
                                     ? '198916951'
                                     : 'Контактное значение'
                             }
@@ -180,12 +202,12 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                         {errors.value && (
                             <p className="mt-1 text-sm text-red-500">{errors.value}</p>
                         )}
-                        {selectedChannel?.code === 'whatsapp' && (
+                        {formData.channel_type === 'whatsapp' && (
                             <p className="mt-1 text-xs text-gray-500">
                                 Формат: код страны + номер без пробелов (например: 79991234567)
                             </p>
                         )}
-                        {selectedChannel?.code === 'telegram' && (
+                        {formData.channel_type === 'telegram' && (
                             <p className="mt-1 text-xs text-gray-500">
                                 Chat ID можно узнать у бота @userinfobot в Telegram
                             </p>

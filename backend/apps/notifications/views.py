@@ -43,6 +43,32 @@ class NotificationChannelViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminUser]
     pagination_class = None
 
+    def destroy(self, request, *args, **kwargs):
+        """Удаление канала с обработкой защищенных связей."""
+        from django.db.models import ProtectedError
+
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except ProtectedError as e:
+            # Получаем информацию о связанных объектах
+            protected_objects = []
+            if hasattr(e, 'protected_objects'):
+                for obj in list(e.protected_objects)[:5]:  # Показываем первые 5
+                    protected_objects.append(str(obj))
+
+            error_message = (
+                'Невозможно удалить канал, так как к нему привязаны контакты или правила отправки. '
+                'Сначала удалите или переназначьте связанные объекты.'
+            )
+
+            if protected_objects:
+                error_message += f' Связанные объекты: {", ".join(protected_objects)}'
+
+            return Response(
+                {'error': error_message},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
     @action(detail=True, methods=['post'])
     def update_settings(self, request, pk=None):
         """Обновление настроек канала."""
@@ -164,13 +190,110 @@ class NotificationChannelViewSet(viewsets.ModelViewSet):
 
         return Response({'error': 'Тестирование для этого канала не реализовано'})
 
+    @action(detail=False, methods=['post'], url_path='test-connection-preview')
+    def test_connection_preview(self, request):
+        """
+        Тестирование подключения без создания канала.
+        Используется при создании нового канала для проверки настроек.
+        """
+        channel_code = request.data.get('channel_code')
+        settings = request.data.get('settings', {})
+
+        if not channel_code:
+            return Response(
+                {'error': 'Не указан код канала (channel_code)'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not settings:
+            return Response(
+                {'error': 'Не указаны настройки (settings)'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Тестируем в зависимости от типа канала
+        if channel_code == 'email':
+            from .services import EmailService
+
+            smtp_host = settings.get('smtp_host')
+            smtp_port = settings.get('smtp_port')
+            smtp_username = settings.get('smtp_username')
+            smtp_password = settings.get('smtp_password')
+            from_email = settings.get('from_email')
+            use_tls = settings.get('use_tls', True)
+
+            if not all([smtp_host, smtp_port, smtp_username, smtp_password, from_email]):
+                return Response(
+                    {'error': 'Недостаточно параметров для Email (требуются: smtp_host, smtp_port, smtp_username, smtp_password, from_email)'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            email_service = EmailService(
+                smtp_host=smtp_host,
+                smtp_port=int(smtp_port),
+                smtp_username=smtp_username,
+                smtp_password=smtp_password,
+                from_email=from_email,
+                use_tls=use_tls
+            )
+            result = email_service.test_connection()
+
+            if 'error' in result:
+                return Response({'success': False, 'error': result['error']})
+
+            return Response({'success': True, 'data': result})
+
+        elif channel_code == 'whatsapp':
+            from .services import WhatsAppService
+
+            instance_id = settings.get('instance_id')
+            api_token = settings.get('api_token')
+
+            if not instance_id or not api_token:
+                return Response(
+                    {'error': 'Недостаточно параметров для WhatsApp (требуются: instance_id, api_token)'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            whatsapp = WhatsAppService(instance_id=instance_id, api_token=api_token)
+            result = whatsapp.check_state_instance()
+
+            if 'error' in result:
+                return Response({'success': False, 'error': result['error']})
+
+            return Response({'success': True, 'data': result})
+
+        elif channel_code == 'telegram':
+            from .services import TelegramService
+
+            bot_token = settings.get('bot_token')
+
+            if not bot_token:
+                return Response(
+                    {'error': 'Недостаточно параметров для Telegram (требуется: bot_token)'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            telegram = TelegramService(bot_token=bot_token)
+            result = telegram.get_bot_info()
+
+            if 'error' in result:
+                return Response({'success': False, 'error': result['error']})
+
+            return Response({'success': True, 'data': result})
+
+        return Response(
+            {'error': f'Тестирование для канала "{channel_code}" не поддерживается'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     @action(detail=True, methods=['post'])
     def send_test(self, request, pk=None):
         """Отправка тестового сообщения через канал."""
         channel = self.get_object()
 
-        # Получаем все активные контакты для этого канала
-        contacts = NotificationContact.objects.filter(channel=channel, is_active=True)
+        # Получаем все активные контакты для типа этого канала
+        contacts = NotificationContact.objects.filter(channel_type=channel.code, is_active=True)
 
         if not contacts.exists():
             return Response(
@@ -287,10 +410,32 @@ class NotificationTypeViewSet(viewsets.ModelViewSet):
 
 class NotificationTemplateViewSet(viewsets.ModelViewSet):
     """ViewSet для шаблонов уведомлений."""
-    queryset = NotificationTemplate.objects.select_related('notification_type', 'channel').all()
+    queryset = NotificationTemplate.objects.select_related('notification_type').all()
     serializer_class = NotificationTemplateSerializer
     permission_classes = [permissions.IsAdminUser]
     pagination_class = None
+
+    @action(detail=True, methods=['post'])
+    def set_default(self, request, pk=None):
+        """Установить шаблон как шаблон по умолчанию для данного типа уведомления + типа канала."""
+        template = self.get_object()
+
+        # Сначала снимаем флаг is_default со всех шаблонов этого типа уведомления + типа канала
+        NotificationTemplate.objects.filter(
+            notification_type=template.notification_type,
+            channel_type=template.channel_type
+        ).update(is_default=False)
+
+        # Устанавливаем флаг для выбранного шаблона
+        template.is_default = True
+        template.save()
+
+        serializer = self.get_serializer(template)
+        return Response({
+            'success': True,
+            'message': f'Шаблон "{template.name}" установлен по умолчанию',
+            'template': serializer.data
+        })
 
     @action(detail=True, methods=['post'])
     def preview(self, request, pk=None):
@@ -316,20 +461,208 @@ class NotificationTemplateViewSet(viewsets.ModelViewSet):
 
 class NotificationContactViewSet(viewsets.ModelViewSet):
     """ViewSet для контактов."""
-    queryset = NotificationContact.objects.select_related('channel').all()
+    queryset = NotificationContact.objects.all()
     serializer_class = NotificationContactSerializer
     permission_classes = [permissions.IsAdminUser]
     pagination_class = None
+
+    @action(detail=True, methods=['post'])
+    def send_test(self, request, pk=None):
+        """Отправка тестового сообщения на контакт."""
+        contact = self.get_object()
+
+        # Получаем активный канал соответствующего типа
+        try:
+            channel = NotificationChannel.objects.get(code=contact.channel_type, is_active=True)
+        except NotificationChannel.DoesNotExist:
+            return Response(
+                {'error': f'Нет активного канала типа {contact.get_channel_type_display()}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        test_message = request.data.get('message', f'Тестовое сообщение от Faida Group Store')
+
+        try:
+            if contact.channel_type == 'whatsapp':
+                from .services import WhatsAppService
+
+                settings = channel.settings
+                instance_id = settings.get('instance_id')
+                api_token = settings.get('api_token')
+
+                whatsapp = WhatsAppService(instance_id=instance_id, api_token=api_token)
+                result = whatsapp.send_message(contact.value, test_message)
+
+                if 'error' in result:
+                    return Response({
+                        'success': False,
+                        'error': result['error']
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                return Response({
+                    'success': True,
+                    'message_id': result.get('idMessage'),
+                    'data': result
+                })
+
+            elif contact.channel_type == 'email':
+                from .services import EmailService
+
+                settings = channel.settings
+                email_service = EmailService(
+                    smtp_host=settings.get('smtp_host'),
+                    smtp_port=int(settings.get('smtp_port')),
+                    smtp_username=settings.get('smtp_username'),
+                    smtp_password=settings.get('smtp_password'),
+                    from_email=settings.get('from_email'),
+                    use_tls=settings.get('use_tls', True)
+                )
+                result = email_service.send_message(
+                    to_email=contact.value,
+                    subject='Тестовое уведомление - Faida Group Store',
+                    message=test_message
+                )
+
+                if 'error' in result:
+                    return Response({
+                        'success': False,
+                        'error': result['error']
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                return Response({
+                    'success': True,
+                    'data': result
+                })
+
+            elif contact.channel_type == 'telegram':
+                from .services import TelegramService
+
+                settings = channel.settings
+                bot_token = settings.get('bot_token')
+
+                telegram = TelegramService(bot_token=bot_token)
+                result = telegram.send_message(contact.value, test_message)
+
+                if 'error' in result:
+                    return Response({
+                        'success': False,
+                        'error': result['error']
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                return Response({
+                    'success': True,
+                    'message_id': result.get('result', {}).get('message_id'),
+                    'data': result
+                })
+
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({
+            'error': 'Тип канала не поддерживается'
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class NotificationRuleViewSet(viewsets.ModelViewSet):
     """ViewSet для правил отправки."""
     queryset = NotificationRule.objects.select_related(
-        'notification_type', 'channel'
+        'notification_type', 'channel', 'default_template'
     ).prefetch_related('contacts').all()
     serializer_class = NotificationRuleSerializer
     permission_classes = [permissions.IsAdminUser]
     pagination_class = None
+
+    def create(self, request, *args, **kwargs):
+        """Создание правила с обработкой вложенных полей."""
+        data = request.data.copy()
+
+        # Извлекаем IDs для FK и M2M полей
+        contact_ids = data.pop('contacts', []) if isinstance(data.get('contacts'), list) else []
+
+        # Валидация: системные правила могут использовать только email каналы
+        rule_type = data.get('rule_type', 'additional')
+        if rule_type == 'system':
+            try:
+                channel = NotificationChannel.objects.get(id=data.get('channel'))
+                if channel.code != 'email':
+                    return Response(
+                        {'error': 'Системные уведомления могут использовать только Email каналы'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            except NotificationChannel.DoesNotExist:
+                pass  # Ошибка будет обработана при создании
+
+        # Создаем правило
+        rule = NotificationRule.objects.create(
+            name=data.get('name'),
+            rule_type=rule_type,
+            notification_type_id=data.get('notification_type'),
+            channel_id=data.get('channel'),
+            default_template_id=data.get('default_template') if data.get('default_template') else None,
+            is_enabled=data.get('is_enabled', True)
+        )
+
+        # Назначаем контакты (только для дополнительных правил)
+        # Для системных правил контакты игнорируются
+        if rule_type == 'additional' and contact_ids:
+            rule.contacts.set(contact_ids)
+
+        serializer = self.get_serializer(rule)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        """Обновление правила с обработкой вложенных полей."""
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        data = request.data.copy()
+
+        # Извлекаем IDs для FK и M2M полей
+        contact_ids = data.pop('contacts', None)
+
+        # Валидация: если меняется rule_type на system или channel, проверяем ограничения
+        new_rule_type = data.get('rule_type', instance.rule_type)
+        new_channel_id = data.get('channel', instance.channel_id)
+
+        if new_rule_type == 'system':
+            try:
+                channel = NotificationChannel.objects.get(id=new_channel_id)
+                if channel.code != 'email':
+                    return Response(
+                        {'error': 'Системные уведомления могут использовать только Email каналы'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            except NotificationChannel.DoesNotExist:
+                pass  # Ошибка будет обработана при сохранении
+
+        # Обновляем основные поля
+        if 'name' in data:
+            instance.name = data['name']
+        if 'rule_type' in data:
+            instance.rule_type = data['rule_type']
+        if 'notification_type' in data:
+            instance.notification_type_id = data['notification_type']
+        if 'channel' in data:
+            instance.channel_id = data['channel']
+        if 'default_template' in data:
+            instance.default_template_id = data['default_template'] if data['default_template'] else None
+        if 'is_enabled' in data:
+            instance.is_enabled = data['is_enabled']
+
+        instance.save()
+
+        # Обновляем контакты если они переданы (только для дополнительных правил)
+        if contact_ids is not None:
+            if instance.rule_type == 'additional':
+                instance.contacts.set(contact_ids)
+            else:
+                # Для системных правил очищаем контакты
+                instance.contacts.clear()
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
     @action(detail=True, methods=['post'])
     def assign_contacts(self, request, pk=None):
@@ -337,15 +670,15 @@ class NotificationRuleViewSet(viewsets.ModelViewSet):
         rule = self.get_object()
         contact_ids = request.data.get('contact_ids', [])
 
-        # Валидация: контакты должны принадлежать тому же каналу
+        # Валидация: контакты должны иметь тот же тип, что и канал правила
         if contact_ids:
             invalid_contacts = NotificationContact.objects.filter(
                 id__in=contact_ids
-            ).exclude(channel=rule.channel)
+            ).exclude(channel_type=rule.channel.code)
 
             if invalid_contacts.exists():
                 return Response(
-                    {'error': 'Контакты должны принадлежать тому же каналу что и правило'},
+                    {'error': 'Контакты должны иметь тот же тип, что и канал правила'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
@@ -365,6 +698,132 @@ class NotificationRuleViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(rule)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def send_test(self, request, pk=None):
+        """Отправка тестового сообщения через правило."""
+        rule = self.get_object()
+
+        # Проверяем что правило активно
+        if not rule.is_enabled:
+            return Response(
+                {'error': 'Правило отключено. Включите его перед тестированием.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Проверяем что канал активен
+        if not rule.channel.is_active:
+            return Response(
+                {'error': f'Канал "{rule.channel.name}" отключен'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Проверяем наличие контактов
+        contacts = rule.contacts.filter(is_active=True)
+        if not contacts.exists():
+            return Response(
+                {'error': 'К правилу не привязаны активные контакты'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        test_message = request.data.get('message', f'Тестовое сообщение от Faida Group Store через правило "{rule.notification_type.name}"')
+
+        results = []
+        channel = rule.channel
+
+        for contact in contacts:
+            try:
+                if channel.code == 'whatsapp':
+                    from .services import WhatsAppService
+
+                    settings = channel.settings
+                    instance_id = settings.get('instance_id')
+                    api_token = settings.get('api_token')
+
+                    whatsapp = WhatsAppService(instance_id=instance_id, api_token=api_token)
+                    result = whatsapp.send_message(contact.value, test_message)
+
+                    if 'error' in result:
+                        results.append({
+                            'contact': contact.name,
+                            'success': False,
+                            'error': result['error']
+                        })
+                    else:
+                        results.append({
+                            'contact': contact.name,
+                            'success': True,
+                            'message_id': result.get('idMessage')
+                        })
+
+                elif channel.code == 'email':
+                    from .services import EmailService
+
+                    settings = channel.settings
+                    email_service = EmailService(
+                        smtp_host=settings.get('smtp_host'),
+                        smtp_port=int(settings.get('smtp_port')),
+                        smtp_username=settings.get('smtp_username'),
+                        smtp_password=settings.get('smtp_password'),
+                        from_email=settings.get('from_email'),
+                        use_tls=settings.get('use_tls', True)
+                    )
+                    result = email_service.send_message(
+                        to_email=contact.value,
+                        subject='Тестовое уведомление - Faida Group Store',
+                        message=test_message
+                    )
+
+                    if 'error' in result:
+                        results.append({
+                            'contact': contact.name,
+                            'success': False,
+                            'error': result['error']
+                        })
+                    else:
+                        results.append({
+                            'contact': contact.name,
+                            'success': True
+                        })
+
+                elif channel.code == 'telegram':
+                    from .services import TelegramService
+
+                    settings = channel.settings
+                    bot_token = settings.get('bot_token')
+
+                    telegram = TelegramService(bot_token=bot_token)
+                    result = telegram.send_message(contact.value, test_message)
+
+                    if 'error' in result:
+                        results.append({
+                            'contact': contact.name,
+                            'success': False,
+                            'error': result['error']
+                        })
+                    else:
+                        results.append({
+                            'contact': contact.name,
+                            'success': True,
+                            'message_id': result.get('result', {}).get('message_id')
+                        })
+
+            except Exception as e:
+                results.append({
+                    'contact': contact.name,
+                    'success': False,
+                    'error': str(e)
+                })
+
+        success_count = sum(1 for r in results if r['success'])
+
+        return Response({
+            'success': success_count > 0,
+            'total': len(results),
+            'sent': success_count,
+            'failed': len(results) - success_count,
+            'results': results
+        })
 
     @action(detail=True, methods=['post'], url_path='assign-template')
     def assign_template(self, request, pk=None):
@@ -390,10 +849,10 @@ class NotificationRuleViewSet(viewsets.ModelViewSet):
         if template_id:
             try:
                 template = NotificationTemplate.objects.get(id=template_id)
-                # Шаблон должен быть для того же типа уведомления и канала
-                if template.notification_type != rule.notification_type or template.channel != rule.channel:
+                # Шаблон должен быть для того же типа уведомления и типа канала
+                if template.notification_type != rule.notification_type or template.channel_type != rule.channel.code:
                     return Response(
-                        {'error': 'Шаблон не подходит для этого правила (другой тип уведомления или канал)'},
+                        {'error': 'Шаблон не подходит для этого правила (другой тип уведомления или тип канала)'},
                         status=status.HTTP_400_BAD_REQUEST
                     )
             except NotificationTemplate.DoesNotExist:

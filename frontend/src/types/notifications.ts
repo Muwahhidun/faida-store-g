@@ -33,6 +33,7 @@ export interface NotificationType {
     description: string;
     is_enabled: boolean;
     order: number;
+    variables_help: Record<string, string>;  // Доступные переменные для этого типа уведомления
     created_at: string;
     updated_at: string;
 }
@@ -41,24 +42,24 @@ export interface NotificationTemplate {
     id: number;
     notification_type: number;
     notification_type_name: string;
-    channel: number;
-    channel_name: string;
+    channel_type: 'telegram' | 'whatsapp' | 'email';
+    channel_type_display: string;  // "Telegram", "WhatsApp", "Email"
     name: string;
     subject: string;
     template: string;
     variables_help: Record<string, string>;
     is_default: boolean;
+    is_system: boolean;
     created_at: string;
     updated_at: string;
 }
 
 export interface NotificationContact {
     id: number;
-    channel: number;
-    channel_name: string;
-    channel_icon: string;
+    channel_type: 'telegram' | 'whatsapp' | 'email';
+    channel_type_display: string;  // "Telegram", "WhatsApp", "Email"
     name: string;
-    value: string;  // Поле в БД называется "value", не "contact_value"
+    value: string;  // @username, +7999... или email
     is_active: boolean;
     created_at: string;
     updated_at: string;
@@ -72,6 +73,8 @@ export interface ContactTemplate {
 
 export interface NotificationRule {
     id: number;
+    name: string;
+    rule_type: 'system' | 'additional';
     notification_type: {
         id: number;
         code: string;
@@ -84,6 +87,11 @@ export interface NotificationRule {
         name: string;
         icon: string;
     };
+    default_template: {
+        id: number;
+        name: string;
+        channel_type: 'telegram' | 'whatsapp' | 'email';
+    } | null;
     is_enabled: boolean;
     contacts: NotificationContact[];
     contact_templates: ContactTemplate[];

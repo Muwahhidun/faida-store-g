@@ -47,9 +47,9 @@ export default function AssignContactsModal({
         }
     };
 
-    // Фильтруем контакты: показываем только те, которые принадлежат каналу правила
+    // Фильтруем контакты: показываем только те, у которых тип совпадает с типом канала в правиле
     const availableContacts = rule
-        ? contacts.filter(c => c.channel === rule.channel.id)
+        ? contacts.filter(c => c.channel_type === rule.channel.code)
         : [];
 
     return (

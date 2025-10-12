@@ -43,25 +43,27 @@ class NotificationTypeAdmin(admin.ModelAdmin):
 @admin.register(NotificationTemplate)
 class NotificationTemplateAdmin(admin.ModelAdmin):
     """Админка для шаблонов уведомлений."""
-    list_display = ('notification_type', 'channel', 'created_at')
-    list_filter = ('channel', 'notification_type__category')
-    search_fields = ('notification_type__name', 'template')
+    list_display = ('notification_type', 'channel_type', 'name', 'is_system', 'is_default', 'created_at')
+    list_filter = ('channel_type', 'is_system', 'is_default', 'notification_type__category')
+    search_fields = ('notification_type__name', 'name', 'template')
+    readonly_fields = ('created_at', 'updated_at')
 
 
 @admin.register(NotificationContact)
 class NotificationContactAdmin(admin.ModelAdmin):
     """Админка для контактов."""
-    list_display = ('name', 'channel', 'value', 'is_active', 'created_at')
-    list_filter = ('channel', 'is_active')
+    list_display = ('name', 'channel_type', 'value', 'is_active', 'created_at')
+    list_filter = ('channel_type', 'is_active')
     search_fields = ('name', 'value')
-    ordering = ('channel', 'name')
+    ordering = ('channel_type', 'name')
 
 
 @admin.register(NotificationRule)
 class NotificationRuleAdmin(admin.ModelAdmin):
     """Админка для правил отправки уведомлений."""
-    list_display = ('notification_type', 'channel', 'is_enabled', 'created_at')
+    list_display = ('name', 'notification_type', 'channel', 'is_enabled', 'created_at')
     list_filter = ('channel', 'is_enabled', 'notification_type__category')
+    search_fields = ('name', 'notification_type__name', 'channel__name')
     filter_horizontal = ('contacts',)
 
 

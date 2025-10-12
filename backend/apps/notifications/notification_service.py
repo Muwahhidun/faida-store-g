@@ -74,12 +74,25 @@ class NotificationService:
 
         # Для каждого правила отправляем уведомления
         for rule in rules:
-            # Получаем шаблон для этого канала
+            # Получаем шаблон для этого типа канала (сначала пытаемся найти is_default=True, если нет - любой)
             try:
-                template = NotificationTemplate.objects.get(
+                # Сначала ищем шаблон по умолчанию
+                template = NotificationTemplate.objects.filter(
                     notification_type=notification_type,
-                    channel=rule.channel
-                )
+                    channel_type=rule.channel.code,
+                    is_default=True
+                ).first()
+
+                # Если нет шаблона по умолчанию, берем любой для этого типа
+                if not template:
+                    template = NotificationTemplate.objects.filter(
+                        notification_type=notification_type,
+                        channel_type=rule.channel.code
+                    ).first()
+
+                if not template:
+                    raise NotificationTemplate.DoesNotExist()
+
             except NotificationTemplate.DoesNotExist:
                 logger.error(f"Шаблон для {notification_type_code} / {rule.channel.code} не найден")
                 continue
