@@ -7,10 +7,9 @@ import {
     FaBell,
     FaEnvelope,
     FaWhatsapp,
+    FaTelegram,
     FaListUl,
-    FaFileAlt,
     FaUsers,
-    FaRandom,
     FaHistory,
     FaChartBar,
     FaSpinner,
@@ -21,24 +20,40 @@ import {
     FaExclamationTriangle,
     FaClock,
     FaSyncAlt,
-    FaTimes
+    FaRoute,
+    FaFileAlt
 } from 'react-icons/fa';
 import {
     useNotificationChannels,
     useNotificationContacts,
     useNotificationLogs,
     useNotificationStats,
+    useNotificationRules,
     useCreateContact,
     useUpdateContact,
     useDeleteContact,
     useRetryNotification,
-    useTestChannel
+    useTestChannel,
+    useSendTestMessage,
+    useAssignContacts,
+    useToggleRule,
+    useUpdateChannelSettings,
+    useCreateChannel,
+    useDeleteChannel,
+    useCreateTemplate,
+    useUpdateTemplate
 } from '../../../hooks/useNotifications';
 import toast from 'react-hot-toast';
-import type { NotificationContact } from '../../../types/notifications';
+import type { NotificationContact, NotificationTemplate } from '../../../types/notifications';
+import { ContactFormModal } from '../notifications/ContactFormModal';
+import { TemplateFormModal } from '../notifications/TemplateFormModal';
+import RulesTab from '../notifications/RulesTab';
+import ChannelSettingsModal from '../notifications/ChannelSettingsModal';
+import ChannelCreateModal from '../notifications/ChannelCreateModal';
+import TemplatesTab from '../notifications/TemplatesTab';
 
 // Типы для табов
-type Tab = 'overview' | 'channels' | 'contacts' | 'logs';
+type Tab = 'overview' | 'channels' | 'contacts' | 'templates' | 'rules' | 'logs';
 
 interface TabConfig {
     id: Tab;
@@ -53,6 +68,8 @@ export const NotificationsSection: React.FC = () => {
         { id: 'overview', label: 'Обзор', icon: <FaChartBar /> },
         { id: 'channels', label: 'Каналы', icon: <FaBell /> },
         { id: 'contacts', label: 'Контакты', icon: <FaUsers /> },
+        { id: 'templates', label: 'Шаблоны', icon: <FaFileAlt /> },
+        { id: 'rules', label: 'Правила', icon: <FaRoute /> },
         { id: 'logs', label: 'Логи', icon: <FaHistory /> },
     ];
 
@@ -98,6 +115,8 @@ export const NotificationsSection: React.FC = () => {
                 {activeTab === 'overview' && <OverviewTab />}
                 {activeTab === 'channels' && <ChannelsTab />}
                 {activeTab === 'contacts' && <ContactsTab />}
+                {activeTab === 'templates' && <TemplatesTabWrapper />}
+                {activeTab === 'rules' && <RulesTabWrapper />}
                 {activeTab === 'logs' && <LogsTab />}
             </div>
         </div>
@@ -219,6 +238,54 @@ const OverviewTab: React.FC = () => {
 const ChannelsTab: React.FC = () => {
     const { data: channels, isLoading } = useNotificationChannels();
     const testChannel = useTestChannel();
+    const sendTestMessage = useSendTestMessage();
+    const updateSettings = useUpdateChannelSettings();
+    const createChannel = useCreateChannel();
+    const deleteChannel = useDeleteChannel();
+
+    const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+    const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [selectedChannel, setSelectedChannel] = useState<any | null>(null);
+    const [deletingChannelId, setDeletingChannelId] = useState<number | null>(null);
+
+    const handleOpenSettings = (channel: any) => {
+        setSelectedChannel(channel);
+        setSettingsModalOpen(true);
+    };
+
+    const handleSaveSettings = async (channelId: number, settings: Record<string, any>) => {
+        await updateSettings.mutateAsync({ channelId, settings });
+        toast.success('Настройки сохранены');
+    };
+
+    const handleCreateChannel = async (
+        channelData: { code: string; name: string; icon: string; is_active: boolean },
+        settings: Record<string, any>
+    ) => {
+        try {
+            console.log('[handleCreateChannel] Creating channel:', channelData);
+            console.log('[handleCreateChannel] Settings to save:', settings);
+
+            // Создаём канал
+            const createdChannel = await createChannel.mutateAsync(channelData);
+            console.log('[handleCreateChannel] Created channel response:', createdChannel);
+
+            // Сохраняем настройки
+            if (Object.keys(settings).length > 0) {
+                console.log('[handleCreateChannel] Updating settings for ID:', createdChannel.id);
+                const result = await updateSettings.mutateAsync({
+                    channelId: createdChannel.id,
+                    settings
+                });
+                console.log('[handleCreateChannel] Settings update result:', result);
+            }
+
+            toast.success('Канал создан и настроен успешно!');
+        } catch (error) {
+            console.error('[handleCreateChannel] Error:', error);
+            throw error;
+        }
+    };
 
     const handleTestChannel = async (channelId: number, channelName: string) => {
         try {
@@ -230,6 +297,35 @@ const ChannelsTab: React.FC = () => {
             }
         } catch (error: any) {
             toast.error(`Ошибка тестирования: ${error.response?.data?.error || error.message}`);
+        }
+    };
+
+    const handleSendTest = async (channelId: number, channelName: string) => {
+        try {
+            const result = await sendTestMessage.mutateAsync({ channelId });
+            if (result.success) {
+                toast.success(`${channelName}: Отправлено ${result.sent} из ${result.total} контактов`);
+            } else {
+                toast.error(`${channelName}: Ошибка отправки`);
+            }
+        } catch (error: any) {
+            toast.error(`Ошибка: ${error.response?.data?.error || error.message}`);
+        }
+    };
+
+    const handleDeleteChannel = async (channelId: number, channelName: string) => {
+        if (!confirm(`Удалить канал "${channelName}"? Это действие нельзя отменить.`)) {
+            return;
+        }
+
+        setDeletingChannelId(channelId);
+        try {
+            await deleteChannel.mutateAsync(channelId);
+            toast.success(`Канал "${channelName}" удален`);
+        } catch (error: any) {
+            toast.error(error.response?.data?.error || 'Ошибка удаления');
+        } finally {
+            setDeletingChannelId(null);
         }
     };
 
@@ -245,21 +341,20 @@ const ChannelsTab: React.FC = () => {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">Каналы связи</h3>
-                <a
-                    href="http://localhost:8000/admin/notifications/notificationchannel/add/"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <button
+                    onClick={() => setCreateModalOpen(true)}
                     className="btn-secondary text-sm flex items-center space-x-2"
                 >
                     <FaPlus className="w-3 h-3" />
                     <span>Добавить канал</span>
-                </a>
+                </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {channels?.map((channel) => {
                     const IconComponent = channel.code === 'email' ? FaEnvelope :
-                                        channel.code === 'whatsapp' ? FaWhatsapp : FaBell;
+                                        channel.code === 'whatsapp' ? FaWhatsapp :
+                                        channel.code === 'telegram' ? FaTelegram : FaBell;
 
                     return (
                         <div
@@ -309,16 +404,41 @@ const ChannelsTab: React.FC = () => {
                                 </div>
                             )}
 
-                            <div className="mt-3">
-                                <a
-                                    href={`http://localhost:8000/admin/notifications/notificationchannel/${channel.id}/change/`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                            <div className="mt-3 flex items-center space-x-3">
+                                {channel.is_active && (
+                                    <button
+                                        onClick={() => handleSendTest(channel.id, channel.name)}
+                                        disabled={sendTestMessage.isPending}
+                                        className="text-sm text-green-600 hover:underline flex items-center space-x-1 disabled:opacity-50"
+                                    >
+                                        {sendTestMessage.isPending ? (
+                                            <FaSpinner className="w-3 h-3 animate-spin" />
+                                        ) : (
+                                            <FaBell className="w-3 h-3" />
+                                        )}
+                                        <span>Отправить тест</span>
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => handleOpenSettings(channel)}
                                     className="text-sm text-blue-600 hover:underline flex items-center space-x-1"
                                 >
                                     <FaEdit className="w-3 h-3" />
                                     <span>Настроить</span>
-                                </a>
+                                </button>
+                                <span className="text-gray-300">|</span>
+                                <button
+                                    onClick={() => handleDeleteChannel(channel.id, channel.name)}
+                                    disabled={deletingChannelId === channel.id}
+                                    className="text-sm text-red-600 hover:underline flex items-center space-x-1 disabled:opacity-50"
+                                >
+                                    {deletingChannelId === channel.id ? (
+                                        <FaSpinner className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                        <FaTrash className="w-3 h-3" />
+                                    )}
+                                    <span>Удалить</span>
+                                </button>
                             </div>
                         </div>
                     );
@@ -331,9 +451,499 @@ const ChannelsTab: React.FC = () => {
                     <p>Нет настроенных каналов</p>
                 </div>
             )}
+
+            <ChannelSettingsModal
+                isOpen={settingsModalOpen}
+                onClose={() => {
+                    setSettingsModalOpen(false);
+                    setSelectedChannel(null);
+                }}
+                channel={selectedChannel}
+                onSave={handleSaveSettings}
+                onTestConnection={async (channelId: number) => {
+                    return await testChannel.mutateAsync(channelId);
+                }}
+                isSaving={updateSettings.isPending}
+            />
+
+            <ChannelCreateModal
+                isOpen={createModalOpen}
+                onClose={() => setCreateModalOpen(false)}
+                onSave={handleCreateChannel}
+                isSaving={createChannel.isPending}
+            />
         </div>
     );
 };
 
-// ==================== CONTACTS TAB (продолжение в следующем сообщении) ====================
-// Файл слишком большой, продолжу во второй части
+// ==================== TEMPLATES TAB ====================
+
+const TemplatesTabWrapper: React.FC = () => {
+    const [editingTemplate, setEditingTemplate] = useState<NotificationTemplate | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const createTemplate = useCreateTemplate();
+    const updateTemplate = useUpdateTemplate();
+
+    const handleCreate = () => {
+        setEditingTemplate(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEdit = (template: NotificationTemplate) => {
+        setEditingTemplate(template);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEditingTemplate(null);
+    };
+
+    const handleSubmit = async (data: Partial<NotificationTemplate>) => {
+        try {
+            if (editingTemplate) {
+                await updateTemplate.mutateAsync({ id: editingTemplate.id, data });
+                toast.success('Шаблон обновлен!');
+            } else {
+                await createTemplate.mutateAsync(data);
+                toast.success('Шаблон создан!');
+            }
+            handleCloseModal();
+        } catch (error: any) {
+            toast.error(error.response?.data?.error || 'Ошибка сохранения');
+        }
+    };
+
+    return (
+        <>
+            <TemplatesTab
+                onCreateTemplate={handleCreate}
+                onEditTemplate={handleEdit}
+            />
+            {isModalOpen && (
+                <TemplateFormModal
+                    template={editingTemplate}
+                    onClose={handleCloseModal}
+                    onSubmit={handleSubmit}
+                    isSubmitting={createTemplate.isPending || updateTemplate.isPending}
+                />
+            )}
+        </>
+    );
+};
+
+// ==================== CONTACTS TAB ====================
+
+const ContactsTab: React.FC = () => {
+    const { data: contacts, isLoading: contactsLoading } = useNotificationContacts();
+    const { data: channels } = useNotificationChannels();
+    const createContact = useCreateContact();
+    const updateContact = useUpdateContact();
+    const deleteContact = useDeleteContact();
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingContact, setEditingContact] = useState<NotificationContact | null>(null);
+    const [deletingContactId, setDeletingContactId] = useState<number | null>(null);
+
+    const handleCreate = () => {
+        setEditingContact(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEdit = (contact: NotificationContact) => {
+        setEditingContact(contact);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEditingContact(null);
+    };
+
+    const handleSubmit = async (data: Partial<NotificationContact>) => {
+        try {
+            if (editingContact) {
+                await updateContact.mutateAsync({ id: editingContact.id, data });
+                toast.success('Контакт обновлен!');
+            } else {
+                await createContact.mutateAsync(data);
+                toast.success('Контакт создан!');
+            }
+            handleCloseModal();
+        } catch (error: any) {
+            toast.error(error.response?.data?.error || 'Ошибка сохранения');
+        }
+    };
+
+    const handleDelete = async (contactId: number) => {
+        if (!confirm('Удалить этот контакт? Это действие нельзя отменить.')) {
+            return;
+        }
+
+        setDeletingContactId(contactId);
+        try {
+            await deleteContact.mutateAsync(contactId);
+            toast.success('Контакт удален');
+        } catch (error: any) {
+            toast.error(error.response?.data?.error || 'Ошибка удаления');
+        } finally {
+            setDeletingContactId(null);
+        }
+    };
+
+    if (contactsLoading) {
+        return (
+            <div className="flex justify-center py-12">
+                <FaSpinner className="w-8 h-8 text-blue-600 animate-spin" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Контакты получателей</h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                        Управление контактами для получения уведомлений
+                    </p>
+                </div>
+                <button
+                    onClick={handleCreate}
+                    className="btn-primary flex items-center space-x-2"
+                >
+                    <FaPlus className="w-4 h-4" />
+                    <span>Добавить контакт</span>
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {contacts?.map((contact) => {
+                    const channel = channels?.find(c => c.id === contact.channel);
+                    const IconComponent = channel?.code === 'email' ? FaEnvelope :
+                                        channel?.code === 'whatsapp' ? FaWhatsapp :
+                                        channel?.code === 'telegram' ? FaTelegram : FaBell;
+
+                    return (
+                        <div
+                            key={contact.id}
+                            className={`border rounded-lg p-4 ${
+                                contact.is_active ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-300'
+                            }`}
+                        >
+                            <div className="flex items-start justify-between mb-3">
+                                <div className="flex items-center space-x-3">
+                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                                        contact.is_active ? 'bg-blue-100' : 'bg-gray-200'
+                                    }`}>
+                                        <IconComponent className={`w-5 h-5 ${
+                                            contact.is_active ? 'text-blue-600' : 'text-gray-500'
+                                        }`} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold text-gray-900">{contact.name}</h4>
+                                        <p className="text-xs text-gray-600">{channel?.name}</p>
+                                    </div>
+                                </div>
+
+                                {contact.is_active ? (
+                                    <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
+                                        Активен
+                                    </span>
+                                ) : (
+                                    <span className="px-2 py-1 text-xs font-medium bg-gray-200 text-gray-600 rounded">
+                                        Отключен
+                                    </span>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <p className="text-sm text-gray-700">
+                                    <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs">
+                                        {contact.value}
+                                    </span>
+                                </p>
+                            </div>
+
+                            <div className="mt-4 flex items-center space-x-2 pt-3 border-t border-gray-200">
+                                <button
+                                    onClick={() => handleEdit(contact)}
+                                    className="text-sm text-blue-600 hover:underline flex items-center space-x-1"
+                                >
+                                    <FaEdit className="w-3 h-3" />
+                                    <span>Редактировать</span>
+                                </button>
+                                <span className="text-gray-300">|</span>
+                                <button
+                                    onClick={() => handleDelete(contact.id)}
+                                    disabled={deletingContactId === contact.id}
+                                    className="text-sm text-red-600 hover:underline flex items-center space-x-1 disabled:opacity-50"
+                                >
+                                    {deletingContactId === contact.id ? (
+                                        <FaSpinner className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                        <FaTrash className="w-3 h-3" />
+                                    )}
+                                    <span>Удалить</span>
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {(!contacts || contacts.length === 0) && (
+                <div className="text-center py-12 text-gray-500">
+                    <FaUsers className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                    <p className="mb-2">Нет контактов</p>
+                    <button
+                        onClick={handleCreate}
+                        className="text-blue-600 hover:underline text-sm"
+                    >
+                        Создать первый контакт
+                    </button>
+                </div>
+            )}
+
+            {/* Модальное окно */}
+            {isModalOpen && channels && (
+                <ContactFormModal
+                    contact={editingContact}
+                    channels={channels}
+                    onClose={handleCloseModal}
+                    onSubmit={handleSubmit}
+                    isSubmitting={createContact.isPending || updateContact.isPending}
+                />
+            )}
+        </div>
+    );
+};
+
+// ==================== RULES TAB ====================
+
+const RulesTabWrapper: React.FC = () => {
+    const { data: rules, isLoading: rulesLoading } = useNotificationRules();
+    const { data: contacts, isLoading: contactsLoading } = useNotificationContacts();
+    const assignContacts = useAssignContacts();
+    const toggleRule = useToggleRule();
+
+    const handleToggleRule = async (ruleId: number) => {
+        try {
+            await toggleRule.mutateAsync(ruleId);
+            toast.success('Статус правила изменен');
+        } catch (error: any) {
+            toast.error(error.response?.data?.error || 'Ошибка изменения статуса');
+        }
+    };
+
+    const handleAssignContacts = async (ruleId: number, contactIds: number[]) => {
+        try {
+            await assignContacts.mutateAsync({ ruleId, contactIds });
+            toast.success('Контакты назначены');
+        } catch (error: any) {
+            toast.error(error.response?.data?.error || 'Ошибка назначения контактов');
+        }
+    };
+
+    if (rulesLoading || contactsLoading) {
+        return (
+            <div className="flex justify-center py-12">
+                <FaSpinner className="w-8 h-8 text-blue-600 animate-spin" />
+            </div>
+        );
+    }
+
+    return (
+        <RulesTab
+            rules={rules || []}
+            contacts={contacts || []}
+            onToggleRule={handleToggleRule}
+            onAssignContacts={handleAssignContacts}
+            isToggling={toggleRule.isPending}
+            isAssigning={assignContacts.isPending}
+        />
+    );
+};
+
+// ==================== LOGS TAB ====================
+
+const LogsTab: React.FC = () => {
+    const { data: logs, isLoading } = useNotificationLogs();
+    const retryNotification = useRetryNotification();
+
+    const [statusFilter, setStatusFilter] = useState<string>('all');
+    const [searchQuery, setSearchQuery] = useState<string>('');
+
+    const handleRetry = async (logId: number) => {
+        try {
+            await retryNotification.mutateAsync(logId);
+            toast.success('Уведомление отправлено повторно!');
+        } catch (error: any) {
+            toast.error(error.response?.data?.error || 'Ошибка повторной отправки');
+        }
+    };
+
+    // Фильтрация логов
+    const filteredLogs = logs?.filter(log => {
+        // Фильтр по статусу
+        if (statusFilter !== 'all' && log.status !== statusFilter) {
+            return false;
+        }
+
+        // Поиск по названию, получателю
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            return (
+                log.notification_type_name.toLowerCase().includes(query) ||
+                log.recipient_value.toLowerCase().includes(query) ||
+                log.contact_name?.toLowerCase().includes(query)
+            );
+        }
+
+        return true;
+    }) || [];
+
+    const getStatusBadge = (status: string) => {
+        const badges: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
+            sent: { color: 'bg-green-100 text-green-800', icon: <FaCheckCircle />, label: 'Отправлено' },
+            failed: { color: 'bg-red-100 text-red-800', icon: <FaExclamationTriangle />, label: 'Ошибка' },
+            pending: { color: 'bg-yellow-100 text-yellow-800', icon: <FaClock />, label: 'Ожидает' },
+            retrying: { color: 'bg-blue-100 text-blue-800', icon: <FaSyncAlt />, label: 'Повтор' },
+        };
+
+        const badge = badges[status] || badges.pending;
+
+        return (
+            <span className={`inline-flex items-center space-x-1 px-2 py-1 text-xs font-medium rounded ${badge.color}`}>
+                {badge.icon}
+                <span>{badge.label}</span>
+            </span>
+        );
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center py-12">
+                <FaSpinner className="w-8 h-8 text-blue-600 animate-spin" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">Логи уведомлений</h3>
+                <p className="text-sm text-gray-600">Обновляется каждые 30 секунд</p>
+            </div>
+
+            {/* Фильтры */}
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Поиск по типу, получателю..."
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+                <div className="w-full md:w-48">
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="all">Все статусы</option>
+                        <option value="sent">Отправлено</option>
+                        <option value="pending">Ожидает</option>
+                        <option value="retrying">Повтор</option>
+                        <option value="failed">Ошибка</option>
+                    </select>
+                </div>
+            </div>
+
+            {/* Статистика по фильтрам */}
+            {filteredLogs.length > 0 && (
+                <p className="text-sm text-gray-600">
+                    Найдено: <strong>{filteredLogs.length}</strong> {logs && logs.length !== filteredLogs.length && `из ${logs.length}`}
+                </p>
+            )}
+
+            <div className="space-y-3">
+                {filteredLogs.slice(0, 50).map((log) => (
+                    <div key={log.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                        <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                                <div className="flex items-center space-x-3 mb-2">
+                                    <h4 className="font-semibold text-gray-900">{log.notification_type_name}</h4>
+                                    {getStatusBadge(log.status)}
+                                    <span className="text-sm text-gray-500">{log.channel_name}</span>
+                                </div>
+
+                                <p className="text-sm text-gray-600 mb-1">
+                                    Получатель: <span className="font-mono">{log.contact_name || log.recipient_value}</span>
+                                </p>
+
+                                <p className="text-xs text-gray-500">
+                                    {new Date(log.created_at).toLocaleString('ru-RU')}
+                                </p>
+
+                                {log.error_message && (
+                                    <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
+                                        <strong>Ошибка:</strong> {log.error_message}
+                                    </div>
+                                )}
+
+                                {log.status === 'retrying' && log.next_retry_at && (
+                                    <p className="mt-2 text-xs text-blue-600">
+                                        <FaClock className="inline mr-1" />
+                                        Следующая попытка: {new Date(log.next_retry_at).toLocaleString('ru-RU')}
+                                    </p>
+                                )}
+
+                                {log.retry_count > 0 && (
+                                    <p className="mt-1 text-xs text-gray-600">
+                                        Попыток: {log.retry_count} / {log.max_retries}
+                                    </p>
+                                )}
+                            </div>
+
+                            {(log.status === 'failed' || log.status === 'retrying') && (
+                                <button
+                                    onClick={() => handleRetry(log.id)}
+                                    disabled={retryNotification.isPending}
+                                    className="btn-secondary text-sm flex items-center space-x-2"
+                                    title="Повторить отправку"
+                                >
+                                    {retryNotification.isPending ? (
+                                        <FaSpinner className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                        <FaSyncAlt className="w-3 h-3" />
+                                    )}
+                                    <span>Повторить</span>
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {filteredLogs.length === 0 && (
+                <div className="text-center py-12 text-gray-500">
+                    <FaHistory className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                    {!logs || logs.length === 0 ? (
+                        <>
+                            <p>Пока нет логов</p>
+                            <p className="text-sm mt-1">Логи появятся после отправки первого уведомления</p>
+                        </>
+                    ) : (
+                        <>
+                            <p>Логи не найдены</p>
+                            <p className="text-sm mt-1">Попробуйте изменить фильтры</p>
+                        </>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};

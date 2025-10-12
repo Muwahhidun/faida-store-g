@@ -43,9 +43,11 @@ export interface NotificationTemplate {
     notification_type_name: string;
     channel: number;
     channel_name: string;
+    name: string;
     subject: string;
     template: string;
     variables_help: Record<string, string>;
+    is_default: boolean;
     created_at: string;
     updated_at: string;
 }
@@ -56,21 +58,35 @@ export interface NotificationContact {
     channel_name: string;
     channel_icon: string;
     name: string;
-    value: string;
+    value: string;  // Поле в БД называется "value", не "contact_value"
     is_active: boolean;
     created_at: string;
     updated_at: string;
 }
 
+export interface ContactTemplate {
+    contact_id: number;
+    template_id: number | null;
+    template_name: string;
+}
+
 export interface NotificationRule {
     id: number;
-    notification_type: number;
-    notification_type_name: string;
-    channel: number;
-    channel_name: string;
+    notification_type: {
+        id: number;
+        code: string;
+        name: string;
+        description: string;
+    };
+    channel: {
+        id: number;
+        code: string;
+        name: string;
+        icon: string;
+    };
     is_enabled: boolean;
-    contacts: number[];
-    contacts_data: NotificationContact[];
+    contacts: NotificationContact[];
+    contact_templates: ContactTemplate[];
     created_at: string;
     updated_at: string;
 }

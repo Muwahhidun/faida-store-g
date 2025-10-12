@@ -143,7 +143,7 @@ class NotificationType(models.Model):
 class NotificationTemplate(models.Model):
     """
     Шаблоны сообщений для каждого типа и канала.
-    Один тип может иметь разные шаблоны для разных каналов.
+    Один тип может иметь несколько шаблонов для одного канала (например: короткий, подробный, VIP).
     """
     notification_type = models.ForeignKey(
         NotificationType,
@@ -156,6 +156,12 @@ class NotificationTemplate(models.Model):
         on_delete=models.CASCADE,
         related_name='templates',
         verbose_name='Канал'
+    )
+    name = models.CharField(
+        max_length=200,
+        default='Стандартный',
+        verbose_name='Название шаблона',
+        help_text='Например: Стандартный, Подробный, Для VIP клиентов'
     )
     subject = models.CharField(
         max_length=500,
@@ -173,16 +179,21 @@ class NotificationTemplate(models.Model):
         verbose_name='Справка по переменным',
         help_text='JSON с описанием доступных переменных'
     )
+    is_default = models.BooleanField(
+        default=False,
+        verbose_name='Шаблон по умолчанию',
+        help_text='Используется если для контакта не указан конкретный шаблон'
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
 
     class Meta:
         verbose_name = 'Шаблон уведомления'
         verbose_name_plural = 'Шаблоны уведомлений'
-        unique_together = ('notification_type', 'channel')
+        ordering = ['notification_type', 'channel', 'name']
 
     def __str__(self):
-        return f"{self.notification_type.name} - {self.channel.name}"
+        return f"{self.notification_type.name} - {self.channel.name} - {self.name}"
 
     def get_template_variables(self):
         """
@@ -299,7 +310,8 @@ class NotificationRule(models.Model):
         NotificationContact,
         related_name='rules',
         verbose_name='Контакты',
-        help_text='Кому отправлять уведомления'
+        help_text='Кому отправлять уведомления',
+        blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
@@ -311,6 +323,40 @@ class NotificationRule(models.Model):
 
     def __str__(self):
         return f"{self.notification_type.name} → {self.channel.name}"
+
+
+class RuleContactTemplate(models.Model):
+    """
+    Дополнительная связь для назначения конкретного шаблона контакту в рамках правила.
+    Если для контакта нет записи в этой таблице, используется шаблон по умолчанию.
+    """
+    rule = models.ForeignKey(
+        NotificationRule,
+        on_delete=models.CASCADE,
+        related_name='contact_templates',
+        verbose_name='Правило'
+    )
+    contact = models.ForeignKey(
+        NotificationContact,
+        on_delete=models.CASCADE,
+        verbose_name='Контакт'
+    )
+    template = models.ForeignKey(
+        NotificationTemplate,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name='Шаблон',
+        help_text='Если не указан, используется шаблон по умолчанию для этого типа уведомления и канала'
+    )
+
+    class Meta:
+        verbose_name = 'Назначение шаблона контакту'
+        verbose_name_plural = 'Назначения шаблонов контактам'
+        unique_together = ('rule', 'contact')
+
+    def __str__(self):
+        return f"{self.rule} | {self.contact.name} → {self.template.name}"
 
 
 class NotificationLog(models.Model):

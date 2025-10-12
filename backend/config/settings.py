@@ -277,20 +277,9 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB в байтах
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB в байтах
 
 # Настройки Email
-# Если EMAIL_HOST указан в .env, используем SMTP, иначе console backend
-if os.getenv('EMAIL_HOST'):
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.mail.ru')
-    EMAIL_PORT = int(os.getenv('EMAIL_PORT', '465'))
-    EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'True').lower() in ['true', '1', 'yes']
-    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'False').lower() in ['true', '1', 'yes']
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@faida.ru')
-else:
-    # Для разработки без настроенного SMTP - console backend
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    DEFAULT_FROM_EMAIL = 'noreply@faida.ru'
+# Используем кастомный backend, который берет настройки из админ-панели
+EMAIL_BACKEND = 'apps.notifications.email_backend.NotificationEmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@faida.ru'  # Fallback, если канал не настроен
 
 # Настройки для email шаблонов (используется templated_mail)
 DOMAIN = os.getenv('FRONTEND_URL', 'localhost:5173')
@@ -313,6 +302,13 @@ DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': 'email/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': 'activate/{uid}/{token}',
+    # Шаблоны email - используем кастомные классы с нашими шаблонами
+    'EMAIL': {
+        'password_reset': 'apps.users.email.PasswordResetEmail',
+        'password_changed_confirmation': 'apps.users.email.PasswordChangedConfirmationEmail',
+        'activation': 'apps.users.email.ActivationEmail',
+        'confirmation': 'apps.users.email.ConfirmationEmail',
+    },
     'SERIALIZERS': {
         'user_create': 'djoser.serializers.UserCreateSerializer',
         'user': 'djoser.serializers.UserSerializer',

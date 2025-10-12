@@ -10,7 +10,8 @@ from .models import (
     NotificationTemplate,
     NotificationContact,
     NotificationRule,
-    NotificationLog
+    NotificationLog,
+    RuleContactTemplate
 )
 
 
@@ -64,16 +65,59 @@ class NotificationContactSerializer(serializers.ModelSerializer):
         read_only_fields = ('created_at', 'updated_at')
 
 
+class RuleContactTemplateSerializer(serializers.ModelSerializer):
+    """Сериализатор связи контакт-шаблон."""
+    contact = NotificationContactSerializer(read_only=True)
+    template = NotificationTemplateSerializer(read_only=True)
+    contact_id = serializers.IntegerField(write_only=True)
+    template_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
+
+    class Meta:
+        model = RuleContactTemplate
+        fields = ('id', 'rule', 'contact', 'template', 'contact_id', 'template_id')
+
+
 class NotificationRuleSerializer(serializers.ModelSerializer):
     """Сериализатор правил отправки."""
-    notification_type_name = serializers.CharField(source='notification_type.name', read_only=True)
-    channel_name = serializers.CharField(source='channel.name', read_only=True)
-    contacts_data = NotificationContactSerializer(source='contacts', many=True, read_only=True)
+    notification_type = serializers.SerializerMethodField()
+    channel = serializers.SerializerMethodField()
+    contacts = NotificationContactSerializer(many=True, read_only=True)
+    contact_templates = serializers.SerializerMethodField()
 
     class Meta:
         model = NotificationRule
-        fields = '__all__'
+        fields = ('id', 'notification_type', 'channel', 'is_enabled', 'contacts', 'contact_templates', 'created_at', 'updated_at')
         read_only_fields = ('created_at', 'updated_at')
+
+    def get_notification_type(self, obj):
+        """Вернуть вложенный объект типа уведомления."""
+        return {
+            'id': obj.notification_type.id,
+            'code': obj.notification_type.code,
+            'name': obj.notification_type.name,
+            'description': obj.notification_type.description,
+        }
+
+    def get_channel(self, obj):
+        """Вернуть вложенный объект канала."""
+        return {
+            'id': obj.channel.id,
+            'code': obj.channel.code,
+            'name': obj.channel.name,
+            'icon': obj.channel.icon,
+        }
+
+    def get_contact_templates(self, obj):
+        """Вернуть назначенные шаблоны для контактов."""
+        contact_templates = RuleContactTemplate.objects.filter(rule=obj).select_related('contact', 'template')
+        return [
+            {
+                'contact_id': ct.contact.id,
+                'template_id': ct.template.id if ct.template else None,
+                'template_name': ct.template.name if ct.template else 'По умолчанию'
+            }
+            for ct in contact_templates
+        ]
 
 
 class NotificationLogSerializer(serializers.ModelSerializer):

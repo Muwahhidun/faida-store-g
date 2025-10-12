@@ -6,8 +6,169 @@ import requests
 import logging
 from typing import List, Optional
 from django.conf import settings
+from django.core.mail import EmailMessage
+from django.core.mail.backends.smtp import EmailBackend
 
 logger = logging.getLogger(__name__)
+
+
+class EmailService:
+    """
+    Сервис для отправки Email через SMTP с настраиваемыми параметрами.
+    """
+
+    def __init__(self, smtp_host: str, smtp_port: int, smtp_username: str,
+                 smtp_password: str, from_email: str, use_tls: bool = True):
+        self.smtp_host = smtp_host
+        self.smtp_port = smtp_port
+        self.smtp_username = smtp_username
+        self.smtp_password = smtp_password
+        self.from_email = from_email
+        self.use_tls = use_tls
+        self.use_ssl = smtp_port == 465  # SSL для порта 465
+
+    def send_message(self, to_email: str, subject: str, message: str, html_message: str = None) -> dict:
+        """
+        Отправить email сообщение.
+
+        Args:
+            to_email: Email получателя
+            subject: Тема письма
+            message: Текстовое содержимое
+            html_message: HTML содержимое (опционально)
+
+        Returns:
+            dict: Результат отправки
+        """
+        try:
+            # Создаём кастомный email backend с настройками из канала
+            backend = EmailBackend(
+                host=self.smtp_host,
+                port=self.smtp_port,
+                username=self.smtp_username,
+                password=self.smtp_password,
+                use_tls=self.use_tls and not self.use_ssl,
+                use_ssl=self.use_ssl,
+                fail_silently=False
+            )
+
+            # Создаём email сообщение
+            email = EmailMessage(
+                subject=subject,
+                body=html_message if html_message else message,
+                from_email=self.from_email,
+                to=[to_email],
+                connection=backend
+            )
+
+            if html_message:
+                email.content_subtype = 'html'
+
+            # Отправляем
+            email.send()
+
+            logger.info(f"Email отправлен на {to_email}")
+            return {'success': True}
+
+        except Exception as e:
+            logger.error(f"Ошибка отправки Email на {to_email}: {e}")
+            return {'error': str(e)}
+
+    def test_connection(self) -> dict:
+        """
+        Проверить соединение с SMTP сервером.
+
+        Returns:
+            dict: Результат проверки
+        """
+        try:
+            backend = EmailBackend(
+                host=self.smtp_host,
+                port=self.smtp_port,
+                username=self.smtp_username,
+                password=self.smtp_password,
+                use_tls=self.use_tls and not self.use_ssl,
+                use_ssl=self.use_ssl,
+                fail_silently=False
+            )
+            backend.open()
+            backend.close()
+
+            logger.info(f"Успешное подключение к {self.smtp_host}:{self.smtp_port}")
+            return {'success': True}
+
+        except Exception as e:
+            logger.error(f"Ошибка подключения к {self.smtp_host}:{self.smtp_port}: {e}")
+            return {'error': str(e)}
+
+
+class TelegramService:
+    """
+    Сервис для отправки сообщений через Telegram Bot API.
+    """
+
+    def __init__(self, bot_token: str):
+        self.bot_token = bot_token
+        self.base_url = f"https://api.telegram.org/bot{bot_token}"
+
+    def send_message(self, chat_id: str, message: str) -> dict:
+        """
+        Отправить текстовое сообщение в Telegram.
+
+        Args:
+            chat_id: ID чата (может быть username с @ или числовой ID)
+            message: Текст сообщения
+
+        Returns:
+            dict: Ответ от API
+        """
+        url = f"{self.base_url}/sendMessage"
+
+        payload = {
+            "chat_id": chat_id,
+            "text": message,
+            "parse_mode": "HTML"  # Поддержка HTML форматирования
+        }
+
+        try:
+            response = requests.post(url, json=payload, timeout=10)
+            response.raise_for_status()
+            result = response.json()
+
+            if result.get('ok'):
+                logger.info(f"Telegram сообщение отправлено в чат {chat_id}")
+                return result
+            else:
+                error_msg = result.get('description', 'Unknown error')
+                logger.error(f"Ошибка отправки Telegram сообщения в чат {chat_id}: {error_msg}")
+                return {"error": error_msg}
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Ошибка отправки Telegram сообщения в чат {chat_id}: {e}")
+            return {"error": str(e)}
+
+    def get_bot_info(self) -> dict:
+        """
+        Получить информацию о боте.
+
+        Returns:
+            dict: Информация о боте
+        """
+        url = f"{self.base_url}/getMe"
+
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            result = response.json()
+
+            if result.get('ok'):
+                return result.get('result', {})
+            else:
+                return {"error": result.get('description', 'Unknown error')}
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Ошибка получения информации о Telegram боте: {e}")
+            return {"error": str(e)}
 
 
 class WhatsAppService:
