@@ -52,7 +52,9 @@ export interface ProductListItem extends BaseModel {
   unit: string;
   in_stock: boolean;
   stock_quantity: number;
-  brand: string;
+  brand?: number | null;  // FK к модели Brand
+  brand_name?: string | null;  // Название бренда
+  brand_logo?: string | null;  // URL логотипа бренда
   weight: string;
   main_image?: ProductImage;
   is_available: boolean;

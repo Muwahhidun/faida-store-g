@@ -42,7 +42,9 @@ interface ProductDetail {
   in_stock: boolean;
   stock_quantity: number;
   description: string;
-  brand: string;
+  brand?: number | null;  // FK к модели Brand
+  brand_name?: string | null;  // Название бренда
+  brand_logo?: string | null;  // URL логотипа бренда
   weight: string;
   composition: string;
   shelf_life: string;
@@ -350,10 +352,22 @@ const ProductDetailPage: React.FC = () => {
 
             {/* Дополнительная информация */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {product.brand && (
-                <div>
+              {product.brand_name && (
+                <div className="flex items-center">
                   <span className="font-medium text-gray-900">Производитель:</span>
-                  <span className="ml-2 text-gray-700">{product.brand}</span>
+                  <div className="ml-2 flex items-center gap-2">
+                    {product.brand_logo && (
+                      <img
+                        src={product.brand_logo}
+                        alt={product.brand_name}
+                        className="w-5 h-5 object-contain"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    )}
+                    <span className="text-gray-700">{product.brand_name}</span>
+                  </div>
                 </div>
               )}
               

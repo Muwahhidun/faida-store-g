@@ -191,49 +191,57 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ProductListSerializer(serializers.ModelSerializer):
     """Сериализатор для списка товаров (упрощенный)."""
-    
+
     category = CategorySerializer(read_only=True)
     main_image = ProductImageSerializer(read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)  # Добавляем все изображения
     is_available = serializers.ReadOnlyField()
     tags_list = serializers.ReadOnlyField()
     barcodes_list = serializers.ReadOnlyField()  # Добавляем список штрихкодов
-    
+
+    # Добавляем поля бренда
+    brand_name = serializers.CharField(source='brand.name', read_only=True, allow_null=True)
+    brand_logo = serializers.ImageField(source='brand.logo', read_only=True, allow_null=True)
+
     # Добавляем поле для статуса остатков
     stock_status = serializers.SerializerMethodField()
-    
+
     def get_stock_status(self, obj):
         """Получить статус остатков товара."""
         return obj.get_stock_status()
-    
+
     class Meta:
         model = Product
         fields = [
             'id', 'code', 'article', 'name', 'category', 'price', 'currency', 'unit',
-            'in_stock', 'stock_quantity', 'brand', 'weight', 'main_image', 'images',
+            'in_stock', 'stock_quantity', 'brand', 'brand_name', 'brand_logo', 'weight', 'main_image', 'images',
             'is_available', 'tags_list', 'barcodes_list', 'stock_status', 'created_at'
         ]
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для детального просмотра товара."""
-    
+
     category = CategorySerializer(read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
     is_available = serializers.ReadOnlyField()
     tags_list = serializers.ReadOnlyField()
     barcodes_list = serializers.ReadOnlyField()  # Добавляем список штрихкодов
     related_products = ProductListSerializer(many=True, read_only=True)
-    
+
+    # Добавляем поля бренда
+    brand_name = serializers.CharField(source='brand.name', read_only=True, allow_null=True)
+    brand_logo = serializers.ImageField(source='brand.logo', read_only=True, allow_null=True)
+
     # Добавляем новые поля для детальной информации
     retail_price = serializers.ReadOnlyField()
     internet_price = serializers.ReadOnlyField()
     main_warehouse_stock = serializers.ReadOnlyField()
     all_warehouses_stock = serializers.ReadOnlyField()
-    
+
     # Добавляем поле для статуса остатков
     stock_status = serializers.SerializerMethodField()
-    
+
     # Добавляем информацию об источнике и его настройках
     source_settings = serializers.SerializerMethodField()
     
@@ -257,7 +265,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 'code', 'article', 'name', 'category', 'price', 'currency', 'unit',
-            'in_stock', 'stock_quantity', 'description', 'brand', 'weight',
+            'in_stock', 'stock_quantity', 'description', 'brand', 'brand_name', 'brand_logo', 'weight',
             'composition', 'shelf_life', 'storage_conditions',
             'seo_title', 'seo_description',
             'tags_list', 'barcodes_list', 'images', 'related_products', 'is_available',

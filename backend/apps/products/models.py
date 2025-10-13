@@ -8,6 +8,39 @@ from decimal import Decimal
 import json
 
 
+class Brand(models.Model):
+    """Модель бренда/производителя товара."""
+
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+        verbose_name="Название бренда"
+    )
+    logo = models.ImageField(
+        upload_to='brands/',
+        blank=True,
+        null=True,
+        verbose_name="Логотип бренда",
+        help_text="Иконка бренда для отображения в карточке товара"
+    )
+    description = models.TextField(
+        blank=True,
+        verbose_name="Описание бренда"
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Дата создания"
+    )
+
+    class Meta:
+        verbose_name = "Бренд"
+        verbose_name_plural = "Бренды"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     """Модель товара из 1С."""
     
@@ -109,9 +142,12 @@ class Product(models.Model):
         blank=True,
         verbose_name="Описание"
     )
-    brand = models.CharField(
-        max_length=100, 
+    brand = models.ForeignKey(
+        Brand,
+        on_delete=models.SET_NULL,
+        null=True,
         blank=True,
+        related_name='products',
         verbose_name="Бренд"
     )
     weight = models.CharField(

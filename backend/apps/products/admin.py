@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 import json
-from .models import Product, ProductImage
+from .models import Product, ProductImage, Brand
 
 
 class ProductImageInline(admin.TabularInline):
@@ -123,14 +123,51 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
     """Админка для изображений товаров."""
-    
+
     list_display = ('product', 'image_preview', 'alt_text', 'is_main', 'order')
     list_filter = ('is_main', 'created_at')
     search_fields = ('product__name', 'alt_text')
     list_editable = ('is_main', 'order')
-    
+
     def image_preview(self, obj):
         if obj.image:
             return format_html('<img src="{}" width="100" height="100" />', obj.image.url)
         return "Нет изображения"
     image_preview.short_description = "Превью"
+
+
+@admin.register(Brand)
+class BrandAdmin(admin.ModelAdmin):
+    """Админка для брендов."""
+
+    list_display = ('name', 'logo_preview', 'products_count', 'created_at')
+    search_fields = ('name', 'description')
+    readonly_fields = ('created_at', 'logo_preview')
+
+    fieldsets = (
+        ('Основная информация', {
+            'fields': ('name', 'description')
+        }),
+        ('Логотип', {
+            'fields': ('logo', 'logo_preview')
+        }),
+        ('Служебные поля', {
+            'fields': ('created_at',),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def logo_preview(self, obj):
+        """Превью логотипа бренда."""
+        if obj.logo:
+            return format_html(
+                '<img src="{}" width="100" height="100" style="object-fit: contain;" />',
+                obj.logo.url
+            )
+        return "Нет логотипа"
+    logo_preview.short_description = "Превью логотипа"
+
+    def products_count(self, obj):
+        """Количество товаров бренда."""
+        return obj.products.count()
+    products_count.short_description = "Количество товаров"

@@ -27,7 +27,9 @@ interface Product {
   in_stock: boolean;
   stock_quantity: number;
   description: string;
-  brand: string;
+  brand?: number | null;  // FK к модели Brand
+  brand_name?: string | null;  // Название бренда
+  brand_logo?: string | null;  // URL логотипа бренда
   is_weighted: boolean;
   category?: {
     id: number;
@@ -647,13 +649,31 @@ const ProductsPage: React.FC = () => {
                           {product.name}
                         </h3>
                       </div>
-                      
+
                       {/* Все остальное прижато к низу */}
                       <div className="flex-shrink-0">
-                        {product.brand && (
-                          <p className="text-xs text-primary-800 font-semibold mb-2">
-                            {product.brand}
-                          </p>
+                        {/* Логотип бренда и название бренда на одной строке */}
+                        {product.brand_name && (
+                          <div className="flex items-center gap-2 mb-2">
+                            {/* Логотип бренда слева */}
+                            {product.brand_logo && (
+                              <div className="flex-shrink-0 w-5 h-5">
+                                <img
+                                  src={product.brand_logo}
+                                  alt={product.brand_name}
+                                  className="w-full h-full object-contain"
+                                  onError={(e) => {
+                                    // Скрываем изображение если не загрузилось
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            )}
+                            {/* Название бренда */}
+                            <p className="text-xs text-primary-800 font-semibold">
+                              {product.brand_name}
+                            </p>
+                          </div>
                         )}
 
                         <div className="mb-3">
