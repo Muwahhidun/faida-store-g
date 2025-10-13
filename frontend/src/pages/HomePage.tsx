@@ -15,25 +15,29 @@ const HomePage: React.FC = () => {
       </Helmet>
 
       {/* Hero секция */}
-      <section className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <section className="bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white relative overflow-hidden">
+        {/* Декоративные элементы */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-secondary-500 opacity-10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary-500 opacity-10 rounded-full blur-3xl"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Качественные <span className="text-emerald-200">халяль</span> продукты
+              Качественные <span className="text-secondary-500">халяль</span> продукты
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-emerald-100">
+            <p className="text-xl md:text-2xl mb-8 text-gray-300">
               Натуральные колбасные изделия и мясные деликатесы высшего качества
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/products"
-                className="bg-white text-emerald-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                className="bg-secondary-500 text-primary-900 px-8 py-3 rounded-lg font-semibold hover:bg-secondary-600 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
                 Посмотреть каталог
               </Link>
               <Link
                 to="/about"
-                className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-emerald-600 transition-colors"
+                className="border-2 border-secondary-500 text-secondary-500 px-8 py-3 rounded-lg font-semibold hover:bg-secondary-500 hover:text-primary-900 transition-all duration-200 transform hover:scale-105"
               >
                 О компании
               </Link>
@@ -55,37 +59,37 @@ const HomePage: React.FC = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="text-center group">
+              <div className="bg-secondary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transform transition-all duration-200 group-hover:scale-110 group-hover:bg-secondary-500">
+                <svg className="w-8 h-8 text-secondary-600 group-hover:text-primary-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">100% Халяль</h3>
+              <h3 className="text-xl font-semibold mb-2 text-primary-900">100% Халяль</h3>
               <p className="text-gray-600">
                 Все наши продукты имеют сертификат халяль и производятся в соответствии с исламскими традициями
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="text-center group">
+              <div className="bg-secondary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transform transition-all duration-200 group-hover:scale-110 group-hover:bg-secondary-500">
+                <svg className="w-8 h-8 text-secondary-600 group-hover:text-primary-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Натуральные ингредиенты</h3>
+              <h3 className="text-xl font-semibold mb-2 text-primary-900">Натуральные ингредиенты</h3>
               <p className="text-gray-600">
                 Используем только натуральные специи и ингредиенты без консервантов и искусственных добавок
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="text-center group">
+              <div className="bg-secondary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transform transition-all duration-200 group-hover:scale-110 group-hover:bg-secondary-500">
+                <svg className="w-8 h-8 text-secondary-600 group-hover:text-primary-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Быстрая доставка</h3>
+              <h3 className="text-xl font-semibold mb-2 text-primary-900">Быстрая доставка</h3>
               <p className="text-gray-600">
                 Доставляем свежие продукты по всей России в кратчайшие сроки с сохранением качества
               </p>
@@ -109,7 +113,7 @@ const HomePage: React.FC = () => {
           <div className="text-center">
             <Link
               to="/products"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-primary-900 bg-secondary-500 hover:bg-secondary-600 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
             >
               Посмотреть все товары
               <svg className="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
