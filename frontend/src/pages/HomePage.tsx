@@ -2,12 +2,36 @@
  * Страница "О компании".
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import patternSvg from '../assets/pattern.svg';
 
+interface Brand {
+  id: number;
+  name: string;
+  logo: string;
+  products_count: number;
+}
+
 const HomePage: React.FC = () => {
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Загружаем бренды с логотипами
+    fetch('http://localhost:8000/api/brands/')
+      .then(res => res.json())
+      .then(data => {
+        setBrands(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки брендов:', err);
+        setIsLoading(false);
+      });
+  }, []);
+
   return (
     <>
       <Helmet>
@@ -131,6 +155,45 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Наши бренды */}
+      {!isLoading && brands.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
+                Наши бренды
+              </h2>
+              <p className="text-xl text-primary-800">
+                Мы работаем с лучшими производителями халяльных продуктов
+              </p>
+            </div>
+
+            {/* Карусель брендов */}
+            <div className="flex justify-center">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-8 max-w-4xl">
+                {brands.map((brand) => (
+                  <div
+                    key={brand.id}
+                    className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 group"
+                  >
+                    <div className="w-32 h-32 mb-4 flex items-center justify-center">
+                      <img
+                        src={brand.logo}
+                        alt={brand.name}
+                        className="max-w-full max-h-full object-contain transform group-hover:scale-110 transition-transform duration-200"
+                      />
+                    </div>
+                    <p className="text-sm font-semibold text-primary-800 text-center">
+                      {brand.name}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
     </>
   );
 };

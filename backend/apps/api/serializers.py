@@ -3,7 +3,7 @@
 """
 
 from rest_framework import serializers
-from apps.products.models import Product, ProductImage
+from apps.products.models import Product, ProductImage, Brand
 from apps.categories.models import Category
 from apps.core.models import SiteSettings
 from apps.sync1c.models import IntegrationSource, SyncLog
@@ -754,3 +754,18 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 #             'created_at', 'updated_at'
 #         )
 #         read_only_fields = ('id', 'created_at', 'updated_at')
+
+
+class BrandSerializer(serializers.ModelSerializer):
+    """Сериализатор для брендов."""
+
+    products_count = serializers.SerializerMethodField()
+
+    def get_products_count(self, obj):
+        """Получить количество товаров бренда."""
+        return obj.products.count()
+
+    class Meta:
+        model = Brand
+        fields = ('id', 'name', 'logo', 'description', 'products_count', 'created_at')
+        read_only_fields = ('id', 'created_at')

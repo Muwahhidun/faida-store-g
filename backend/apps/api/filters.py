@@ -32,12 +32,7 @@ class ProductFilter(django_filters.FilterSet):
     available = django_filters.BooleanFilter(method='filter_available')
     
     # Фильтр по бренду
-    brand = django_filters.CharFilter(lookup_expr='icontains')
-    brands = django_filters.ModelMultipleChoiceFilter(
-        field_name='brand',
-        to_field_name='brand',
-        queryset=Product.objects.values_list('brand', flat=True).distinct()
-    )
+    brand = django_filters.CharFilter(field_name='brand__name', lookup_expr='icontains')
     
     # Фильтр по тегам
     tags = django_filters.CharFilter(method='filter_by_tags')
@@ -120,7 +115,7 @@ class ProductFilter(django_filters.FilterSet):
                 models.Q(name__icontains=value) |
                 models.Q(description__icontains=value) |
                 models.Q(tags__icontains=value) |
-                models.Q(brand__icontains=value) |
+                models.Q(brand__name__icontains=value) |
                 models.Q(barcodes__icontains=value)
             )
         return queryset

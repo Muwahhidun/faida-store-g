@@ -25,7 +25,7 @@ class OrdersPagination(LimitOffsetPagination):
     default_limit = 10
     max_limit = 100
 
-from apps.products.models import Product, ProductImage
+from apps.products.models import Product, ProductImage, Brand
 from apps.categories.models import Category
 from apps.core.models import SiteSettings
 from apps.sync1c.models import IntegrationSource, SyncLog
@@ -43,6 +43,7 @@ from .serializers import (
     JobListSerializer, JobDetailSerializer, JobCreateUpdateSerializer, JobMediaSerializer,
     NewsListSerializer, NewsDetailSerializer, NewsCreateUpdateSerializer, NewsCategorySerializer, NewsMediaSerializer,
     OrderListSerializer, OrderDetailSerializer, OrderCreateSerializer,
+    BrandSerializer,
     # TODO: Обновить после миграции
     # NotificationSettingsSerializer, WhatsAppOperatorSerializer
 )
@@ -1179,3 +1180,18 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class BrandViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet для брендов.
+    Возвращает список брендов с логотипами для отображения в карусели.
+    """
+    queryset = Brand.objects.all().order_by('name')
+    serializer_class = BrandSerializer
+    permission_classes = [AllowAny]
+    pagination_class = None  # Отключаем пагинацию для брендов
+
+    def get_queryset(self):
+        """Возвращает только бренды с логотипами."""
+        return Brand.objects.exclude(logo='').exclude(logo__isnull=True).order_by('name')
