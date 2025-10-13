@@ -115,7 +115,7 @@ class ProductFilter(django_filters.FilterSet):
                 models.Q(name__icontains=value) |
                 models.Q(description__icontains=value) |
                 models.Q(tags__icontains=value) |
-                # models.Q(brand__name__icontains=value) |
+                # models.Q(brand__name__icontains=value) |  # Временно отключен поиск по бренду
                 models.Q(barcodes__icontains=value)
             )
         return queryset
