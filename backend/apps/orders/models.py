@@ -117,13 +117,13 @@ class Order(models.Model):
         Отправка уведомлений при создании или изменении статуса.
         """
         is_new = self.pk is None
-        old_status = None
 
-        # Если это обновление, получаем старый статус
+        # Сохраняем старый статус для сигнала
+        self._old_status = None
         if not is_new:
             try:
                 old_instance = Order.objects.get(pk=self.pk)
-                old_status = old_instance.status
+                self._old_status = old_instance.status
             except Order.DoesNotExist:
                 pass
 
@@ -148,13 +148,9 @@ class Order(models.Model):
 
         super().save(*args, **kwargs)
 
-        # Отправляем уведомления после сохранения
-        if is_new:
-            # Новый заказ - отправляем уведомление
-            self.send_new_order_notification()
-        elif old_status and old_status != self.status:
-            # Статус изменился - отправляем уведомление
-            self.send_status_changed_notification()
+        # Уведомления отправляются через Django signals (см. apps/notifications/signals.py)
+        # Методы send_new_order_notification() и send_status_changed_notification()
+        # оставлены для обратной совместимости, но не вызываются автоматически
 
     def __str__(self):
         return f"Заказ {self.order_number} - {self.customer_name}"

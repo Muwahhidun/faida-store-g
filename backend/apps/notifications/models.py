@@ -391,7 +391,7 @@ class NotificationRule(models.Model):
     class Meta:
         verbose_name = 'Правило отправки уведомления'
         verbose_name_plural = 'Правила отправки уведомлений'
-        unique_together = ('notification_type', 'channel')
+        unique_together = ('notification_type', 'channel', 'rule_type')
 
     def __str__(self):
         return self.name
@@ -399,24 +399,45 @@ class NotificationRule(models.Model):
     def clean(self):
         """
         Валидация правила перед сохранением.
-        Проверяет, что все контакты имеют тот же тип канала, что и выбранный канал.
+        Проверяет:
+        1. Системные правила не могут иметь контактов
+        2. Системные правила могут использовать только email канал
+        3. Все контакты имеют тот же тип канала, что и выбранный канал
         """
         super().clean()
+
+        # Валидация для системных правил
+        if self.rule_type == 'system':
+            # Системные правила могут использовать только email канал
+            if self.channel and self.channel.code != 'email':
+                raise ValidationError({
+                    'channel': f'Системные правила поддерживают только email канал. '
+                              f'Выбранный канал: {self.channel.name} ({self.channel.code})'
+                })
 
         # Если правило еще не сохранено (нет pk), пропускаем валидацию контактов
         # (они будут добавлены после сохранения через ManyToMany)
         if not self.pk:
             return
 
-        # Проверяем соответствие типа канала и типов контактов
-        channel_type = self.channel.code
-        for contact in self.contacts.all():
-            if contact.channel_type != channel_type:
-                raise ValidationError(
-                    f"Контакт '{contact.name}' имеет тип '{contact.get_channel_type_display()}', "
-                    f"но выбранный канал '{self.channel.name}' имеет тип '{channel_type}'. "
-                    f"Типы должны совпадать."
-                )
+        # Системные правила НЕ должны иметь контактов
+        if self.rule_type == 'system':
+            if self.contacts.exists():
+                raise ValidationError({
+                    'contacts': 'Системные правила не должны иметь контактов. '
+                               'Уведомления отправляются автоматически пользователю, совершившему действие.'
+                })
+
+        # Проверяем соответствие типа канала и типов контактов (для дополнительных правил)
+        if self.rule_type == 'additional':
+            channel_type = self.channel.code
+            for contact in self.contacts.all():
+                if contact.channel_type != channel_type:
+                    raise ValidationError(
+                        f"Контакт '{contact.name}' имеет тип '{contact.get_channel_type_display()}', "
+                        f"но выбранный канал '{self.channel.name}' имеет тип '{channel_type}'. "
+                        f"Типы должны совпадать."
+                    )
 
 
 class RuleContactTemplate(models.Model):

@@ -249,7 +249,8 @@ class WhatsAppService:
             response.raise_for_status()
             result = response.json()
             logger.info(f"WhatsApp сообщение отправлено на {phone_number}: {result}")
-            return result
+            # Возвращаем единый формат как Email Service
+            return {'success': True, 'raw_response': result}
         except requests.exceptions.RequestException as e:
             logger.error(f"Ошибка отправки WhatsApp сообщения на {phone_number}: {e}")
             return {"error": str(e)}
@@ -457,6 +458,7 @@ class NotificationDispatcher:
                         )
 
                         # Логируем результат
+                        logger.info(f"[СОЗДАНИЕ ЛОГА #1 - SYSTEM] Тип={notification_type.code}, Канал={rule.channel.code}, Contact=None, RecipientValue={user_email}")
                         NotificationLog.objects.create(
                             notification_type=notification_type,
                             channel=rule.channel,
@@ -474,6 +476,7 @@ class NotificationDispatcher:
 
                     except Exception as e:
                         logger.error(f"Ошибка отправки на {user_email}: {e}")
+                        logger.info(f"[СОЗДАНИЕ ЛОГА #2 - SYSTEM ERROR] Тип={notification_type.code}, Канал={rule.channel.code}, Contact=None, RecipientValue={user_email}")
                         NotificationLog.objects.create(
                             notification_type=notification_type,
                             channel=rule.channel,
@@ -503,6 +506,7 @@ class NotificationDispatcher:
                             )
 
                             # Логируем результат
+                            logger.info(f"[СОЗДАНИЕ ЛОГА #3 - ADDITIONAL] Тип={notification_type.code}, Канал={rule.channel.code}, Contact={contact.name} (ID={contact.id}), RecipientValue={contact.value}")
                             NotificationLog.objects.create(
                                 notification_type=notification_type,
                                 channel=rule.channel,
@@ -520,6 +524,7 @@ class NotificationDispatcher:
 
                         except Exception as e:
                             logger.error(f"Ошибка отправки контакту {contact.name}: {e}")
+                            logger.info(f"[СОЗДАНИЕ ЛОГА #4 - ADDITIONAL ERROR] Тип={notification_type.code}, Канал={rule.channel.code}, Contact={contact.name} (ID={contact.id}), RecipientValue={contact.value}")
                             NotificationLog.objects.create(
                                 notification_type=notification_type,
                                 channel=rule.channel,
@@ -603,6 +608,7 @@ class NotificationDispatcher:
         Returns:
             dict: Результат отправки
         """
+        logger.info(f"[_send_to_contact] Вызван для контакта '{contact.name}' ({contact.value}) через канал '{channel.code}'")
         try:
             if channel.code == 'email':
                 settings = channel.settings

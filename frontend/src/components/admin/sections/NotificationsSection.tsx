@@ -29,6 +29,7 @@ import {
     useNotificationLogs,
     useNotificationStats,
     useNotificationRules,
+    useNotificationTypes,
     useCreateContact,
     useUpdateContact,
     useDeleteContact,
@@ -782,6 +783,7 @@ const ContactsTab: React.FC = () => {
 const RulesTabWrapper: React.FC = () => {
     const { data: rules, isLoading: rulesLoading } = useNotificationRules();
     const { data: contacts, isLoading: contactsLoading } = useNotificationContacts();
+    const { data: notificationTypes, isLoading: typesLoading } = useNotificationTypes();
     const assignContacts = useAssignContacts();
     const toggleRule = useToggleRule();
     const sendTestToRule = useSendTestToRule();
@@ -885,7 +887,7 @@ const RulesTabWrapper: React.FC = () => {
         }
     };
 
-    if (rulesLoading || contactsLoading) {
+    if (rulesLoading || contactsLoading || typesLoading) {
         return (
             <div className="flex justify-center py-12">
                 <FaSpinner className="w-8 h-8 text-blue-600 animate-spin" />
@@ -898,6 +900,7 @@ const RulesTabWrapper: React.FC = () => {
             <RulesTab
                 rules={rules || []}
                 contacts={contacts || []}
+                notificationTypes={notificationTypes || []}
                 onToggleRule={handleToggleRule}
                 onAssignContacts={handleAssignContacts}
                 onSendTest={handleSendTest}

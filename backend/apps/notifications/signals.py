@@ -63,16 +63,22 @@ def send_order_notifications(sender, instance, created, **kwargs):
     """
     Отправка уведомлений при создании заказа или изменении его статуса.
     """
+    logger.info(f"[SIGNAL] send_order_notifications вызван для заказа {instance.order_number}, created={created}")
     try:
         # Формируем список товаров
         items_list = []
         for item in instance.items.all():
-            items_list.append(f"{item.product_name or (item.product.name if item.product else 'Товар')} x {item.quantity}")
+            product_name = item.product.name if item.product else 'Товар'
+            items_list.append(f"{product_name} x {item.quantity}")
+
+        # Определяем email пользователя (для системных уведомлений)
+        user_email = instance.customer_email or (instance.user.email if instance.user else None)
 
         base_context = {
             'order_number': instance.order_number,
             'customer_name': instance.customer_name,
             'customer_phone': instance.customer_phone,
+            'email': user_email,  # Добавляем email для системных уведомлений
             'total_amount': f"{instance.total_amount} ₽",
             'items_list': ', '.join(items_list) if items_list else 'Нет товаров',
             'delivery_address': instance.delivery_address or 'Не указан',
@@ -85,21 +91,22 @@ def send_order_notifications(sender, instance, created, **kwargs):
             NotificationDispatcher.send_notification('new_order', base_context)
         else:
             # Проверяем изменение статуса
-            # Используем специальный трюк: сравниваем с базой данных
-            try:
-                from apps.orders.models import Order
-                old_instance = Order.objects.get(pk=instance.pk)
-                if old_instance.status != instance.status:
-                    logger.info(f"🔔 Статус заказа {instance.order_number} изменен: {old_instance.status} → {instance.status}")
-                    context = {
-                        **base_context,
-                        'old_status': old_instance.get_status_display(),
-                        'new_status': instance.get_status_display(),
-                        'status': instance.get_status_display(),
-                    }
-                    NotificationDispatcher.send_notification('order_status_changed', context)
-            except sender.DoesNotExist:
-                pass
+            # Используем _old_status который был сохранен в методе save() модели
+            old_status = getattr(instance, '_old_status', None)
+            if old_status and old_status != instance.status:
+                logger.info(f"🔔 Статус заказа {instance.order_number} изменен: {old_status} → {instance.status}")
+                # Получаем текстовое представление старого статуса
+                status_dict = dict(instance.STATUS_CHOICES)
+                old_status_display = status_dict.get(old_status, old_status)
+
+                context = {
+                    **base_context,
+                    'old_status': old_status_display,
+                    'new_status': instance.get_status_display(),
+                    'status': instance.get_status_display(),
+                }
+                logger.info(f"[SIGNAL] Вызов NotificationDispatcher.send_notification для order_status_changed, context keys: {context.keys()}")
+                NotificationDispatcher.send_notification('order_status_changed', context)
 
     except Exception as e:
         logger.error(f"❌ Ошибка отправки уведомления о заказе: {e}")

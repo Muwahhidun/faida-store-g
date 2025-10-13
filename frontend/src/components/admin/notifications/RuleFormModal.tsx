@@ -63,15 +63,21 @@ export const RuleFormModal: React.FC<RuleFormModalProps> = ({
         }
 
         // Преобразуем данные формы в формат API
-        await onSubmit({
+        const submitData: any = {
             name: formData.name.trim(),
-            rule_type: formData.rule_type as any,
-            notification_type: formData.notification_type as any,
-            channel: formData.channel as any,
-            default_template: formData.default_template || null as any,
+            rule_type: formData.rule_type,
+            notification_type: formData.notification_type,
+            channel: formData.channel,
+            default_template: formData.default_template || null,
             is_enabled: formData.is_enabled,
-            contacts: formData.contact_ids as any
-        });
+        };
+
+        // Контакты отправляем ТОЛЬКО для дополнительных правил
+        if (formData.rule_type === 'additional') {
+            submitData.contacts = formData.contact_ids;
+        }
+
+        await onSubmit(submitData);
     };
 
     const handleChange = (field: string, value: any) => {
