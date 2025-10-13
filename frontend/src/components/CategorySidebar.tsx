@@ -4,6 +4,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import patternSvg from '../assets/pattern.svg';
 
 interface Category {
   id: number;
@@ -121,43 +122,50 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
     return (
       <div key={category.id} className="mb-1">
         <div
-          className={`flex items-center justify-between py-2 px-3 rounded-md cursor-pointer transition-colors ${
+          className={`group flex items-center justify-between py-2.5 px-3 rounded-lg cursor-pointer transition-all duration-200 ${
             isSelected
-              ? 'bg-secondary-100 text-primary-900 font-semibold shadow-sm'
-              : 'hover:bg-gray-100 text-gray-700'
+              ? 'bg-primary-800 text-white font-semibold shadow-md transform scale-[1.02]'
+              : 'hover:bg-gray-50 text-gray-700 hover:translate-x-1'
           }`}
           style={{ paddingLeft: `${0.75 + level * 1}rem` }}
           onClick={() => onCategorySelect(category.id)}
           title={`${category.category_visible_name} (${category.products_count || 0} товаров)`}
         >
-          <div className="flex items-center flex-1 min-w-0">
+          <div className="flex items-center flex-1 min-w-0 gap-2">
+            {/* Иконка папки */}
+            <svg className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-secondary-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
+
             <span
-              className="text-sm truncate font-medium"
+              className="text-sm truncate font-semibold"
               title={category.category_visible_name}
             >
               {category.category_visible_name}
             </span>
-            {category.products_count && (
-              <span className={`ml-2 text-xs px-2 py-1 rounded-full flex-shrink-0 ${
-                isSelected ? 'bg-secondary-200 text-primary-900' : 'text-gray-500 bg-gray-200'
+            {category.products_count !== undefined && category.products_count > 0 && (
+              <span className={`ml-auto text-xs px-2.5 py-0.5 rounded-full flex-shrink-0 font-bold ${
+                isSelected ? 'bg-secondary-500 text-primary-900' : 'text-gray-600 bg-gray-200'
               }`}>
                 {category.products_count}
               </span>
             )}
           </div>
-          
+
           {hasChildren && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 toggleCategory(category.id);
               }}
-              className="ml-2 p-1 hover:bg-gray-200 rounded"
+              className={`ml-2 p-1 rounded transition-colors ${
+                isSelected ? 'hover:bg-primary-900' : 'hover:bg-gray-200'
+              }`}
             >
-              <svg 
-                className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -165,9 +173,9 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
             </button>
           )}
         </div>
-        
+
         {hasChildren && isExpanded && (
-          <div className="ml-2">
+          <div className="ml-2 border-l-2 border-gray-200 pl-2 mt-1">
             {category.children?.map(child => renderCategory(child, level + 1))}
           </div>
         )}
@@ -202,22 +210,43 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-md ${className}`}>
-      <div className="p-4 border-b border-primary-100">
-        <h3 className="text-lg font-semibold text-primary-900">Категории</h3>
+    <div className={`bg-white rounded-lg shadow-lg overflow-hidden ${className}`}>
+      {/* Заголовок с фирменным градиентом и паттерном */}
+      <div className="relative bg-primary-800 text-white overflow-hidden">
+        {/* Фирменный паттерн */}
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `url(${patternSvg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        ></div>
+        <div className="relative p-4 border-b border-primary-900">
+          <h3 className="text-lg font-bold flex items-center gap-2">
+            <svg className="w-5 h-5 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            Категории
+          </h3>
+        </div>
       </div>
 
       <div className="p-4">
         {/* Кнопка "Все товары" */}
         <div
-          className={`flex items-center py-2 px-3 mb-3 rounded-md cursor-pointer transition-all duration-200 ${
+          className={`group flex items-center gap-2 py-2.5 px-3 mb-3 rounded-lg cursor-pointer transition-all duration-200 ${
             selectedCategoryId === null
-              ? 'bg-secondary-100 text-primary-900 font-semibold shadow-sm'
-              : 'hover:bg-gray-100 text-gray-700'
+              ? 'bg-primary-800 text-white font-semibold shadow-md transform scale-[1.02]'
+              : 'hover:bg-gray-50 text-gray-700 hover:translate-x-1'
           }`}
           onClick={() => onCategorySelect(null)}
         >
-          <span className="text-sm">Все товары</span>
+          <svg className={`w-4 h-4 ${selectedCategoryId === null ? 'text-secondary-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span className="text-sm font-semibold">Все товары</span>
         </div>
 
         {/* Список категорий */}

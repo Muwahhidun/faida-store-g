@@ -87,7 +87,7 @@ const Header: React.FC = () => {
                     </Link>
                     
                     {/* Навигация */}
-                    <nav className="hidden md:flex items-center space-x-8">
+                    <nav className="hidden md:flex items-center space-x-8" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>
                         <NavLink
                             to="/"
                             className={({ isActive }) =>
