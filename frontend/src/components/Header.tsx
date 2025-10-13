@@ -75,7 +75,7 @@ const Header: React.FC = () => {
     }, []);
 
     return (
-        <header className="relative bg-primary-900 border-b border-primary-800 sticky top-0 z-50 shadow-lg">
+        <header className="relative bg-primary-900 border-b-2 border-secondary-500 sticky top-0 z-50 shadow-lg">
             {/* Фирменный паттерн */}
             <div
                 className="absolute inset-0 opacity-10 pointer-events-none"
