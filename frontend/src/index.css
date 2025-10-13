@@ -1,3 +1,6 @@
+@import './assets/fonts/tiktok-sans.css';
+@import url('https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,13 +8,15 @@
 /* Базовые стили */
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'TikTok Sans', system-ui, sans-serif;
+    font-weight: 300;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', system-ui, sans-serif;
+    font-family: 'TikTok Sans', system-ui, sans-serif;
+    font-weight: 700;
   }
-  
+
   body {
     @apply bg-gray-50 text-gray-900;
   }

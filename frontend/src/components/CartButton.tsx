@@ -114,7 +114,7 @@ const CartButton: React.FC<CartButtonProps> = ({
     return (
       <button
         onClick={handleAddToCart}
-        className={`flex items-center justify-center gap-2 bg-secondary-500 hover:bg-secondary-600 text-white border border-emerald-600 rounded-lg transition-colors ${sizes.button} ${className}`}
+        className={`flex items-center justify-center gap-2 bg-primary-800 hover:bg-primary-900 text-white border border-primary-800 rounded-lg transition-colors ${sizes.button} ${className}`}
       >
         <ShoppingCartIcon className={sizes.icon} />
         В корзину
@@ -135,19 +135,19 @@ const CartButton: React.FC<CartButtonProps> = ({
       
       <button
         onClick={handleDecrement}
-        className={`flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 transition-colors ${sizes.counterButton}`}
+        className={`flex items-center justify-center bg-primary-800 hover:bg-primary-900 text-white border border-primary-800 transition-colors ${sizes.counterButton}`}
       >
         <MinusIcon className={sizes.counterIcon} />
       </button>
-      
+
       <div className={`flex items-center justify-center bg-white border-t border-b border-gray-300 font-medium text-gray-900 ${sizes.counter}`}>
         {formatQuantity(quantity, product.unit)}
       </div>
-      
+
       <button
         onClick={handleIncrement}
         disabled={quantity >= product.stock_quantity}
-        className={`flex items-center justify-center bg-secondary-500 hover:bg-secondary-600 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white border border-emerald-600 disabled:border-gray-300 rounded-r-lg transition-colors ${sizes.counterButton}`}
+        className={`flex items-center justify-center bg-primary-800 hover:bg-primary-900 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white border border-primary-800 disabled:border-gray-300 rounded-r-lg transition-colors ${sizes.counterButton}`}
       >
         <PlusIcon className={sizes.counterIcon} />
       </button>

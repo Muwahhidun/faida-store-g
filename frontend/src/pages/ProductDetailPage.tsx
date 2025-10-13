@@ -292,7 +292,7 @@ const ProductDetailPage: React.FC = () => {
             <div className="border-t border-b border-gray-200 py-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <span className="text-3xl font-bold text-secondary-600">
+                  <span className="text-3xl font-bold text-primary-800">
                     {formatPrice(product.price)} {product.currency}
                   </span>
                   <span className="text-lg text-gray-500 ml-2">за {product.unit}</span>

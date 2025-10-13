@@ -5,6 +5,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import patternSvg from '../assets/pattern.svg';
 
 const HomePage: React.FC = () => {
   return (
@@ -15,10 +16,17 @@ const HomePage: React.FC = () => {
       </Helmet>
 
       {/* Hero секция */}
-      <section className="bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white relative overflow-hidden">
-        {/* Декоративные элементы */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-secondary-500 opacity-10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary-500 opacity-10 rounded-full blur-3xl"></div>
+      <section className="bg-primary-800 text-white relative overflow-hidden">
+        {/* Фирменный паттерн */}
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `url(${patternSvg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        ></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10">
           <div className="text-center">

@@ -125,7 +125,7 @@ const CartPage: React.FC = () => {
             </p>
             <Link
               to="/products"
-              className="inline-flex items-center px-6 py-3 bg-secondary-500 text-white font-medium rounded-lg hover:bg-secondary-600 transition-colors"
+              className="inline-flex items-center px-6 py-3 bg-secondary-500 text-primary-800 font-medium rounded-lg hover:bg-secondary-600 transition-colors"
             >
               <ArrowLeftIcon className="w-5 h-5 mr-2" />
               Перейти к товарам
@@ -191,8 +191,9 @@ const CartPage: React.FC = () => {
                         >
                           {item.name}
                         </Link>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {formatPrice(item.price, item.currency)} за {item.unit}
+                        <p className="text-sm mt-1">
+                          <span className="text-primary-800 font-semibold">{formatPrice(item.price, item.currency)}</span>
+                          <span className="text-gray-600"> за {item.unit}</span>
                         </p>
                         
                         {/* Статус наличия */}
@@ -229,8 +230,8 @@ const CartPage: React.FC = () => {
 
                       {/* Общая стоимость позиции */}
                       <div className="text-right">
-                        <p className="text-lg font-bold text-gray-900">
-                          {formatPrice(item.price * item.quantity, item.currency)}
+                        <p className="text-lg font-bold text-primary-800">
+                          {formatPrice((typeof item.price === 'string' ? parseFloat(item.price) : item.price) * item.quantity, item.currency)}
                         </p>
                         <p className="text-sm text-gray-500">
                           {formatPrice(item.price, item.currency)} × {formatQuantity(item.quantity, item.unit)}

@@ -466,8 +466,8 @@ const ProductsPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleInStockToggle}
-                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 ${
-                          inStockOnly ? 'bg-secondary-500' : 'bg-gray-200'
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-800 focus:ring-offset-2 ${
+                          inStockOnly ? 'bg-primary-800' : 'bg-gray-200'
                         }`}
                         role="switch"
                         aria-checked={inStockOnly}
@@ -487,8 +487,8 @@ const ProductsPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={toggleFavoritesFilter}
-                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-error-600 focus:ring-offset-2 ${
-                          showFavoritesOnly ? 'bg-error-600' : 'bg-gray-200'
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-800 focus:ring-offset-2 ${
+                          showFavoritesOnly ? 'bg-primary-800' : 'bg-gray-200'
                         }`}
                         role="switch"
                         aria-checked={showFavoritesOnly}
@@ -566,7 +566,7 @@ const ProductsPage: React.FC = () => {
                     to={`/products/${product.id}`}
                     className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full min-h-[400px] group"
                   >
-                    <div className="relative w-full h-40 bg-gray-50 overflow-hidden p-3 flex items-center justify-center">
+                    <div className="relative w-full h-40 bg-white overflow-hidden p-3 flex items-center justify-center">
                       {product.main_image || (product.images?.length > 0) ? (
                         <div className="w-full h-full max-w-full max-h-full">
                           <ProductImage
@@ -576,7 +576,7 @@ const ProductsPage: React.FC = () => {
                           />
                         </div>
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded-md border-2 border-dashed border-gray-200">
+                        <div className="w-full h-full flex items-center justify-center bg-white rounded-md border-2 border-dashed border-gray-200">
                           <div className="text-center">
                             <svg className="w-8 h-8 text-gray-300 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -608,10 +608,10 @@ const ProductsPage: React.FC = () => {
                       </button>
                     </div>
                     
-                    <div className="p-3 flex-grow flex flex-col">
+                    <div className="p-3 flex-grow flex flex-col bg-gray-50">
                       {/* Название товара - занимает доступное место сверху */}
                       <div className="flex-grow">
-                        <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-4 leading-tight">
+                        <h3 className="text-sm font-bold text-primary-800 mb-2 line-clamp-4 leading-tight">
                           {product.name}
                         </h3>
                       </div>
@@ -619,22 +619,22 @@ const ProductsPage: React.FC = () => {
                       {/* Все остальное прижато к низу */}
                       <div className="flex-shrink-0">
                         {product.brand && (
-                          <p className="text-xs text-gray-500 mb-2">
+                          <p className="text-xs text-primary-800 font-semibold mb-2">
                             {product.brand}
                           </p>
                         )}
-                        
+
                         <div className="mb-3">
                           <div className="mb-1">
-                            <span className="text-base font-bold text-secondary-600">
+                            <span className="text-base font-bold text-primary-800">
                               {product.price} {product.currency}
                             </span>
                           </div>
                           <div className="flex items-center justify-between gap-2">
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-primary-800 font-semibold">
                               за {product.unit}
                             </span>
-                            <span className={`text-xs ${
+                            <span className={`text-xs font-semibold ${
                               product.stock_status
                                 ? product.stock_status.status === 'in_stock'
                                   ? 'text-green-600'
@@ -680,7 +680,7 @@ const ProductsPage: React.FC = () => {
                   {showFavoritesOnly ? 'Нет избранных товаров' : 'Товары не найдены'}
                 </h3>
                 <p className="text-gray-600">
-                  {showFavoritesOnly 
+                  {showFavoritesOnly
                     ? 'Добавьте товары в избранное, нажав на ❤️ на карточках товаров'
                     : 'Попробуйте изменить фильтры или обновить страницу'
                   }

@@ -1,0 +1,46 @@
+/* TikTok Sans Font Family */
+
+/* Light - для основного текста */
+@font-face {
+  font-family: 'TikTok Sans';
+  src: url('./TikTokSans_18pt-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Regular - обычный текст */
+@font-face {
+  font-family: 'TikTok Sans';
+  src: url('./TikTokSans_18pt-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* SemiBold - полужирный */
+@font-face {
+  font-family: 'TikTok Sans';
+  src: url('./TikTokSans_18pt-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Bold - для заголовков и акцентов */
+@font-face {
+  font-family: 'TikTok Sans';
+  src: url('./TikTokSans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ExtraBold - для ключевых визуальных элементов */
+@font-face {
+  font-family: 'TikTok Sans';
+  src: url('./TikTokSans_18pt-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}

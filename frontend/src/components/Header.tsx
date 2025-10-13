@@ -7,6 +7,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { FaShoppingCart, FaUser, FaCog, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
 import { Menu, Transition } from '@headlessui/react';
 import { useCart } from '../contexts/CartContext';
+import logoFullSvg from '../assets/logo-full.svg';
 
 interface UserData {
     role: 'user' | 'moderator' | 'admin';
@@ -77,11 +78,12 @@ const Header: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Логотип */}
-                    <Link to="/" className="flex items-center space-x-2 group">
-                        <div className="w-8 h-8 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center transform transition-transform group-hover:scale-110">
-                            <span className="text-primary-900 font-bold text-sm">F</span>
-                        </div>
-                        <span className="text-xl font-bold text-white">Faida Group</span>
+                    <Link to="/" className="flex items-center group">
+                        <img
+                            src={logoFullSvg}
+                            alt="Faida Group Logo"
+                            className="h-10 w-auto transform transition-transform group-hover:scale-110"
+                        />
                     </Link>
                     
                     {/* Навигация */}

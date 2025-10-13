@@ -28,6 +28,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Quill / React Quill (WYSIWYG редактор)
 - React Hot Toast (уведомления)
 - React Intersection Observer (ленивая загрузка)
+- **TikTok Sans** - фирменный шрифт (Light для основного текста, Bold для заголовков)
 
 **Инфраструктура:**
 - Docker Compose (5 сервисов: db, redis, backend, frontend, scheduler)
@@ -472,7 +473,7 @@ PostgreSQL доступна по адресу `localhost:5432`:
 13. **Система уведомлений (apps/notifications)**:
     - **Два типа правил**:
       - `system` - уведомления пользователю (только email, без контактов)
-      - `additional` - уведомления админам/модераторам (любой канал, с контактами)
+      - `additional` - уведомления админам/модераторам (любой канал, с указанием контактов)
     - **Constraint**: `unique_together = ('notification_type', 'channel', 'rule_type')` позволяет создавать оба типа правил для одного уведомления
     - **Валидация**: системные правила могут использовать только email канал и НЕ могут иметь контактов
     - **Важно**: В Order.save() используется `self._old_status` для отслеживания изменений статуса (signal срабатывает ПОСЛЕ сохранения)
@@ -480,6 +481,20 @@ PostgreSQL доступна по адресу `localhost:5432`:
     - **NotificationDispatcher**: основной класс для отправки, обрабатывает system и additional правила отдельно
     - **Каналы**: Email (SMTP) и WhatsApp (Green API) с настройками в NotificationChannel
     - **Шаблоны**: переменные контекста подставляются через `.format(**context)`
+
+14. **Фирменный стиль Faida Group** (цвета и шрифты согласно брендбуку):
+    - **Фирменные цвета:**
+      - **primary-900** (#0E1A3A) - тёмно-синий основной | RGB: 14, 26, 58 | CMYK: 100, 91, 45, 54
+      - **secondary-500** (#F2C56D) - жёлтый акцентный | RGB: 242, 197, 109 | CMYK: 5, 24, 65, 0
+      - **primary-800** (#162956) - дополнительный синий | RGB: 22, 41, 86 | CMYK: 100, 88, 38, 31
+      - **secondary-600** (#D8AE64) - светлый золотистый | RGB: 216, 174, 100 | CMYK: 15, 31, 67, 4
+      - Полная палитра (50-950) для каждого цвета в `tailwind.config.js`
+    - **Фирменные шрифты TikTok Sans:**
+      - Light (300) - основной текст | Regular (400) | SemiBold (600) | Bold (700) - заголовки | ExtraBold (800)
+      - Расположение: `frontend/src/assets/fonts/`
+      - Импорт: `frontend/src/index.css` → `@import './assets/fonts/tiktok-sans.css'`
+    - **Полная документация:** `BRANDBOOK.md` - единое руководство по фирменному стилю
+    - Применение: `bg-primary-900`, `text-secondary-500`, `font-bold`, `font-light`
 
 ## Рабочий процесс разработки
 
