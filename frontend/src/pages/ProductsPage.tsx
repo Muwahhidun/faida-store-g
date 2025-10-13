@@ -416,7 +416,7 @@ const ProductsPage: React.FC = () => {
           <div className="flex-1">
             {/* Floating спиннер следует за курсором */}
             {isFetching && (
-              <div 
+              <div
                 className="fixed z-50 pointer-events-none transition-all duration-150 ease-out"
                 style={{
                   left: mousePosition.x + 15,
@@ -424,8 +424,8 @@ const ProductsPage: React.FC = () => {
                   transform: 'translate(0, 0)'
                 }}
               >
-                <div className="bg-white shadow-lg rounded-full p-2 border border-gray-200">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-emerald-600"></div>
+                <div className="bg-white shadow-lg rounded-full p-2 border border-primary-800">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-secondary-500"></div>
                 </div>
               </div>
             )}
@@ -442,7 +442,7 @@ const ProductsPage: React.FC = () => {
                     placeholder="Поиск товаров..."
                     value={searchQuery}
                     onChange={(e) => handleSearchChange(e.target.value)}
-                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm placeholder-gray-500"
+                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-secondary-500 focus:border-secondary-500 text-sm placeholder-gray-500"
                   />
                   {searchQuery && (
                     <button
@@ -466,8 +466,8 @@ const ProductsPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleInStockToggle}
-                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 ${
-                          inStockOnly ? 'bg-emerald-600' : 'bg-gray-200'
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 ${
+                          inStockOnly ? 'bg-secondary-500' : 'bg-gray-200'
                         }`}
                         role="switch"
                         aria-checked={inStockOnly}
@@ -487,8 +487,8 @@ const ProductsPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={toggleFavoritesFilter}
-                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-pink-600 focus:ring-offset-2 ${
-                          showFavoritesOnly ? 'bg-pink-600' : 'bg-gray-200'
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-error-600 focus:ring-offset-2 ${
+                          showFavoritesOnly ? 'bg-error-600' : 'bg-gray-200'
                         }`}
                         role="switch"
                         aria-checked={showFavoritesOnly}
@@ -531,17 +531,17 @@ const ProductsPage: React.FC = () => {
                   {/* Индикаторы активных фильтров слева */}
                   <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                     {searchQuery && (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary-100 text-primary-900">
                         Поиск: "{searchQuery}"
                       </span>
                     )}
                     {sortBy && (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-900">
                         Сортировка: {sortBy === 'price' ? 'Цена ↑' : sortBy === '-price' ? 'Цена ↓' : sortBy === 'name' ? 'А-Я' : 'Я-А'}
                       </span>
                     )}
                     {inStockOnly && (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-100 text-success-800">
                         Только в наличии
                       </span>
                     )}
@@ -595,8 +595,8 @@ const ProductsPage: React.FC = () => {
                         }}
                         className={`absolute top-2 right-2 p-2 rounded-full transition-all duration-200 hover:scale-110 ${
                           favorites.has(product.id)
-                            ? 'bg-pink-100 text-pink-600 hover:bg-pink-200'
-                            : 'bg-white/80 text-gray-400 hover:bg-white hover:text-pink-500'
+                            ? 'bg-error-100 text-error-600 hover:bg-error-200'
+                            : 'bg-white/80 text-gray-400 hover:bg-white hover:text-error-600'
                         } shadow-sm hover:shadow-md`}
                         title={favorites.has(product.id) ? 'Удалить из избранного' : 'Добавить в избранное'}
                       >
@@ -626,7 +626,7 @@ const ProductsPage: React.FC = () => {
                         
                         <div className="mb-3">
                           <div className="mb-1">
-                            <span className="text-base font-bold text-emerald-600">
+                            <span className="text-base font-bold text-secondary-600">
                               {product.price} {product.currency}
                             </span>
                           </div>

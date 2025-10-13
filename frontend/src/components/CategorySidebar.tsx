@@ -120,10 +120,10 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
 
     return (
       <div key={category.id} className="mb-1">
-        <div 
+        <div
           className={`flex items-center justify-between py-2 px-3 rounded-md cursor-pointer transition-colors ${
-            isSelected 
-              ? 'bg-emerald-100 text-emerald-800 font-medium' 
+            isSelected
+              ? 'bg-secondary-100 text-primary-900 font-semibold shadow-sm'
               : 'hover:bg-gray-100 text-gray-700'
           }`}
           style={{ paddingLeft: `${0.75 + level * 1}rem` }}
@@ -138,7 +138,9 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
               {category.category_visible_name}
             </span>
             {category.products_count && (
-              <span className="ml-2 text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full flex-shrink-0">
+              <span className={`ml-2 text-xs px-2 py-1 rounded-full flex-shrink-0 ${
+                isSelected ? 'bg-secondary-200 text-primary-900' : 'text-gray-500 bg-gray-200'
+              }`}>
                 {category.products_count}
               </span>
             )}
@@ -201,16 +203,16 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
 
   return (
     <div className={`bg-white rounded-lg shadow-md ${className}`}>
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Категории</h3>
+      <div className="p-4 border-b border-primary-100">
+        <h3 className="text-lg font-semibold text-primary-900">Категории</h3>
       </div>
-      
+
       <div className="p-4">
         {/* Кнопка "Все товары" */}
-        <div 
-          className={`flex items-center py-2 px-3 mb-3 rounded-md cursor-pointer transition-colors ${
-            selectedCategoryId === null 
-              ? 'bg-emerald-100 text-emerald-800 font-medium' 
+        <div
+          className={`flex items-center py-2 px-3 mb-3 rounded-md cursor-pointer transition-all duration-200 ${
+            selectedCategoryId === null
+              ? 'bg-secondary-100 text-primary-900 font-semibold shadow-sm'
               : 'hover:bg-gray-100 text-gray-700'
           }`}
           onClick={() => onCategorySelect(null)}
