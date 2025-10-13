@@ -215,10 +215,10 @@ const AdminPanelPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-50">
                 {/* Шапка */}
-                <div className="bg-white shadow-sm border-b border-gray-200">
+                <div className="bg-primary-900 shadow-lg border-b border-primary-800">
                     <div className="container mx-auto px-4">
                         <div className="flex items-center justify-between h-16">
-                            <h1 className="text-xl font-bold text-gray-900">Панель управления</h1>
+                            <h1 className="text-xl font-bold text-white">Панель управления</h1>
                         </div>
                     </div>
                 </div>
@@ -248,8 +248,8 @@ const AdminPanelPage: React.FC = () => {
                                 onClick={() => setSelectedTab('settings')}
                                 className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                                     selectedTab === 'settings'
-                                        ? 'border-blue-600 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                        ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
                                 <FaCog className="w-4 h-4" />
@@ -259,8 +259,8 @@ const AdminPanelPage: React.FC = () => {
                                 onClick={() => setSelectedTab('sources')}
                                 className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                                     selectedTab === 'sources'
-                                        ? 'border-green-600 text-green-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                        ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
                                 <FaDatabase className="w-4 h-4" />
@@ -270,8 +270,8 @@ const AdminPanelPage: React.FC = () => {
                                 onClick={() => setSelectedTab('categories')}
                                 className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                                     selectedTab === 'categories'
-                                        ? 'border-purple-600 text-purple-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                        ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
                                 <FaList className="w-4 h-4" />
@@ -281,8 +281,8 @@ const AdminPanelPage: React.FC = () => {
                                 onClick={() => setSelectedTab('products')}
                                 className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                                     selectedTab === 'products'
-                                        ? 'border-orange-600 text-orange-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                        ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
                                 <FaTags className="w-4 h-4" />
@@ -292,8 +292,8 @@ const AdminPanelPage: React.FC = () => {
                                 onClick={() => setSelectedTab('users')}
                                 className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                                     selectedTab === 'users'
-                                        ? 'border-indigo-600 text-indigo-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                        ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
                                 <FaUsers className="w-4 h-4" />
@@ -303,8 +303,8 @@ const AdminPanelPage: React.FC = () => {
                                 onClick={() => setSelectedTab('orders')}
                                 className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                                     selectedTab === 'orders'
-                                        ? 'border-emerald-600 text-emerald-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                        ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
                                 <FaShoppingBag className="w-4 h-4" />
@@ -314,8 +314,8 @@ const AdminPanelPage: React.FC = () => {
                                 onClick={() => setSelectedTab('notifications')}
                                 className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                                     selectedTab === 'notifications'
-                                        ? 'border-yellow-600 text-yellow-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                        ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
                                 <FaBell className="w-4 h-4" />
@@ -327,7 +327,7 @@ const AdminPanelPage: React.FC = () => {
                     {/* Контент табов */}
                     {loading ? (
                         <div className="text-center py-12">
-                            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-secondary-500"></div>
                             <p className="mt-4 text-gray-600">Загрузка данных...</p>
                         </div>
                     ) : (
