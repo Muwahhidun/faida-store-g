@@ -178,7 +178,7 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                                 </span>
                                 <button
                                     onClick={() => setEditingCategory(category)}
-                                    className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                    className="p-1 text-gray-400 hover:text-secondary-600 transition-colors"
                                     title="Редактировать название"
                                 >
                                     <FaEdit className="w-3.5 h-3.5" />
@@ -205,7 +205,7 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                             disabled={!category.is_active}
                         />
                         <div className={`w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all ${
-                            category.is_active ? 'peer-checked:bg-purple-600' : 'opacity-50 cursor-not-allowed'
+                            category.is_active ? 'peer-checked:bg-primary-600' : 'opacity-50 cursor-not-allowed'
                         }`}></div>
                     </label>
                 </div>
@@ -220,8 +220,8 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
         <div className="card p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                 <div className="flex items-center space-x-3 min-w-0">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <FaList className="w-5 h-5 text-purple-600" />
+                    <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <FaList className="w-5 h-5 text-primary-600" />
                     </div>
                     <div className="min-w-0">
                         <h2 className="text-lg font-semibold text-gray-900">Управление категориями</h2>
@@ -253,7 +253,7 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
             <div className="space-y-3 max-h-96 overflow-y-auto">
                 {loading ? (
                     <div className="py-8 text-center">
-                        <FaSpinner className="w-8 h-8 text-purple-600 animate-spin mx-auto mb-3" />
+                        <FaSpinner className="w-8 h-8 text-primary-600 animate-spin mx-auto mb-3" />
                         <p className="text-gray-600">Загрузка категорий...</p>
                     </div>
                 ) : categories.length === 0 ? (
@@ -266,7 +266,7 @@ export const CategoriesSection: React.FC<CategoriesSectionProps> = ({
                         <div key={sourceKey} className="border border-gray-200 rounded-lg p-3">
                             {/* Заголовок группы */}
                             <div className="flex items-center mb-3 pb-2 border-b border-gray-100">
-                                <FaDatabase className="w-4 h-4 text-purple-600 mr-2" />
+                                <FaDatabase className="w-4 h-4 text-primary-600 mr-2" />
                                 <h4 className="font-medium text-gray-800">
                                     {sourceKey === 'no_source' ? 'Категории без товаров' : sourceKey}
                                 </h4>

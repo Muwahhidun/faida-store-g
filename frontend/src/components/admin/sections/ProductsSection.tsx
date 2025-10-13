@@ -177,8 +177,8 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
         <div className="card p-6">
             {/* Заголовок */}
             <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <FaTags className="w-5 h-5 text-orange-600" />
+                <div className="w-10 h-10 bg-warning-100 rounded-lg flex items-center justify-center">
+                    <FaTags className="w-5 h-5 text-warning-600" />
                 </div>
                 <div>
                     <h2 className="text-lg font-semibold text-gray-900">Управление товарами</h2>
@@ -313,7 +313,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
             <div>
                 {loading ? (
                     <div className="py-12 text-center">
-                        <FaSpinner className="w-8 h-8 text-orange-600 animate-spin mx-auto mb-3" />
+                        <FaSpinner className="w-8 h-8 text-warning-600 animate-spin mx-auto mb-3" />
                         <p className="text-gray-600">Загрузка товаров...</p>
                     </div>
                 ) : products.length === 0 ? (
@@ -372,7 +372,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
                                                 <div className="flex flex-col items-center">
                                                     <button
                                                         onClick={() => handleEditProductStock(product)}
-                                                        className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-100 rounded-lg"
+                                                        className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-100 rounded-lg"
                                                         title="Настройки остатков"
                                                     >
                                                         <FaSlidersH className="w-4 h-4" />
@@ -382,7 +382,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
                                                             Общие
                                                         </span>
                                                     ) : (
-                                                        <span className="text-xs text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded mt-1" title="Используются индивидуальные настройки">
+                                                        <span className="text-xs text-primary-600 bg-purple-50 px-1.5 py-0.5 rounded mt-1" title="Используются индивидуальные настройки">
                                                             Индивид.
                                                         </span>
                                                     )}
@@ -394,7 +394,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
                                                         onChange={() => handleProductToggle(product)}
                                                         className="sr-only peer"
                                                     />
-                                                    <div className="w-9 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
+                                                    <div className="w-9 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-warning-600"></div>
                                                 </label>
                                             </div>
                                         </td>

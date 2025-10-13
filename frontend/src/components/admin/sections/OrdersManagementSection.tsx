@@ -219,8 +219,8 @@ const OrdersManagementSection: React.FC<OrdersManagementSectionProps> = ({
       <div className="bg-white p-6 rounded-lg border border-gray-200">
         {/* Заголовок */}
         <div className="flex items-center space-x-3 mb-6">
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-            <FaShoppingBag className="w-5 h-5 text-blue-600" />
+          <div className="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center">
+            <FaShoppingBag className="w-5 h-5 text-secondary-600" />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Управление заказами</h2>
@@ -324,7 +324,7 @@ const OrdersManagementSection: React.FC<OrdersManagementSectionProps> = ({
       {/* Список заказов */}
       {isLoading ? (
         <div className="py-12 text-center bg-white rounded-lg border border-gray-200">
-          <FaSpinner className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
+          <FaSpinner className="w-8 h-8 text-secondary-600 animate-spin mx-auto mb-3" />
           <p className="text-gray-600">Загрузка заказов...</p>
         </div>
       ) : orders.length === 0 ? (
@@ -489,7 +489,7 @@ const OrdersManagementSection: React.FC<OrdersManagementSectionProps> = ({
                                   e.stopPropagation();
                                   copyProductNames(order.items || []);
                                 }}
-                                className="flex items-center gap-2 text-xs font-medium text-blue-600 uppercase tracking-wider hover:text-blue-800 transition-colors group"
+                                className="flex items-center gap-2 text-xs font-medium text-secondary-600 uppercase tracking-wider hover:text-blue-800 transition-colors group"
                                 title="Копировать названия товаров"
                               >
                                 <FaCopy className="w-3 h-3 opacity-70 group-hover:opacity-100" />
@@ -502,7 +502,7 @@ const OrdersManagementSection: React.FC<OrdersManagementSectionProps> = ({
                                   e.stopPropagation();
                                   copyProductQuantities(order.items || []);
                                 }}
-                                className="flex items-center gap-2 text-xs font-medium text-blue-600 uppercase tracking-wider hover:text-blue-800 transition-colors group"
+                                className="flex items-center gap-2 text-xs font-medium text-secondary-600 uppercase tracking-wider hover:text-blue-800 transition-colors group"
                                 title="Копировать количества"
                               >
                                 <FaCopy className="w-3 h-3 opacity-70 group-hover:opacity-100" />

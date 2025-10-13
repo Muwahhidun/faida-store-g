@@ -120,7 +120,7 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
                             value={formData.notification_type}
                             onChange={(e) => handleChange('notification_type', Number(e.target.value))}
                             disabled={!!template}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 disabled:bg-gray-100"
                             required
                         >
                             <option value={0}>Выберите тип уведомления</option>
@@ -144,7 +144,7 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
                             value={formData.channel_type}
                             onChange={(e) => handleChange('channel_type', e.target.value)}
                             disabled={!!template}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 disabled:bg-gray-100"
                             required
                         >
                             <option value="">Выберите тип канала</option>
@@ -169,7 +169,7 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
                             value={formData.name}
                             onChange={(e) => handleChange('name', e.target.value)}
                             placeholder="Например: Стандартный, Подробный, Для VIP клиентов"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500"
                             required
                         />
                         <p className="mt-1 text-xs text-gray-600">
@@ -188,7 +188,7 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
                                 value={formData.subject}
                                 onChange={(e) => handleChange('subject', e.target.value)}
                                 placeholder="Тема письма (можно использовать переменные)"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500"
                                 required={showSubjectField}
                             />
                         </div>
@@ -204,7 +204,7 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
                             onChange={(e) => handleChange('template', e.target.value)}
                             placeholder="Текст уведомления с переменными {{variable_name}}"
                             rows={8}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 font-mono text-sm"
                             required
                         />
                         <p className="mt-1 text-xs text-gray-600">
@@ -255,7 +255,7 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
                             id="is_default"
                             checked={formData.is_default}
                             onChange={(e) => handleChange('is_default', e.target.checked)}
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            className="w-4 h-4 text-secondary-600 border-gray-300 rounded focus:ring-secondary-500"
                         />
                         <label htmlFor="is_default" className="flex items-center space-x-2 text-sm text-gray-900 cursor-pointer">
                             <FaStar className="text-yellow-600" />
@@ -279,7 +279,7 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+                            className="px-4 py-2 text-sm font-medium text-white bg-secondary-500 rounded-lg hover:bg-secondary-600 disabled:opacity-50 flex items-center space-x-2"
                         >
                             {isSubmitting && <FaSpinner className="w-4 h-4 animate-spin" />}
                             <span>{template ? 'Сохранить' : 'Создать'}</span>

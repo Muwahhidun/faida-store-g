@@ -148,7 +148,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
                                 errors.name ? 'border-red-500' : 'border-gray-300'
                             }`}
                             placeholder="Например: Администратор WhatsApp"
@@ -186,7 +186,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                             type={formData.channel_type === 'email' ? 'email' : 'text'}
                             value={formData.value}
                             onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
                                 errors.value ? 'border-red-500' : 'border-gray-300'
                             }`}
                             placeholder={
@@ -221,7 +221,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                             id="is_active"
                             checked={formData.is_active}
                             onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            className="h-4 w-4 text-secondary-600 focus:ring-secondary-500 border-gray-300 rounded"
                         />
                         <label htmlFor="is_active" className="ml-2 text-sm text-gray-700">
                             Активен (уведомления будут отправляться на этот контакт)
@@ -243,7 +243,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                         type="submit"
                         onClick={handleSubmit}
                         disabled={isSubmitting}
-                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 text-sm font-medium text-white bg-secondary-500 rounded-lg hover:bg-secondary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? 'Сохранение...' : contact ? 'Сохранить' : 'Создать'}
                     </button>

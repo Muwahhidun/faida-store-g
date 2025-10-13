@@ -54,11 +54,11 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
     return (
         <div className="card p-6">
             <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <FaCog className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center">
+                    <FaCog className="w-5 h-5 text-secondary-600" />
                 </div>
                 <div>
-                    <h2 className="text-lg font-semibold text-gray-900">Настройки сайта</h2>
+                    <h2 className="text-lg font-semibold text-primary-900">Настройки сайта</h2>
                     <p className="text-sm text-gray-600">Управление отображением товаров и остатков</p>
                 </div>
             </div>
@@ -75,7 +75,7 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
                             min="0"
                             value={minStock}
                             onChange={(e) => setMinStock(Number(e.target.value))}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
                             placeholder="Введите количество"
                         />
                     </div>
@@ -106,7 +106,7 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
                                     onChange={(e) => setShowStockQuantitiesGlobally(e.target.checked)}
                                     className="sr-only peer"
                                 />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-secondary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary-500"></div>
                             </label>
                         </div>
 
@@ -137,7 +137,7 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
                                 min="1"
                                 value={defaultLowStockThreshold}
                                 onChange={(e) => setDefaultLowStockThreshold(Number(e.target.value))}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
                                 placeholder="Введите количество"
                             />
                             <p className="mt-1 text-xs text-gray-500">
@@ -150,7 +150,7 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
                 <button
                     onClick={handleSaveSettings}
                     disabled={saveLoading}
-                    className={`w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center space-x-2 ${
+                    className={`w-full px-4 py-2 text-sm font-medium text-primary-900 bg-secondary-500 hover:bg-secondary-600 rounded-lg flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition-all ${
                         saveLoading ? 'opacity-75 cursor-not-allowed' : ''
                     }`}
                 >

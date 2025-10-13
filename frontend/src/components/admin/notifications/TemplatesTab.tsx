@@ -167,9 +167,9 @@ const TemplatesTab: React.FC<TemplatesTabProps> = ({ onCreateTemplate, onEditTem
 
         switch (channelCode.toLowerCase()) {
             case 'email':
-                return <FaEnvelope className="text-blue-600" />;
+                return <FaEnvelope className="text-secondary-600" />;
             case 'whatsapp':
-                return <FaWhatsapp className="text-green-600" />;
+                return <FaWhatsapp className="text-success-600" />;
             case 'telegram':
                 return <FaTelegram className="text-blue-500" />;
             default:
@@ -263,7 +263,7 @@ const TemplatesTab: React.FC<TemplatesTabProps> = ({ onCreateTemplate, onEditTem
                             className={`p-1.5 rounded transition-colors ${
                                 template.is_system
                                     ? 'text-gray-400 cursor-not-allowed'
-                                    : 'text-blue-600 hover:bg-blue-50'
+                                    : 'text-secondary-600 hover:bg-blue-50'
                             }`}
                             title={template.is_system ? 'Системный шаблон нельзя редактировать' : 'Редактировать'}
                         >
@@ -307,7 +307,7 @@ const TemplatesTab: React.FC<TemplatesTabProps> = ({ onCreateTemplate, onEditTem
                                                 e.stopPropagation();
                                                 copyToClipboard(template.subject, 'Тема');
                                             }}
-                                            className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 transition-colors group"
+                                            className="flex items-center gap-1 text-xs text-secondary-600 hover:text-blue-800 transition-colors group"
                                             title="Копировать тему"
                                         >
                                             <FaCopy className="w-3 h-3 opacity-70 group-hover:opacity-100" />
@@ -328,7 +328,7 @@ const TemplatesTab: React.FC<TemplatesTabProps> = ({ onCreateTemplate, onEditTem
                                             e.stopPropagation();
                                             copyToClipboard(template.template, 'Текст шаблона');
                                         }}
-                                        className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 transition-colors group"
+                                        className="flex items-center gap-1 text-xs text-secondary-600 hover:text-blue-800 transition-colors group"
                                         title="Копировать текст шаблона"
                                     >
                                         <FaCopy className="w-3 h-3 opacity-70 group-hover:opacity-100" />
@@ -365,7 +365,7 @@ const TemplatesTab: React.FC<TemplatesTabProps> = ({ onCreateTemplate, onEditTem
     if (isLoading) {
         return (
             <div className="flex justify-center py-12">
-                <FaSpinner className="w-8 h-8 text-blue-600 animate-spin" />
+                <FaSpinner className="w-8 h-8 text-secondary-600 animate-spin" />
             </div>
         );
     }
@@ -412,7 +412,7 @@ const TemplatesTab: React.FC<TemplatesTabProps> = ({ onCreateTemplate, onEditTem
                                         ) : (
                                             <FaChevronRight className="text-gray-600 w-4 h-4" />
                                         )}
-                                        <FaFileAlt className="text-blue-600" />
+                                        <FaFileAlt className="text-secondary-600" />
                                         <div className="text-left">
                                             <h4 className="font-semibold text-gray-900">{notificationTypeName}</h4>
                                             <p className="text-xs text-gray-600 mt-0.5">
@@ -484,7 +484,7 @@ const TemplatesTab: React.FC<TemplatesTabProps> = ({ onCreateTemplate, onEditTem
                     <p className="mb-2">Нет шаблонов</p>
                     <button
                         onClick={onCreateTemplate}
-                        className="text-blue-600 hover:underline text-sm"
+                        className="text-secondary-600 hover:underline text-sm"
                     >
                         Создать первый шаблон
                     </button>

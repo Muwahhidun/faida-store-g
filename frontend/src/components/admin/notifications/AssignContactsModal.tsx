@@ -120,7 +120,7 @@ export default function AssignContactsModal({
                                                     type="checkbox"
                                                     checked={selectedIds.includes(contact.id)}
                                                     onChange={() => handleToggle(contact.id)}
-                                                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                                                    className="w-4 h-4 text-secondary-600 rounded focus:ring-2 focus:ring-secondary-500"
                                                 />
                                                 <div className="ml-3 flex-1">
                                                     <div className="flex items-center space-x-2">
@@ -157,7 +157,7 @@ export default function AssignContactsModal({
                                         <button
                                             onClick={handleSubmit}
                                             disabled={isLoading}
-                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+                                            className="px-4 py-2 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 disabled:opacity-50 flex items-center space-x-2"
                                         >
                                             <FaCheck />
                                             <span>{isLoading ? 'Сохранение...' : 'Сохранить'}</span>

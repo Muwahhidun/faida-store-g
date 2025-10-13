@@ -44,7 +44,7 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({ category, 
             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
                 <div className="flex items-center justify-between p-6 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                        <FaEdit className="w-5 h-5 mr-2 text-blue-600" />
+                        <FaEdit className="w-5 h-5 mr-2 text-secondary-600" />
                         Редактирование категории
                     </h3>
                     <button
@@ -83,7 +83,7 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({ category, 
                             value={displayName}
                             onChange={(e) => setDisplayName(e.target.value)}
                             placeholder="Оставьте пустым для использования названия из 1С"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
                         />
                         <p className="text-xs text-gray-500 mt-1">
                             Если заполнено, это название будет показано вместо названия из 1С
@@ -111,7 +111,7 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({ category, 
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+                        className="px-4 py-2 text-sm font-medium text-white bg-secondary-500 hover:bg-secondary-600 rounded-lg disabled:opacity-50"
                         disabled={saving}
                     >
                         {saving ? 'Сохранение...' : 'Сохранить'}

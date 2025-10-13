@@ -49,7 +49,7 @@ export const EditSourceModal: React.FC<EditSourceModalProps> = ({ source, onClos
             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
                 <div className="flex items-center justify-between p-6 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                        <FaEdit className="w-5 h-5 mr-2 text-blue-600" />
+                        <FaEdit className="w-5 h-5 mr-2 text-secondary-600" />
                         Редактирование источника данных
                     </h3>
                     <button
@@ -67,7 +67,7 @@ export const EditSourceModal: React.FC<EditSourceModalProps> = ({ source, onClos
                             id="edit-source-name"
                             value={editedSource.name}
                             onChange={(e) => setEditedSource({ ...editedSource, name: e.target.value })}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary-500 focus:border-secondary-500 sm:text-sm"
                             placeholder="Основная база ПП"
                         />
                     </div>
@@ -78,7 +78,7 @@ export const EditSourceModal: React.FC<EditSourceModalProps> = ({ source, onClos
                             id="edit-source-code"
                             value={editedSource.code}
                             onChange={(e) => setEditedSource({ ...editedSource, code: e.target.value })}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary-500 focus:border-secondary-500 sm:text-sm"
                             placeholder="pp"
                         />
                     </div>
@@ -89,7 +89,7 @@ export const EditSourceModal: React.FC<EditSourceModalProps> = ({ source, onClos
                             id="edit-json-path"
                             value={editedSource.json_file_path}
                             onChange={(e) => setEditedSource({ ...editedSource, json_file_path: e.target.value })}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary-500 focus:border-secondary-500 sm:text-sm"
                             placeholder="pp/export.json"
                         />
                     </div>
@@ -100,7 +100,7 @@ export const EditSourceModal: React.FC<EditSourceModalProps> = ({ source, onClos
                             id="edit-media-path"
                             value={editedSource.media_dir_path}
                             onChange={(e) => setEditedSource({ ...editedSource, media_dir_path: e.target.value })}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary-500 focus:border-secondary-500 sm:text-sm"
                             placeholder="pp/export_media"
                         />
                     </div>
@@ -110,8 +110,8 @@ export const EditSourceModal: React.FC<EditSourceModalProps> = ({ source, onClos
                             <Switch
                                 checked={editedSource.is_active ?? true}
                                 onChange={(checked) => setEditedSource({ ...editedSource, is_active: checked })}
-                                className={`${editedSource.is_active ? 'bg-blue-600' : 'bg-gray-200'
-                                    } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                                className={`${editedSource.is_active ? 'bg-secondary-500' : 'bg-gray-200'
+                                    } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500`}
                             >
                                 <span
                                     className={`${editedSource.is_active ? 'translate-x-6' : 'translate-x-1'
@@ -124,8 +124,8 @@ export const EditSourceModal: React.FC<EditSourceModalProps> = ({ source, onClos
                             <Switch
                                 checked={editedSource.show_on_site ?? true}
                                 onChange={(checked) => setEditedSource({ ...editedSource, show_on_site: checked })}
-                                className={`${editedSource.show_on_site ? 'bg-blue-600' : 'bg-gray-200'
-                                    } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                                className={`${editedSource.show_on_site ? 'bg-secondary-500' : 'bg-gray-200'
+                                    } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500`}
                             >
                                 <span
                                     className={`${editedSource.show_on_site ? 'translate-x-6' : 'translate-x-1'
@@ -163,7 +163,7 @@ export const EditSourceModal: React.FC<EditSourceModalProps> = ({ source, onClos
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+                        className="px-4 py-2 text-sm font-medium text-white bg-secondary-500 hover:bg-secondary-600 rounded-lg disabled:opacity-50"
                         disabled={saving}
                     >
                         {saving ? 'Сохранение...' : 'Сохранить'}

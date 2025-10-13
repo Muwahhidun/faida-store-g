@@ -86,8 +86,8 @@ export const NotificationsSection: React.FC = () => {
             {/* Заголовок */}
             <div className="card p-6">
                 <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <FaBell className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center">
+                        <FaBell className="w-5 h-5 text-secondary-600" />
                     </div>
                     <div>
                         <h2 className="text-lg font-semibold text-gray-900">Система уведомлений</h2>
@@ -106,7 +106,7 @@ export const NotificationsSection: React.FC = () => {
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex items-center space-x-2 px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
                                     activeTab === tab.id
-                                        ? 'border-blue-600 text-blue-600'
+                                        ? 'border-blue-600 text-secondary-600'
                                         : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                                 }`}
                             >
@@ -139,7 +139,7 @@ const OverviewTab: React.FC = () => {
     if (isLoading) {
         return (
             <div className="flex justify-center py-12">
-                <FaSpinner className="w-8 h-8 text-blue-600 animate-spin" />
+                <FaSpinner className="w-8 h-8 text-secondary-600 animate-spin" />
             </div>
         );
     }
@@ -152,7 +152,7 @@ const OverviewTab: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-center space-x-3">
-                        <FaListUl className="w-8 h-8 text-blue-600" />
+                        <FaListUl className="w-8 h-8 text-secondary-600" />
                         <div>
                             <p className="text-2xl font-bold text-gray-900">{stats?.totalTypes || 0}</p>
                             <p className="text-sm text-gray-600">Типов уведомлений</p>
@@ -162,7 +162,7 @@ const OverviewTab: React.FC = () => {
 
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <div className="flex items-center space-x-3">
-                        <FaBell className="w-8 h-8 text-green-600" />
+                        <FaBell className="w-8 h-8 text-success-600" />
                         <div>
                             <p className="text-2xl font-bold text-gray-900">{stats?.activeChannels || 0}</p>
                             <p className="text-sm text-gray-600">Активных каналов</p>
@@ -172,7 +172,7 @@ const OverviewTab: React.FC = () => {
 
                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                     <div className="flex items-center space-x-3">
-                        <FaCheckCircle className="w-8 h-8 text-purple-600" />
+                        <FaCheckCircle className="w-8 h-8 text-primary-600" />
                         <div>
                             <p className="text-2xl font-bold text-gray-900">{stats?.sentThisMonth || 0}</p>
                             <p className="text-sm text-gray-600">Отправлено за месяц</p>
@@ -198,25 +198,25 @@ const OverviewTab: React.FC = () => {
                 <h4 className="font-semibold text-gray-900 mb-3">Доступные возможности:</h4>
                 <ul className="space-y-2 text-sm text-gray-700">
                     <li className="flex items-start space-x-2">
-                        <FaCheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <FaCheckCircle className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                         <span>
                             <strong>Каналы</strong> - Email, WhatsApp, можно добавить Telegram, SMS
                         </span>
                     </li>
                     <li className="flex items-start space-x-2">
-                        <FaCheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <FaCheckCircle className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                         <span>
                             <strong>Контакты</strong> - админы и менеджеры, которым отправляются уведомления
                         </span>
                     </li>
                     <li className="flex items-start space-x-2">
-                        <FaCheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <FaCheckCircle className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                         <span>
                             <strong>Логи</strong> - история всех отправок с возможностью повтора
                         </span>
                     </li>
                     <li className="flex items-start space-x-2">
-                        <FaCheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <FaCheckCircle className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
                         <span>
                             <strong>Retry</strong> - автоматические повторные попытки при ошибках
                         </span>
@@ -230,7 +230,7 @@ const OverviewTab: React.FC = () => {
                             href="http://localhost:8000/admin/notifications/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline font-medium"
+                            className="text-secondary-600 hover:underline font-medium"
                         >
                             Django Admin →
                         </a>
@@ -384,7 +384,7 @@ const ChannelsTab: React.FC = () => {
     if (isLoading) {
         return (
             <div className="flex justify-center py-12">
-                <FaSpinner className="w-8 h-8 text-blue-600 animate-spin" />
+                <FaSpinner className="w-8 h-8 text-secondary-600 animate-spin" />
             </div>
         );
     }
@@ -418,10 +418,10 @@ const ChannelsTab: React.FC = () => {
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center space-x-3">
                                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                                        channel.is_active ? 'bg-blue-100' : 'bg-gray-200'
+                                        channel.is_active ? 'bg-secondary-100' : 'bg-gray-200'
                                     }`}>
                                         <IconComponent className={`w-5 h-5 ${
-                                            channel.is_active ? 'text-blue-600' : 'text-gray-500'
+                                            channel.is_active ? 'text-secondary-600' : 'text-gray-500'
                                         }`} />
                                     </div>
                                     <div>
@@ -436,7 +436,7 @@ const ChannelsTab: React.FC = () => {
                             <div className="mt-3 flex items-center space-x-3">
                                 <button
                                     onClick={() => handleOpenSettings(channel)}
-                                    className="text-sm text-blue-600 hover:underline flex items-center space-x-1"
+                                    className="text-sm text-secondary-600 hover:underline flex items-center space-x-1"
                                 >
                                     <FaEdit className="w-3 h-3" />
                                     <span>Изменить</span>
@@ -642,7 +642,7 @@ const ContactsTab: React.FC = () => {
     if (contactsLoading) {
         return (
             <div className="flex justify-center py-12">
-                <FaSpinner className="w-8 h-8 text-blue-600 animate-spin" />
+                <FaSpinner className="w-8 h-8 text-secondary-600 animate-spin" />
             </div>
         );
     }
@@ -681,10 +681,10 @@ const ContactsTab: React.FC = () => {
                             <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center space-x-3">
                                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                                        contact.is_active ? 'bg-blue-100' : 'bg-gray-200'
+                                        contact.is_active ? 'bg-secondary-100' : 'bg-gray-200'
                                     }`}>
                                         <IconComponent className={`w-5 h-5 ${
-                                            contact.is_active ? 'text-blue-600' : 'text-gray-500'
+                                            contact.is_active ? 'text-secondary-600' : 'text-gray-500'
                                         }`} />
                                     </div>
                                     <div>
@@ -694,7 +694,7 @@ const ContactsTab: React.FC = () => {
                                 </div>
 
                                 {contact.is_active ? (
-                                    <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
+                                    <span className="px-2 py-1 text-xs font-medium bg-success-100 text-green-800 rounded">
                                         Активен
                                     </span>
                                 ) : (
@@ -715,7 +715,7 @@ const ContactsTab: React.FC = () => {
                             <div className="mt-4 flex items-center space-x-2 pt-3 border-t border-gray-200">
                                 <button
                                     onClick={() => handleEdit(contact)}
-                                    className="text-sm text-blue-600 hover:underline flex items-center space-x-1"
+                                    className="text-sm text-secondary-600 hover:underline flex items-center space-x-1"
                                 >
                                     <FaEdit className="w-3 h-3" />
                                     <span>Изменить</span>
@@ -745,7 +745,7 @@ const ContactsTab: React.FC = () => {
                     <p className="mb-2">Нет контактов</p>
                     <button
                         onClick={handleCreate}
-                        className="text-blue-600 hover:underline text-sm"
+                        className="text-secondary-600 hover:underline text-sm"
                     >
                         Создать первый контакт
                     </button>
@@ -890,7 +890,7 @@ const RulesTabWrapper: React.FC = () => {
     if (rulesLoading || contactsLoading || typesLoading) {
         return (
             <div className="flex justify-center py-12">
-                <FaSpinner className="w-8 h-8 text-blue-600 animate-spin" />
+                <FaSpinner className="w-8 h-8 text-secondary-600 animate-spin" />
             </div>
         );
     }
@@ -976,10 +976,10 @@ const LogsTab: React.FC = () => {
 
     const getStatusBadge = (status: string) => {
         const badges: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
-            sent: { color: 'bg-green-100 text-green-800', icon: <FaCheckCircle />, label: 'Отправлено' },
+            sent: { color: 'bg-success-100 text-green-800', icon: <FaCheckCircle />, label: 'Отправлено' },
             failed: { color: 'bg-red-100 text-red-800', icon: <FaExclamationTriangle />, label: 'Ошибка' },
             pending: { color: 'bg-yellow-100 text-yellow-800', icon: <FaClock />, label: 'Ожидает' },
-            retrying: { color: 'bg-blue-100 text-blue-800', icon: <FaSyncAlt />, label: 'Повтор' },
+            retrying: { color: 'bg-secondary-100 text-blue-800', icon: <FaSyncAlt />, label: 'Повтор' },
         };
 
         const badge = badges[status] || badges.pending;
@@ -995,7 +995,7 @@ const LogsTab: React.FC = () => {
     if (isLoading) {
         return (
             <div className="flex justify-center py-12">
-                <FaSpinner className="w-8 h-8 text-blue-600 animate-spin" />
+                <FaSpinner className="w-8 h-8 text-secondary-600 animate-spin" />
             </div>
         );
     }
@@ -1015,14 +1015,14 @@ const LogsTab: React.FC = () => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Поиск по типу, получателю..."
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500"
                     />
                 </div>
                 <div className="w-full md:w-48">
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500"
                     >
                         <option value="all">Все статусы</option>
                         <option value="sent">Отправлено</option>
@@ -1066,7 +1066,7 @@ const LogsTab: React.FC = () => {
                                 )}
 
                                 {log.status === 'retrying' && log.next_retry_at && (
-                                    <p className="mt-2 text-xs text-blue-600">
+                                    <p className="mt-2 text-xs text-secondary-600">
                                         <FaClock className="inline mr-1" />
                                         Следующая попытка: {new Date(log.next_retry_at).toLocaleString('ru-RU')}
                                     </p>

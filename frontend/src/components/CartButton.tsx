@@ -114,7 +114,7 @@ const CartButton: React.FC<CartButtonProps> = ({
     return (
       <button
         onClick={handleAddToCart}
-        className={`flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-600 rounded-lg transition-colors ${sizes.button} ${className}`}
+        className={`flex items-center justify-center gap-2 bg-secondary-500 hover:bg-secondary-600 text-white border border-emerald-600 rounded-lg transition-colors ${sizes.button} ${className}`}
       >
         <ShoppingCartIcon className={sizes.icon} />
         В корзину
@@ -147,7 +147,7 @@ const CartButton: React.FC<CartButtonProps> = ({
       <button
         onClick={handleIncrement}
         disabled={quantity >= product.stock_quantity}
-        className={`flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white border border-emerald-600 disabled:border-gray-300 rounded-r-lg transition-colors ${sizes.counterButton}`}
+        className={`flex items-center justify-center bg-secondary-500 hover:bg-secondary-600 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white border border-emerald-600 disabled:border-gray-300 rounded-r-lg transition-colors ${sizes.counterButton}`}
       >
         <PlusIcon className={sizes.counterIcon} />
       </button>

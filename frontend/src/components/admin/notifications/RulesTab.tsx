@@ -10,9 +10,9 @@ import type { NotificationRule, NotificationContact, NotificationType } from '..
 const getChannelIcon = (channelCode: string) => {
     switch (channelCode) {
         case 'email':
-            return <FaEnvelope className="text-blue-600" />;
+            return <FaEnvelope className="text-secondary-600" />;
         case 'whatsapp':
-            return <FaWhatsapp className="text-green-600" />;
+            return <FaWhatsapp className="text-success-600" />;
         default:
             return null;
     }
@@ -127,7 +127,7 @@ export default function RulesTab({
                             )}
                             <div className="flex items-center space-x-2 mt-1">
                                 {rule.is_enabled ? (
-                                    <span className="inline-flex items-center text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded">
+                                    <span className="inline-flex items-center text-xs px-2 py-0.5 bg-success-100 text-green-800 rounded">
                                         <FaCheckCircle className="mr-1" />
                                         Включено
                                     </span>
@@ -143,7 +143,7 @@ export default function RulesTab({
                                     </span>
                                 )}
                                 {hasContacts && (
-                                    <span className="inline-flex items-center text-xs px-2 py-0.5 bg-blue-100 text-blue-800 rounded">
+                                    <span className="inline-flex items-center text-xs px-2 py-0.5 bg-secondary-100 text-blue-800 rounded">
                                         {rule.contacts.length} контакт(ов)
                                     </span>
                                 )}
@@ -160,7 +160,7 @@ export default function RulesTab({
                                     handleSendTest(rule.id);
                                 }}
                                 disabled={testingRuleId === rule.id}
-                                className="px-2 py-1.5 text-xs bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 flex items-center space-x-1"
+                                className="px-2 py-1.5 text-xs bg-success-600 text-white rounded hover:bg-success-700 disabled:opacity-50 flex items-center space-x-1"
                                 title="Отправить тест"
                             >
                                 {testingRuleId === rule.id ? (
@@ -179,7 +179,7 @@ export default function RulesTab({
                             disabled={isToggling}
                             className={`p-1.5 rounded transition-colors ${
                                 rule.is_enabled
-                                    ? 'text-green-700 hover:bg-green-100'
+                                    ? 'text-green-700 hover:bg-success-100'
                                     : 'text-gray-700 hover:bg-gray-200'
                             }`}
                             title={rule.is_enabled ? 'Выключить' : 'Включить'}
@@ -195,7 +195,7 @@ export default function RulesTab({
                                 e.stopPropagation();
                                 onEditRule(rule);
                             }}
-                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            className="p-1.5 text-secondary-600 hover:bg-blue-50 rounded transition-colors"
                             title="Редактировать"
                         >
                             <FaEdit className="w-3.5 h-3.5" />
@@ -233,7 +233,7 @@ export default function RulesTab({
                                             key={contact.id}
                                             className={`text-xs px-2 py-1 rounded w-fit ${
                                                 contact.is_active
-                                                    ? 'bg-blue-100 text-blue-800'
+                                                    ? 'bg-secondary-100 text-blue-800'
                                                     : 'bg-gray-100 text-gray-600 line-through'
                                             }`}
                                         >
@@ -286,13 +286,13 @@ export default function RulesTab({
                         <div key={notifType.code} className="bg-white border-2 border-purple-200 rounded-lg overflow-hidden">
                             <button
                                 onClick={() => toggleNotificationType(`system-${notifType.code}`)}
-                                className="w-full bg-purple-50 px-6 py-4 border-b border-purple-200 hover:bg-purple-100 transition-colors text-left"
+                                className="w-full bg-purple-50 px-6 py-4 border-b border-purple-200 hover:bg-primary-100 transition-colors text-left"
                             >
                                 <div className="flex items-center space-x-3">
                                     {isTypeExpanded ? (
-                                        <FaChevronDown className="text-purple-600 w-5 h-5 flex-shrink-0" />
+                                        <FaChevronDown className="text-primary-600 w-5 h-5 flex-shrink-0" />
                                     ) : (
-                                        <FaChevronRight className="text-purple-600 w-5 h-5 flex-shrink-0" />
+                                        <FaChevronRight className="text-primary-600 w-5 h-5 flex-shrink-0" />
                                     )}
                                     <div>
                                         <h3 className="text-lg font-semibold text-gray-900">{notifType.name}</h3>
@@ -309,7 +309,7 @@ export default function RulesTab({
                                         typeRules.map(rule => renderRule(rule))
                                     ) : (
                                         <div className="px-6 py-4 text-sm text-gray-500 text-center">
-                                            Нет правил. <button onClick={onCreateRule} className="text-blue-600 hover:underline">Создать первое правило</button>
+                                            Нет правил. <button onClick={onCreateRule} className="text-secondary-600 hover:underline">Создать первое правило</button>
                                         </div>
                                     )}
                                 </div>
@@ -360,7 +360,7 @@ export default function RulesTab({
                                         typeRules.map(rule => renderRule(rule))
                                     ) : (
                                         <div className="px-6 py-4 text-sm text-gray-500 text-center">
-                                            Нет правил. <button onClick={onCreateRule} className="text-blue-600 hover:underline">Создать первое правило</button>
+                                            Нет правил. <button onClick={onCreateRule} className="text-secondary-600 hover:underline">Создать первое правило</button>
                                         </div>
                                     )}
                                 </div>

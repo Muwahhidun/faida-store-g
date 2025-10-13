@@ -67,9 +67,9 @@ export const SyncLogsModal: React.FC<SyncLogsModalProps> = ({ sourceId, sourceNa
         switch (status) {
             case 'started':
             case 'in_progress':
-                return <FaSpinner className="w-4 h-4 animate-spin text-blue-600" />;
+                return <FaSpinner className="w-4 h-4 animate-spin text-secondary-600" />;
             case 'completed':
-                return <FaCheckCircle className="w-4 h-4 text-green-600" />;
+                return <FaCheckCircle className="w-4 h-4 text-success-600" />;
             case 'failed':
                 return <FaExclamationTriangle className="w-4 h-4 text-red-600" />;
             case 'cancelled':
@@ -83,9 +83,9 @@ export const SyncLogsModal: React.FC<SyncLogsModalProps> = ({ sourceId, sourceNa
         switch (status) {
             case 'started':
             case 'in_progress':
-                return 'text-blue-600 bg-blue-50';
+                return 'text-secondary-600 bg-blue-50';
             case 'completed':
-                return 'text-green-600 bg-green-50';
+                return 'text-success-600 bg-green-50';
             case 'failed':
                 return 'text-red-600 bg-red-50';
             case 'cancelled':
@@ -112,7 +112,7 @@ export const SyncLogsModal: React.FC<SyncLogsModalProps> = ({ sourceId, sourceNa
             <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full mx-4 max-h-[90vh] flex flex-col">
                 <div className="flex items-center justify-between p-6 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                        <FaHistory className="w-5 h-5 mr-2 text-indigo-600" />
+                        <FaHistory className="w-5 h-5 mr-2 text-primary-700" />
                         История синхронизации: {sourceName}
                     </h3>
                     <button
@@ -126,7 +126,7 @@ export const SyncLogsModal: React.FC<SyncLogsModalProps> = ({ sourceId, sourceNa
                 <div className="flex-1 overflow-y-auto p-6">
                     {loading ? (
                         <div className="flex items-center justify-center py-12">
-                            <FaSpinner className="w-8 h-8 animate-spin text-indigo-600" />
+                            <FaSpinner className="w-8 h-8 animate-spin text-primary-700" />
                             <span className="ml-3 text-gray-600">Загрузка истории...</span>
                         </div>
                     ) : error ? (
@@ -154,10 +154,10 @@ export const SyncLogsModal: React.FC<SyncLogsModalProps> = ({ sourceId, sourceNa
                                                         {log.sync_type_display}
                                                     </span>
                                                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                                        log.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                                        log.status === 'completed' ? 'bg-success-100 text-green-800' :
                                                         log.status === 'failed' ? 'bg-red-100 text-red-800' :
                                                         log.status === 'cancelled' ? 'bg-gray-100 text-gray-800' :
-                                                        'bg-blue-100 text-blue-800'
+                                                        'bg-secondary-100 text-blue-800'
                                                     }`}>
                                                         {log.status_display}
                                                     </span>

@@ -106,9 +106,9 @@ export default function ChannelModal({
     const getChannelIcon = (code: string) => {
         switch (code) {
             case 'email':
-                return <FaEnvelope className="w-5 h-5 text-blue-600" />;
+                return <FaEnvelope className="w-5 h-5 text-secondary-600" />;
             case 'whatsapp':
-                return <FaWhatsapp className="w-5 h-5 text-green-600" />;
+                return <FaWhatsapp className="w-5 h-5 text-success-600" />;
             case 'telegram':
                 return <FaTelegram className="w-5 h-5 text-blue-500" />;
             default:
@@ -258,7 +258,7 @@ export default function ChannelModal({
                                 setErrors(prev => ({ ...prev, channelName: '' }));
                             }
                         }}
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 ${
                             errors.channelName ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder={mode === 'create' ? `${channelDisplayName} - Основной` : 'Название канала'}
@@ -277,7 +277,7 @@ export default function ChannelModal({
                         id="is_active"
                         checked={isActive}
                         onChange={(e) => setIsActive(e.target.checked)}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        className="w-4 h-4 text-secondary-600 rounded focus:ring-2 focus:ring-secondary-500"
                     />
                     <label htmlFor="is_active" className="ml-2 text-sm text-gray-700">
                         Активен (канал будет использоваться для отправки)
@@ -303,7 +303,7 @@ export default function ChannelModal({
                     type="text"
                     value={settings.smtp_host || ''}
                     onChange={(e) => handleSettingChange('smtp_host', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 ${
                         errors.smtp_host ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="smtp.gmail.com"
@@ -319,7 +319,7 @@ export default function ChannelModal({
                     type="number"
                     value={settings.smtp_port || ''}
                     onChange={(e) => handleSettingChange('smtp_port', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 ${
                         errors.smtp_port ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="587"
@@ -335,7 +335,7 @@ export default function ChannelModal({
                     type="email"
                     value={settings.smtp_username || ''}
                     onChange={(e) => handleSettingChange('smtp_username', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 ${
                         errors.smtp_username ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="noreply@faida.ru"
@@ -351,7 +351,7 @@ export default function ChannelModal({
                     type="password"
                     value={settings.smtp_password || ''}
                     onChange={(e) => handleSettingChange('smtp_password', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 ${
                         errors.smtp_password ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="••••••••"
@@ -367,7 +367,7 @@ export default function ChannelModal({
                     type="email"
                     value={settings.from_email || ''}
                     onChange={(e) => handleSettingChange('from_email', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 ${
                         errors.from_email ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="info@faida.ru"
@@ -381,7 +381,7 @@ export default function ChannelModal({
                     id="use_tls"
                     checked={settings.use_tls !== false}
                     onChange={(e) => handleSettingChange('use_tls', e.target.checked)}
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                    className="w-4 h-4 text-secondary-600 rounded focus:ring-2 focus:ring-secondary-500"
                 />
                 <label htmlFor="use_tls" className="ml-2 text-sm text-gray-700">
                     Использовать TLS/SSL
@@ -401,7 +401,7 @@ export default function ChannelModal({
                     type="text"
                     value={settings.instance_id || ''}
                     onChange={(e) => handleSettingChange('instance_id', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-success-500 ${
                         errors.instance_id ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="1234567"
@@ -420,7 +420,7 @@ export default function ChannelModal({
                     type="text"
                     value={settings.api_token || ''}
                     onChange={(e) => handleSettingChange('api_token', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-success-500 ${
                         errors.api_token ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="abc123xyz..."
@@ -451,7 +451,7 @@ export default function ChannelModal({
                     type="text"
                     value={settings.bot_token || ''}
                     onChange={(e) => handleSettingChange('bot_token', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 ${
                         errors.bot_token ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
@@ -518,8 +518,8 @@ export default function ChannelModal({
                                             </span>
                                         ) : mode === 'create' && step === 'select' ? (
                                             <span className="flex items-center space-x-3">
-                                                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                                                    <FaBell className="w-5 h-5 text-blue-600" />
+                                                <div className="w-10 h-10 rounded-lg bg-secondary-100 flex items-center justify-center">
+                                                    <FaBell className="w-5 h-5 text-secondary-600" />
                                                 </div>
                                                 <span>{getTitle()}</span>
                                             </span>
@@ -552,7 +552,7 @@ export default function ChannelModal({
                                                 <button
                                                     key={channelType.code}
                                                     onClick={() => handleChannelTypeSelect(channelType)}
-                                                    className="w-full flex items-center space-x-4 p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all"
+                                                    className="w-full flex items-center space-x-4 p-4 border-2 border-gray-200 rounded-lg hover:border-secondary-500 hover:bg-blue-50 transition-all"
                                                 >
                                                     <div className={`text-3xl text-${channelType.color}-600`}>
                                                         <Icon />
@@ -591,7 +591,7 @@ export default function ChannelModal({
                                                 type="button"
                                                 onClick={handleTestConnection}
                                                 disabled={isTesting || isSaving}
-                                                className="px-4 py-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 disabled:opacity-50 flex items-center space-x-2"
+                                                className="px-4 py-2 text-secondary-600 bg-blue-50 rounded-lg hover:bg-secondary-100 disabled:opacity-50 flex items-center space-x-2"
                                             >
                                                 {isTesting ? (
                                                     <>
@@ -628,7 +628,7 @@ export default function ChannelModal({
                                                 <button
                                                     type="submit"
                                                     disabled={isSaving || isTesting}
-                                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+                                                    className="px-4 py-2 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 disabled:opacity-50 flex items-center space-x-2"
                                                 >
                                                     <FaSave />
                                                     <span>{isSaving ? 'Сохранение...' : 'Сохранить'}</span>

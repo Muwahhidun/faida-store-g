@@ -70,7 +70,7 @@ export const UsersSection: React.FC<UsersSectionProps> = ({
             case 'admin':
                 return 'bg-red-100 text-red-800';
             case 'moderator':
-                return 'bg-blue-100 text-blue-800';
+                return 'bg-secondary-100 text-blue-800';
             default:
                 return 'bg-gray-100 text-gray-800';
         }
@@ -165,8 +165,8 @@ export const UsersSection: React.FC<UsersSectionProps> = ({
             <div className="card p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                     <div className="flex items-center space-x-3 min-w-0">
-                        <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <FaUsers className="w-5 h-5 text-purple-600" />
+                        <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <FaUsers className="w-5 h-5 text-primary-600" />
                         </div>
                         <div className="min-w-0">
                             <h2 className="text-lg font-semibold text-gray-900">Пользователи</h2>
@@ -175,7 +175,7 @@ export const UsersSection: React.FC<UsersSectionProps> = ({
                     </div>
                     <button
                         onClick={handleCreateUser}
-                        className="px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg flex items-center justify-center space-x-2 flex-shrink-0"
+                        className="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg flex items-center justify-center space-x-2 flex-shrink-0"
                     >
                         <FaPlus className="w-4 h-4" />
                         <span className="hidden sm:inline">Создать пользователя</span>
@@ -276,7 +276,7 @@ export const UsersSection: React.FC<UsersSectionProps> = ({
                                         </td>
                                         <td className="px-4 py-4 whitespace-nowrap">
                                             {user.is_active ? (
-                                                <span className="flex items-center text-sm text-green-600">
+                                                <span className="flex items-center text-sm text-success-600">
                                                     <FaCheckCircle className="w-4 h-4 mr-1" />
                                                     Активен
                                                 </span>
@@ -297,7 +297,7 @@ export const UsersSection: React.FC<UsersSectionProps> = ({
                                             <div className="flex items-center justify-end space-x-2">
                                                 <button
                                                     onClick={() => handleEditUser(user)}
-                                                    className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                                                    className="p-2 text-gray-500 hover:text-secondary-600 hover:bg-secondary-100 rounded-lg transition-colors"
                                                     title="Редактировать"
                                                 >
                                                     <FaEdit className="w-4 h-4" />
@@ -399,7 +399,7 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
                                 type="text"
                                 value={formData.username}
                                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                 required
                             />
                         </div>
@@ -411,7 +411,7 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
                                 type="email"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                 required
                             />
                         </div>
@@ -423,7 +423,7 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
                                 type="password"
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                 required={!user}
                                 placeholder={user ? 'Оставьте пустым, чтобы не менять' : ''}
                             />
@@ -436,7 +436,7 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
                                 type="text"
                                 value={formData.first_name}
                                 onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             />
                         </div>
                         <div>
@@ -447,7 +447,7 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
                                 type="text"
                                 value={formData.last_name}
                                 onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             />
                         </div>
                         <div>
@@ -468,7 +468,7 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
                                 id="is_active"
                                 checked={formData.is_active}
                                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                             />
                             <label htmlFor="is_active" className="ml-2 block text-sm text-gray-900">
                                 Активен
@@ -485,7 +485,7 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
                             </button>
                             <button
                                 type="submit"
-                                className="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                                className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:opacity-50"
                                 disabled={saving}
                             >
                                 {saving ? 'Сохранение...' : 'Сохранить'}

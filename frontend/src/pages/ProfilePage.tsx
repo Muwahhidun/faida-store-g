@@ -141,7 +141,7 @@ const ProfilePage: React.FC = () => {
                             onClick={() => setSelectedTab('profile')}
                             className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                                 selectedTab === 'profile'
-                                    ? 'border-blue-600 text-blue-600'
+                                    ? 'border-blue-600 text-secondary-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                         >
@@ -152,7 +152,7 @@ const ProfilePage: React.FC = () => {
                             onClick={() => setSelectedTab('orders')}
                             className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                                 selectedTab === 'orders'
-                                    ? 'border-green-600 text-green-600'
+                                    ? 'border-green-600 text-success-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                         >

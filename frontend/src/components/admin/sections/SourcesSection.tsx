@@ -48,9 +48,9 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
             case 'running':
             case 'running_data':
             case 'running_full':
-                return <FaSpinner className="w-3 h-3 animate-spin text-blue-600" />;
+                return <FaSpinner className="w-3 h-3 animate-spin text-secondary-600" />;
             case 'completed':
-                return <FaCheckCircle className="w-3 h-3 text-green-600" />;
+                return <FaCheckCircle className="w-3 h-3 text-secondary-600" />;
             case 'failed':
                 return <FaExclamationTriangle className="w-3 h-3 text-red-600" />;
             default:
@@ -63,9 +63,9 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
             case 'running':
             case 'running_data':
             case 'running_full':
-                return 'text-blue-600';
+                return 'text-secondary-600';
             case 'completed':
-                return 'text-green-600';
+                return 'text-secondary-600';
             case 'failed':
                 return 'text-red-600';
             default:
@@ -300,8 +300,8 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
             <div className="card p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                 <div className="flex items-center space-x-3 min-w-0">
-                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <FaDatabase className="w-5 h-5 text-green-600" />
+                    <div className="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <FaDatabase className="w-5 h-5 text-secondary-600" />
                     </div>
                     <div className="min-w-0">
                         <h2 className="text-lg font-semibold text-gray-900">Источники данных</h2>
@@ -310,7 +310,7 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
                 </div>
                 <button
                     onClick={handleCreateSource}
-                    className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg flex items-center justify-center space-x-2 flex-shrink-0"
+                    className="px-4 py-2 text-sm font-medium text-white bg-secondary-500 hover:bg-secondary-600 rounded-lg flex items-center justify-center space-x-2 flex-shrink-0"
                 >
                     <FaPlus className="w-4 h-4" />
                     <span className="hidden sm:inline">Создать источник</span>
@@ -366,7 +366,7 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
                                     )}
                                     {source.auto_sync_enabled && (
                                         <div className={`text-xs mt-1 flex items-center space-x-1 ${
-                                            source.is_active ? 'text-blue-600' : 'text-gray-400'
+                                            source.is_active ? 'text-secondary-600' : 'text-gray-400'
                                         }`}>
                                             <FaHourglassHalf className="w-3 h-3" />
                                             <span>
@@ -390,7 +390,7 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
                                 </button>
                                 <button
                                     onClick={() => handleEditPriceWarehouse(source)}
-                                    className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="p-2 text-gray-500 hover:text-secondary-600 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Настройки цен и складов"
                                     disabled={isSourceSyncing(source)}
                                 >
@@ -437,11 +437,11 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
                                 <button
                                     onClick={() => handleImportData(source, 'full')}
                                     disabled={!source.is_active || isSourceSyncing(source) || !source.show_on_site || isAnySourceSyncing()}
-                                    className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="p-2 text-gray-500 hover:text-secondary-600 hover:bg-secondary-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     title={!source.is_active ? "Источник неактивен - синхронизация недоступна" : "Полная синхронизация (данные + изображения)"}
                                 >
                                     {importingSourceId === source.id && source.import_status === 'running_full'
-                                        ? <FaSpinner className="w-5 h-5 animate-spin text-green-600" />
+                                        ? <FaSpinner className="w-5 h-5 animate-spin text-secondary-600" />
                                         : <FaSync className="w-5 h-5" />
                                     }
                                 </button>
@@ -463,8 +463,8 @@ export const SourcesSection: React.FC<SourcesSectionProps> = ({
                                     onChange={() => handleSourceToggle(source)}
                                     disabled={isSourceSyncing(source)}
                                     className={`${
-                                        source.show_on_site ? 'bg-blue-600' : 'bg-gray-200'
-                                    } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50`}
+                                        source.show_on_site ? 'bg-secondary-500' : 'bg-gray-200'
+                                    } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 disabled:opacity-50`}
                                 >
                                     <span
                                         className={`${

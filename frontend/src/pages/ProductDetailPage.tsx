@@ -190,7 +190,7 @@ const ProductDetailPage: React.FC = () => {
           <p className="text-gray-600 mb-4">Не удалось найти запрашиваемый товар.</p>
           <Link 
             to="/products" 
-            className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-secondary-500 text-white rounded-md hover:bg-secondary-600 transition-colors"
           >
             <ArrowLeftIcon className="w-4 h-4 mr-2" />
             Вернуться к каталогу
@@ -210,7 +210,7 @@ const ProductDetailPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Хлебные крошки */}
         <nav className="flex items-center space-x-2 text-sm text-gray-500 mb-6">
-          <Link to="/products" className="hover:text-emerald-600 transition-colors">
+          <Link to="/products" className="hover:text-secondary-600 transition-colors">
             Каталог
           </Link>
           {product.category && (
@@ -246,7 +246,7 @@ const ProductDetailPage: React.FC = () => {
                         key={image.id} 
                         className={`aspect-square bg-gray-50 rounded-md overflow-hidden border-2 transition-colors cursor-pointer ${
                           selectedImageIndex === index 
-                            ? 'border-emerald-500' 
+                            ? 'border-secondary-500' 
                             : 'border-transparent hover:border-emerald-300'
                         }`}
                         onClick={() => setSelectedImageIndex(index)}
@@ -292,7 +292,7 @@ const ProductDetailPage: React.FC = () => {
             <div className="border-t border-b border-gray-200 py-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <span className="text-3xl font-bold text-emerald-600">
+                  <span className="text-3xl font-bold text-secondary-600">
                     {formatPrice(product.price)} {product.currency}
                   </span>
                   <span className="text-lg text-gray-500 ml-2">за {product.unit}</span>
@@ -301,12 +301,12 @@ const ProductDetailPage: React.FC = () => {
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                   product.stock_status 
                     ? product.stock_status.status === 'in_stock' 
-                      ? 'bg-green-100 text-green-800'
+                      ? 'bg-success-100 text-green-800'
                       : product.stock_status.status === 'low_stock'
                       ? 'bg-yellow-100 text-yellow-800'
                       : 'bg-red-100 text-red-800'
                     : product.is_available 
-                    ? 'bg-green-100 text-green-800'
+                    ? 'bg-success-100 text-green-800'
                     : 'bg-red-100 text-red-800'
                 }`}>
                   {product.stock_status 
@@ -368,7 +368,7 @@ const ProductDetailPage: React.FC = () => {
               
               {product.is_weighted && (
                 <div className="sm:col-span-2">
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm font-medium">
+                  <span className="bg-secondary-100 text-blue-800 px-2 py-1 rounded-full text-sm font-medium">
                     Весовой товар
                   </span>
                 </div>
@@ -423,7 +423,7 @@ const ProductDetailPage: React.FC = () => {
                       key={index}
                       className={`p-4 rounded-lg border-2 ${
                         priceInfo.ВидЦены === product.source_settings?.default_price_type_name
-                          ? 'border-emerald-500 bg-emerald-50' 
+                          ? 'border-secondary-500 bg-emerald-50' 
                           : 'border-gray-200 bg-gray-50'
                       }`}
                     >
@@ -437,7 +437,7 @@ const ProductDetailPage: React.FC = () => {
                           {priceInfo.ВидЦены === product.source_settings?.default_price_type_name && ' (Показывается на сайте)'}
                         </h4>
                         {priceInfo.ВидЦены === product.source_settings?.default_price_type_name && (
-                          <span className="text-xs text-emerald-600 font-medium">
+                          <span className="text-xs text-secondary-600 font-medium">
                             Актуальная цена
                           </span>
                         )}
@@ -445,7 +445,7 @@ const ProductDetailPage: React.FC = () => {
                       <div className="text-center">
                         <div className={`text-2xl font-bold ${
                           priceInfo.ВидЦены === product.source_settings?.default_price_type_name
-                            ? 'text-emerald-600' 
+                            ? 'text-secondary-600' 
                             : 'text-gray-900'
                         }`}>
                           {priceInfo.Цена} {priceInfo.Валюта || 'RUB'}
@@ -470,7 +470,7 @@ const ProductDetailPage: React.FC = () => {
                         key={index}
                         className={`p-4 rounded-lg border-2 ${
                           isMainWarehouse 
-                            ? 'border-emerald-500 bg-emerald-50' 
+                            ? 'border-secondary-500 bg-emerald-50' 
                             : 'border-gray-200 bg-gray-50'
                         }`}
                       >
@@ -484,7 +484,7 @@ const ProductDetailPage: React.FC = () => {
                             {isMainWarehouse && ' (Показывается на сайте)'}
                           </h4>
                           {isMainWarehouse && (
-                            <span className="text-xs text-emerald-600 font-medium">
+                            <span className="text-xs text-secondary-600 font-medium">
                               Актуальный склад
                             </span>
                           )}
@@ -505,7 +505,7 @@ const ProductDetailPage: React.FC = () => {
                           <div className="text-center">
                             <div className="font-medium text-gray-600">Доступно</div>
                             <div className={`text-lg font-bold ${
-                              stockInfo.available > 0 ? 'text-green-600' : 'text-red-600'
+                              stockInfo.available > 0 ? 'text-success-600' : 'text-red-600'
                             }`}>
                               {formatQuantity(stockInfo.available, product.unit)} {product.unit}
                             </div>

@@ -45,7 +45,7 @@ export const CreateSourceModal: React.FC<CreateSourceModalProps> = ({ onClose, o
             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
                 <div className="flex items-center justify-between p-6 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                        <FaPlus className="w-5 h-5 mr-2 text-green-600" />
+                        <FaPlus className="w-5 h-5 mr-2 text-success-600" />
                         Создание нового источника данных
                     </h3>
                     <button
@@ -63,7 +63,7 @@ export const CreateSourceModal: React.FC<CreateSourceModalProps> = ({ onClose, o
                             id="source-name"
                             value={newSource.name}
                             onChange={(e) => setNewSource({ ...newSource, name: e.target.value })}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-success-500 focus:border-success-500 sm:text-sm"
                             placeholder="Основная база ПП"
                         />
                     </div>
@@ -74,7 +74,7 @@ export const CreateSourceModal: React.FC<CreateSourceModalProps> = ({ onClose, o
                             id="source-code"
                             value={newSource.code}
                             onChange={(e) => setNewSource({ ...newSource, code: e.target.value })}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-success-500 focus:border-success-500 sm:text-sm"
                             placeholder="pp"
                         />
                     </div>
@@ -85,7 +85,7 @@ export const CreateSourceModal: React.FC<CreateSourceModalProps> = ({ onClose, o
                             id="json-path"
                             value={newSource.json_file_path}
                             onChange={(e) => setNewSource({ ...newSource, json_file_path: e.target.value })}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-success-500 focus:border-success-500 sm:text-sm"
                             placeholder="pp/export.json"
                         />
                     </div>
@@ -96,7 +96,7 @@ export const CreateSourceModal: React.FC<CreateSourceModalProps> = ({ onClose, o
                             id="media-path"
                             value={newSource.media_dir_path}
                             onChange={(e) => setNewSource({ ...newSource, media_dir_path: e.target.value })}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-success-500 focus:border-success-500 sm:text-sm"
                             placeholder="pp/export_media"
                         />
                     </div>
@@ -106,8 +106,8 @@ export const CreateSourceModal: React.FC<CreateSourceModalProps> = ({ onClose, o
                             <Switch
                                 checked={newSource.is_active ?? true}
                                 onChange={(checked) => setNewSource({ ...newSource, is_active: checked })}
-                                className={`${newSource.is_active ? 'bg-green-600' : 'bg-gray-200'
-                                    } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
+                                className={`${newSource.is_active ? 'bg-success-600' : 'bg-gray-200'
+                                    } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-success-500`}
                             >
                                 <span
                                     className={`${newSource.is_active ? 'translate-x-6' : 'translate-x-1'
@@ -120,8 +120,8 @@ export const CreateSourceModal: React.FC<CreateSourceModalProps> = ({ onClose, o
                             <Switch
                                 checked={newSource.show_on_site ?? true}
                                 onChange={(checked) => setNewSource({ ...newSource, show_on_site: checked })}
-                                className={`${newSource.show_on_site ? 'bg-green-600' : 'bg-gray-200'
-                                    } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
+                                className={`${newSource.show_on_site ? 'bg-success-600' : 'bg-gray-200'
+                                    } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-success-500`}
                             >
                                 <span
                                     className={`${newSource.show_on_site ? 'translate-x-6' : 'translate-x-1'
@@ -141,7 +141,7 @@ export const CreateSourceModal: React.FC<CreateSourceModalProps> = ({ onClose, o
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg disabled:opacity-50"
+                        className="px-4 py-2 text-sm font-medium text-white bg-success-600 hover:bg-success-700 rounded-lg disabled:opacity-50"
                         disabled={saving}
                     >
                         {saving ? 'Сохранение...' : 'Сохранить'}

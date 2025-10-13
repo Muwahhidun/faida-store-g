@@ -125,7 +125,7 @@ const CartPage: React.FC = () => {
             </p>
             <Link
               to="/products"
-              className="inline-flex items-center px-6 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors"
+              className="inline-flex items-center px-6 py-3 bg-secondary-500 text-white font-medium rounded-lg hover:bg-secondary-600 transition-colors"
             >
               <ArrowLeftIcon className="w-5 h-5 mr-2" />
               Перейти к товарам
@@ -187,7 +187,7 @@ const CartPage: React.FC = () => {
                       <div className="flex-grow">
                         <Link
                           to={`/products/${item.id}`}
-                          className="font-medium text-gray-900 hover:text-emerald-600 transition-colors line-clamp-2"
+                          className="font-medium text-gray-900 hover:text-secondary-600 transition-colors line-clamp-2"
                         >
                           {item.name}
                         </Link>
@@ -201,7 +201,7 @@ const CartPage: React.FC = () => {
                             item.in_stock
                               ? item.stock_quantity <= (siteSettings?.default_low_stock_threshold || 5)
                                 ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-green-100 text-green-800'
+                                : 'bg-success-100 text-green-800'
                               : 'bg-red-100 text-red-800'
                           }`}>
                             {formatStockStatus(item.in_stock, item.stock_quantity, item.unit)}
@@ -260,7 +260,7 @@ const CartPage: React.FC = () => {
                 
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Доставка</span>
-                  <span className="font-medium text-green-600">Бесплатно</span>
+                  <span className="font-medium text-success-600">Бесплатно</span>
                 </div>
                 
                 <div className="border-t border-gray-200 pt-3">
@@ -277,7 +277,7 @@ const CartPage: React.FC = () => {
               <div className="space-y-3">
                 <button
                   onClick={() => navigate('/checkout')}
-                  className="w-full bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors font-medium"
+                  className="w-full bg-secondary-500 text-white py-3 px-4 rounded-lg hover:bg-secondary-600 transition-colors font-medium"
                 >
                   К оформлению
                 </button>

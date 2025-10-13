@@ -25,7 +25,7 @@ export const Toast: React.FC<ToastProps> = ({ message, type, onClose, duration =
     const borderColor = type === 'success' ? 'border-green-200' : 'border-red-200';
     const textColor = type === 'success' ? 'text-green-800' : 'text-red-800';
     const Icon = type === 'success' ? FaCheckCircle : FaExclamationTriangle;
-    const iconColor = type === 'success' ? 'text-green-600' : 'text-red-600';
+    const iconColor = type === 'success' ? 'text-success-600' : 'text-red-600';
 
     return (
         <div
@@ -47,7 +47,7 @@ export const Toast: React.FC<ToastProps> = ({ message, type, onClose, duration =
                 className={`
                     absolute top-2 right-2
                     p-1 rounded
-                    ${type === 'success' ? 'hover:bg-green-100' : 'hover:bg-red-100'}
+                    ${type === 'success' ? 'hover:bg-success-100' : 'hover:bg-red-100'}
                     transition-colors
                 `}
                 aria-label="Закрыть"

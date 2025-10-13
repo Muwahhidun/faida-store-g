@@ -52,7 +52,7 @@ export const AutoSyncModal: React.FC<AutoSyncModalProps> = ({ source, onClose, o
             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
                 <div className="flex items-center justify-between p-6 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                        <FaPlay className="w-5 h-5 mr-2 text-purple-600" />
+                        <FaPlay className="w-5 h-5 mr-2 text-primary-600" />
                         Настройка автосинхронизации: {source.name}
                     </h3>
                     <button
@@ -73,7 +73,7 @@ export const AutoSyncModal: React.FC<AutoSyncModalProps> = ({ source, onClose, o
                         <Switch
                             checked={autoSyncEnabled}
                             onChange={setAutoSyncEnabled}
-                            className={`${autoSyncEnabled ? 'bg-purple-600' : 'bg-gray-200'
+                            className={`${autoSyncEnabled ? 'bg-primary-600' : 'bg-gray-200'
                                 } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500`}
                         >
                             <span
@@ -153,7 +153,7 @@ export const AutoSyncModal: React.FC<AutoSyncModalProps> = ({ source, onClose, o
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg disabled:opacity-50"
+                        className="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-purple-700 rounded-lg disabled:opacity-50"
                         disabled={saving}
                     >
                         {saving ? 'Сохранение...' : 'Сохранить'}

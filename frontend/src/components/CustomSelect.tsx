@@ -51,7 +51,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
                             border shadow-sm
                             ${error
                                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                                : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                                : 'border-gray-300 focus:ring-secondary-500 focus:border-secondary-500'
                             }
                             focus:outline-none focus:ring-2 focus:ring-offset-0
                             disabled:bg-gray-100 disabled:cursor-not-allowed
@@ -105,7 +105,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
                                             {selected ? (
                                                 <span
                                                     className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
-                                                        active ? 'text-blue-600' : 'text-blue-600'
+                                                        active ? 'text-secondary-600' : 'text-secondary-600'
                                                     }`}
                                                 >
                                                     <CheckIcon className="h-5 w-5" aria-hidden="true" />

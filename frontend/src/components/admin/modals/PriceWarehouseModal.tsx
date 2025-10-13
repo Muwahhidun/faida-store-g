@@ -69,7 +69,7 @@ export const PriceWarehouseModal: React.FC<PriceWarehouseModalProps> = ({
             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
                 <div className="flex items-center justify-between p-6 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                        <FaCogs className="w-5 h-5 mr-2 text-blue-600" />
+                        <FaCogs className="w-5 h-5 mr-2 text-secondary-600" />
                         Настройка цен и складов: {source.name}
                     </h3>
                     <button
@@ -82,7 +82,7 @@ export const PriceWarehouseModal: React.FC<PriceWarehouseModalProps> = ({
                 <div className="p-6 space-y-6">
                     {loading ? (
                         <div className="flex items-center justify-center py-12">
-                            <FaSpinner className="w-8 h-8 animate-spin text-blue-600" />
+                            <FaSpinner className="w-8 h-8 animate-spin text-secondary-600" />
                             <span className="ml-3 text-gray-600">Загрузка доступных опций...</span>
                         </div>
                     ) : (
@@ -154,7 +154,7 @@ export const PriceWarehouseModal: React.FC<PriceWarehouseModalProps> = ({
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+                        className="px-4 py-2 text-sm font-medium text-white bg-secondary-500 hover:bg-secondary-600 rounded-lg disabled:opacity-50"
                         disabled={saving}
                     >
                         {saving ? 'Сохранение...' : 'Сохранить'}

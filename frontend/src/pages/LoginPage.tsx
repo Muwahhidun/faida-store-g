@@ -115,7 +115,7 @@ const LoginPage: React.FC = () => {
                                 </label>
                                 <Link
                                     to="/forgot-password"
-                                    className="text-sm font-medium text-blue-600 hover:text-blue-500"
+                                    className="text-sm font-medium text-secondary-600 hover:text-blue-500"
                                 >
                                     Забыли пароль?
                                 </Link>
@@ -183,7 +183,7 @@ const LoginPage: React.FC = () => {
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-600">
                             Нет аккаунта?{' '}
-                            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+                            <Link to="/register" className="font-medium text-secondary-600 hover:text-blue-500">
                                 Зарегистрироваться
                             </Link>
                         </p>
