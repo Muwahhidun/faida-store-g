@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { FaTimes, FaSpinner, FaToggleOn, FaToggleOff, FaCheckSquare, FaSquare } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 import { useNotificationTypes, useNotificationChannels, useNotificationTemplates, useNotificationContacts } from '../../../hooks/useNotifications';
 import type { NotificationRule } from '../../../types/notifications';
 
@@ -57,8 +58,41 @@ export const RuleFormModal: React.FC<RuleFormModalProps> = ({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!formData.name.trim() || !formData.notification_type || !formData.channel || !formData.default_template) {
-            alert('Заполните все обязательные поля');
+        // Детальная валидация с конкретными сообщениями
+        if (!formData.name.trim()) {
+            toast.error('Введите название правила', {
+                duration: 3000,
+                position: 'top-center',
+            });
+            return;
+        }
+        if (!formData.notification_type) {
+            toast.error('Выберите тип уведомления', {
+                duration: 3000,
+                position: 'top-center',
+            });
+            return;
+        }
+        if (!formData.channel) {
+            toast.error('Выберите канал', {
+                duration: 3000,
+                position: 'top-center',
+            });
+            return;
+        }
+        if (!formData.default_template) {
+            toast.error('Выберите шаблон для уведомления', {
+                duration: 3000,
+                position: 'top-center',
+            });
+            return;
+        }
+        // Для дополнительных правил обязательно нужен хотя бы один контакт
+        if (formData.rule_type === 'additional' && formData.contact_ids.length === 0) {
+            toast.error('Выберите хотя бы один контакт для получения уведомлений', {
+                duration: 3000,
+                position: 'top-center',
+            });
             return;
         }
 
@@ -316,7 +350,7 @@ export const RuleFormModal: React.FC<RuleFormModalProps> = ({
                     {formData.rule_type === 'additional' && formData.channel > 0 && (
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Контакты-получатели
+                                Контакты-получатели <span className="text-red-500">*</span>
                             </label>
                             {availableContacts.length > 0 ? (
                                 <div className="border border-gray-300 rounded-lg p-4 max-h-60 overflow-y-auto space-y-2">
