@@ -73,15 +73,15 @@ const Header: React.FC = () => {
     }, []);
 
     return (
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <header className="bg-primary-900 border-b border-primary-800 sticky top-0 z-50 shadow-lg">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Логотип */}
-                    <Link to="/" className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                            <span className="text-white font-bold text-sm">F</span>
+                    <Link to="/" className="flex items-center space-x-2 group">
+                        <div className="w-8 h-8 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center transform transition-transform group-hover:scale-110">
+                            <span className="text-primary-900 font-bold text-sm">F</span>
                         </div>
-                        <span className="text-xl font-bold text-gray-900">Faida Group</span>
+                        <span className="text-xl font-bold text-white">Faida Group</span>
                     </Link>
                     
                     {/* Навигация */}
@@ -89,7 +89,11 @@ const Header: React.FC = () => {
                         <NavLink
                             to="/"
                             className={({ isActive }) =>
-                                `nav-link ${isActive ? 'nav-link-active' : ''}`
+                                `text-sm font-medium transition-all duration-200 ${
+                                    isActive
+                                        ? 'text-secondary-500 border-b-2 border-secondary-500 pb-1'
+                                        : 'text-gray-300 hover:text-secondary-500 hover:border-b-2 hover:border-secondary-500 hover:pb-1'
+                                }`
                             }
                         >
                             О компании
@@ -97,7 +101,11 @@ const Header: React.FC = () => {
                         <NavLink
                             to="/products"
                             className={({ isActive }) =>
-                                `nav-link ${isActive ? 'nav-link-active' : ''}`
+                                `text-sm font-medium transition-all duration-200 ${
+                                    isActive
+                                        ? 'text-secondary-500 border-b-2 border-secondary-500 pb-1'
+                                        : 'text-gray-300 hover:text-secondary-500 hover:border-b-2 hover:border-secondary-500 hover:pb-1'
+                                }`
                             }
                         >
                             Каталог
@@ -105,7 +113,11 @@ const Header: React.FC = () => {
                         <NavLink
                             to="/news"
                             className={({ isActive }) =>
-                                `nav-link ${isActive ? 'nav-link-active' : ''}`
+                                `text-sm font-medium transition-all duration-200 ${
+                                    isActive
+                                        ? 'text-secondary-500 border-b-2 border-secondary-500 pb-1'
+                                        : 'text-gray-300 hover:text-secondary-500 hover:border-b-2 hover:border-secondary-500 hover:pb-1'
+                                }`
                             }
                         >
                             Новости
@@ -113,7 +125,11 @@ const Header: React.FC = () => {
                         <NavLink
                             to="/contacts"
                             className={({ isActive }) =>
-                                `nav-link ${isActive ? 'nav-link-active' : ''}`
+                                `text-sm font-medium transition-all duration-200 ${
+                                    isActive
+                                        ? 'text-secondary-500 border-b-2 border-secondary-500 pb-1'
+                                        : 'text-gray-300 hover:text-secondary-500 hover:border-b-2 hover:border-secondary-500 hover:pb-1'
+                                }`
                             }
                         >
                             Контакты
@@ -121,7 +137,11 @@ const Header: React.FC = () => {
                         <NavLink
                             to="/jobs"
                             className={({ isActive }) =>
-                                `nav-link ${isActive ? 'nav-link-active' : ''}`
+                                `text-sm font-medium transition-all duration-200 ${
+                                    isActive
+                                        ? 'text-secondary-500 border-b-2 border-secondary-500 pb-1'
+                                        : 'text-gray-300 hover:text-secondary-500 hover:border-b-2 hover:border-secondary-500 hover:pb-1'
+                                }`
                             }
                         >
                             Вакансии
@@ -133,13 +153,13 @@ const Header: React.FC = () => {
                         {/* Dropdown меню пользователя */}
                         {isAuthenticated && userData ? (
                             <Menu as="div" className="relative">
-                                <Menu.Button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                                <Menu.Button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-primary-800 rounded-lg transition-colors">
                                     {/* Аватар с инициалами */}
-                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                    <div className="w-8 h-8 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-full flex items-center justify-center text-primary-900 font-semibold text-sm shadow-md">
                                         {userData.username.charAt(0).toUpperCase()}
                                     </div>
                                     <span className="hidden sm:inline">{userData.username}</span>
-                                    <FaChevronDown className="w-3 h-3 text-gray-500" />
+                                    <FaChevronDown className="w-3 h-3 text-gray-300" />
                                 </Menu.Button>
 
                                 <Transition
@@ -214,7 +234,7 @@ const Header: React.FC = () => {
                         ) : (
                             <Link
                                 to="/login"
-                                className="btn btn-primary btn-sm"
+                                className="px-4 py-2 text-sm font-medium text-primary-900 bg-secondary-500 hover:bg-secondary-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
                             >
                                 Войти
                             </Link>
@@ -223,14 +243,14 @@ const Header: React.FC = () => {
                         {/* Корзина (всегда справа) */}
                         <Link
                             to="/cart"
-                            className="relative p-3 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200 group"
+                            className="relative p-3 text-gray-300 hover:text-secondary-500 hover:bg-primary-800 rounded-lg transition-all duration-200 group"
                         >
                             <FaShoppingCart
                                 size={22}
                                 className="transition-transform duration-200 group-hover:scale-110"
                             />
                             {getTotalItems() > 0 && (
-                                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-lg ring-2 ring-white transform transition-all duration-200 hover:scale-110 animate-pulse">
+                                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-secondary-500 to-secondary-600 text-primary-900 text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-lg ring-2 ring-primary-900 transform transition-all duration-200 hover:scale-110">
                                     {getTotalItems() > 99 ? '99+' : getTotalItems()}
                                 </span>
                             )}
