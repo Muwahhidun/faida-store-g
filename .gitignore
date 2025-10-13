@@ -63,6 +63,7 @@ Thumbs.db
 # Project specific
 data/goods/
 faida_store.log
+faida_group_style/
 
 # Backup files
 *.OLD.tsx
