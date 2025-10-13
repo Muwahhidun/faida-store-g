@@ -6,7 +6,6 @@ Management command для автоматической обработки пов
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from apps.notifications.models import NotificationLog
-from apps.notifications.notification_service import NotificationService
 
 
 class Command(BaseCommand):
@@ -40,7 +39,6 @@ class Command(BaseCommand):
 
         self.stdout.write(f'Найдено {retry_logs.count()} уведомлений для повторной отправки')
 
-        service = NotificationService()
         success_count = 0
         fail_count = 0
 

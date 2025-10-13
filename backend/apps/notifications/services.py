@@ -293,91 +293,6 @@ class WhatsAppService:
             return {"error": str(e)}
 
 
-def send_new_order_notification_whatsapp(order):
-    """
-    Отправить WhatsApp уведомление о новом заказе всем активным операторам.
-
-    Args:
-        order: Объект заказа (Order model)
-    """
-    from apps.notifications.models import NotificationSettings, WhatsAppOperator
-
-    # Получаем настройки
-    settings_obj = NotificationSettings.load()
-
-    # Проверяем, включены ли WhatsApp уведомления
-    if not settings_obj.enable_whatsapp_notifications:
-        logger.info("WhatsApp уведомления отключены в настройках")
-        return
-
-    # Проверяем, нужно ли уведомлять о новых заказах
-    if not settings_obj.notify_on_new_order:
-        logger.info("Уведомления о новых заказах отключены")
-        return
-
-    # Получаем активных операторов
-    operators = WhatsAppOperator.objects.filter(is_active=True)
-    if not operators.exists():
-        logger.warning("Нет активных WhatsApp операторов для отправки уведомлений")
-        return
-
-    # Создаем сервис WhatsApp
-    whatsapp = WhatsAppService(
-        instance_id=settings_obj.green_api_instance_id,
-        api_token=settings_obj.green_api_token
-    )
-
-    # Формируем сообщение
-    message = format_new_order_message(order)
-
-    # Отправляем всем операторам
-    phone_numbers = [op.get_formatted_phone() for op in operators]
-    results = whatsapp.send_message_to_multiple(phone_numbers, message)
-
-    logger.info(f"Отправлено {len(results)} WhatsApp уведомлений о заказе #{order.order_number}")
-    return results
-
-
-def format_new_order_message(order) -> str:
-    """
-    Форматировать сообщение о новом заказе для WhatsApp.
-
-    Args:
-        order: Объект заказа
-
-    Returns:
-        str: Отформатированное сообщение
-    """
-    # Формируем список товаров
-    items_text = ""
-    for item in order.items.all():
-        items_text += f"• {item.product_name or item.product.name} x {item.quantity} = {item.subtotal} ₽\n"
-
-    # Формируем полное сообщение
-    message = f"""🔔 *НОВЫЙ ЗАКАЗ #{order.order_number}*
-
-👤 *Клиент:* {order.customer_name}
-📱 *Телефон:* {order.customer_phone}
-
-🛒 *Товары:*
-{items_text}
-💰 *Итого:* {order.total_amount} ₽
-
-📍 *Адрес доставки:*
-{order.delivery_address}
-"""
-
-    if order.delivery_comment:
-        message += f"\n📝 *Примечание к адресу:*\n{order.delivery_comment}\n"
-
-    if order.comment:
-        message += f"\n💬 *Комментарий:*\n{order.comment}\n"
-
-    message += f"\n🔗 Перейти к заказу: http://localhost:5173/panel#orders"
-
-    return message
-
-
 class NotificationDispatcher:
     """
     Главный сервис для автоматической отправки уведомлений по правилам.
@@ -422,20 +337,8 @@ class NotificationDispatcher:
                     logger.warning(f"Канал '{rule.channel.name}' отключен, пропускаем")
                     continue
 
-                # Определяем шаблон для использования
+                # Получаем шаблон из правила (теперь обязательное поле)
                 template = rule.default_template
-                if not template:
-                    # Ищем стандартный шаблон
-                    from .models import NotificationTemplate
-                    template = NotificationTemplate.objects.filter(
-                        notification_type=notification_type,
-                        channel_type=rule.channel.code,
-                        is_default=True
-                    ).first()
-
-                if not template:
-                    logger.error(f"Не найден шаблон для правила '{rule.name}'")
-                    continue
 
                 # Рендерим шаблон с контекстом
                 message = NotificationDispatcher._render_template(template.template, context)

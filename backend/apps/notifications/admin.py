@@ -43,8 +43,8 @@ class NotificationTypeAdmin(admin.ModelAdmin):
 @admin.register(NotificationTemplate)
 class NotificationTemplateAdmin(admin.ModelAdmin):
     """Админка для шаблонов уведомлений."""
-    list_display = ('notification_type', 'channel_type', 'name', 'is_system', 'is_default', 'created_at')
-    list_filter = ('channel_type', 'is_system', 'is_default', 'notification_type__category')
+    list_display = ('notification_type', 'channel_type', 'name', 'is_system', 'created_at')
+    list_filter = ('channel_type', 'is_system', 'notification_type__category')
     search_fields = ('notification_type__name', 'name', 'template')
     readonly_fields = ('created_at', 'updated_at')
 

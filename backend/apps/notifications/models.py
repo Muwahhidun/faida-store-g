@@ -190,11 +190,6 @@ class NotificationTemplate(models.Model):
         verbose_name='Шаблон сообщения',
         help_text='Текст с переменными: {{order_number}}, {{customer_name}}, {{total_amount}} и т.д.'
     )
-    is_default = models.BooleanField(
-        default=False,
-        verbose_name='Шаблон по умолчанию',
-        help_text='Используется если для контакта не указан конкретный шаблон'
-    )
     is_system = models.BooleanField(
         default=False,
         verbose_name='Системный шаблон',
@@ -209,12 +204,6 @@ class NotificationTemplate(models.Model):
         ordering = ['notification_type', 'channel_type', 'name']
         # Ограничения уникальности
         constraints = [
-            # Один шаблон по умолчанию на тип уведомления + тип канала
-            models.UniqueConstraint(
-                fields=['notification_type', 'channel_type'],
-                condition=models.Q(is_default=True),
-                name='unique_default_template_per_type_and_channel'
-            ),
             # Уникальное имя шаблона в рамках типа уведомления + типа канала
             models.UniqueConstraint(
                 fields=['notification_type', 'channel_type', 'name'],
@@ -328,6 +317,19 @@ class NotificationContact(models.Model):
             return self.value.replace('+', '').replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
         return self.value
 
+    def delete(self, *args, **kwargs):
+        """
+        Запрещает удаление контакта, если он используется в каких-либо правилах.
+        """
+        # Проверяем, используется ли контакт в правилах
+        if self.rules.exists():
+            from django.db.models import ProtectedError
+            raise ProtectedError(
+                f"Невозможно удалить контакт '{self.name}', так как он используется в {self.rules.count()} правиле(ах)",
+                [self]
+            )
+        return super().delete(*args, **kwargs)
+
 
 class NotificationRule(models.Model):
     """
@@ -366,11 +368,9 @@ class NotificationRule(models.Model):
     )
     default_template = models.ForeignKey(
         'NotificationTemplate',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.PROTECT,
         related_name='rules_using_as_default',
-        verbose_name='Шаблон по умолчанию',
+        verbose_name='Шаблон',
         help_text='Шаблон, используемый для всех контактов этого правила (если не указан индивидуальный)'
     )
     is_enabled = models.BooleanField(
@@ -458,7 +458,7 @@ class RuleContactTemplate(models.Model):
     )
     template = models.ForeignKey(
         NotificationTemplate,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
         verbose_name='Шаблон',

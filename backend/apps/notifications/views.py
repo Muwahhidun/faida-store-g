@@ -416,28 +416,6 @@ class NotificationTemplateViewSet(viewsets.ModelViewSet):
     pagination_class = None
 
     @action(detail=True, methods=['post'])
-    def set_default(self, request, pk=None):
-        """Установить шаблон как шаблон по умолчанию для данного типа уведомления + типа канала."""
-        template = self.get_object()
-
-        # Сначала снимаем флаг is_default со всех шаблонов этого типа уведомления + типа канала
-        NotificationTemplate.objects.filter(
-            notification_type=template.notification_type,
-            channel_type=template.channel_type
-        ).update(is_default=False)
-
-        # Устанавливаем флаг для выбранного шаблона
-        template.is_default = True
-        template.save()
-
-        serializer = self.get_serializer(template)
-        return Response({
-            'success': True,
-            'message': f'Шаблон "{template.name}" установлен по умолчанию',
-            'template': serializer.data
-        })
-
-    @action(detail=True, methods=['post'])
     def preview(self, request, pk=None):
         """Превью шаблона с подстановкой тестовых данных."""
         template = self.get_object()
@@ -901,22 +879,47 @@ class NotificationLogViewSet(viewsets.ReadOnlyModelViewSet):
             )
 
         try:
-            from .notification_service import NotificationService
-
-            service = NotificationService()
-
-            # Пробуем отправить
+            # Используем новую систему уведомлений вместо старой
             if log.channel.code == 'email':
+                from .services import EmailService
+                from django.conf import settings as django_settings
+
                 recipient = log.contact.value if log.contact else log.recipient_value
-                service._send_email(to_email=recipient, subject='', message=log.message)
+                channel_settings = log.channel.settings
+
+                email_service = EmailService(
+                    smtp_host=channel_settings.get('smtp_host'),
+                    smtp_port=int(channel_settings.get('smtp_port', 587)),
+                    smtp_username=channel_settings.get('smtp_username'),
+                    smtp_password=channel_settings.get('smtp_password'),
+                    from_email=channel_settings.get('from_email'),
+                    use_tls=channel_settings.get('use_tls', True)
+                )
+
+                result = email_service.send_message(
+                    to_email=recipient,
+                    subject=f'{log.notification_type.name} - Faida Group Store',
+                    message=log.message
+                )
+
+                if 'error' in result:
+                    raise Exception(result['error'])
 
             elif log.channel.code == 'whatsapp':
+                from .services import WhatsAppService
+
                 phone = log.contact.get_formatted_value() if log.contact else log.recipient_value
-                service._send_whatsapp(
-                    phone=phone,
-                    message=log.message,
-                    channel_settings=log.channel.settings
+                channel_settings = log.channel.settings
+
+                whatsapp = WhatsAppService(
+                    instance_id=channel_settings.get('instance_id'),
+                    api_token=channel_settings.get('api_token')
                 )
+
+                result = whatsapp.send_message(phone, log.message)
+
+                if 'error' in result:
+                    raise Exception(result['error'])
 
             log.mark_as_sent()
 

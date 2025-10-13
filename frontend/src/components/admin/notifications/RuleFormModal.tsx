@@ -57,7 +57,7 @@ export const RuleFormModal: React.FC<RuleFormModalProps> = ({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!formData.name.trim() || !formData.notification_type || !formData.channel) {
+        if (!formData.name.trim() || !formData.notification_type || !formData.channel || !formData.default_template) {
             alert('Заполните все обязательные поля');
             return;
         }
@@ -68,7 +68,7 @@ export const RuleFormModal: React.FC<RuleFormModalProps> = ({
             rule_type: formData.rule_type,
             notification_type: formData.notification_type,
             channel: formData.channel,
-            default_template: formData.default_template || null,
+            default_template: formData.default_template,
             is_enabled: formData.is_enabled,
         };
 
@@ -271,17 +271,18 @@ export const RuleFormModal: React.FC<RuleFormModalProps> = ({
                     {formData.notification_type > 0 && formData.channel > 0 && (
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Шаблон
+                                Шаблон <span className="text-red-500">*</span>
                             </label>
                             <select
                                 value={formData.default_template}
                                 onChange={(e) => handleChange('default_template', Number(e.target.value))}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required
                             >
                                 <option value={0}>Выберите шаблон</option>
                                 {availableTemplates.map(template => (
                                     <option key={template.id} value={template.id}>
-                                        {template.name} {template.is_default && '(по умолчанию)'}
+                                        {template.name}
                                     </option>
                                 ))}
                             </select>

@@ -199,21 +199,6 @@ class NotificationRuleSerializer(serializers.ModelSerializer):
                 'name': obj.default_template.name,
                 'channel_type': obj.default_template.channel_type,
             }
-
-        # Если не указан явный шаблон, найти стандартный шаблон для этого типа уведомления и канала
-        standard_template = NotificationTemplate.objects.filter(
-            notification_type=obj.notification_type,
-            channel_type=obj.channel.code,
-            is_default=True
-        ).first()
-
-        if standard_template:
-            return {
-                'id': standard_template.id,
-                'name': standard_template.name,
-                'channel_type': standard_template.channel_type,
-            }
-
         return None
 
     def get_contact_templates(self, obj):
