@@ -5,6 +5,7 @@
 import React from 'react';
 import { ShoppingCartIcon, PlusIcon, MinusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useCart } from '../contexts/CartContext';
+import patternSvg from '../assets/pattern.svg';
 
 interface Product {
   id: number;
@@ -114,10 +115,20 @@ const CartButton: React.FC<CartButtonProps> = ({
     return (
       <button
         onClick={handleAddToCart}
-        className={`flex items-center justify-center gap-2 bg-primary-800 hover:bg-primary-900 text-white border border-primary-800 rounded-lg transition-colors ${sizes.button} ${className}`}
+        className={`relative overflow-hidden flex items-center justify-center gap-2 bg-primary-800 hover:bg-primary-900 text-white border border-primary-800 rounded-lg transition-colors ${sizes.button} ${className}`}
       >
-        <ShoppingCartIcon className={sizes.icon} />
-        В корзину
+        {/* Фирменный паттерн */}
+        <div
+          className="absolute inset-0 opacity-10 pointer-events-none"
+          style={{
+            backgroundImage: `url(${patternSvg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        ></div>
+        <ShoppingCartIcon className={`${sizes.icon} relative z-10`} />
+        <span className="relative z-10">В корзину</span>
       </button>
     );
   }
@@ -135,9 +146,19 @@ const CartButton: React.FC<CartButtonProps> = ({
       
       <button
         onClick={handleDecrement}
-        className={`flex items-center justify-center bg-primary-800 hover:bg-primary-900 text-white border border-primary-800 transition-colors ${sizes.counterButton}`}
+        className={`relative overflow-hidden flex items-center justify-center bg-primary-800 hover:bg-primary-900 text-white border border-primary-800 transition-colors ${sizes.counterButton}`}
       >
-        <MinusIcon className={sizes.counterIcon} />
+        {/* Фирменный паттерн */}
+        <div
+          className="absolute inset-0 opacity-10 pointer-events-none"
+          style={{
+            backgroundImage: `url(${patternSvg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        ></div>
+        <MinusIcon className={`${sizes.counterIcon} relative z-10`} />
       </button>
 
       <div className={`flex items-center justify-center bg-white border-t border-b border-gray-300 font-medium text-gray-900 ${sizes.counter}`}>
@@ -147,9 +168,19 @@ const CartButton: React.FC<CartButtonProps> = ({
       <button
         onClick={handleIncrement}
         disabled={quantity >= product.stock_quantity}
-        className={`flex items-center justify-center bg-primary-800 hover:bg-primary-900 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white border border-primary-800 disabled:border-gray-300 rounded-r-lg transition-colors ${sizes.counterButton}`}
+        className={`relative overflow-hidden flex items-center justify-center bg-primary-800 hover:bg-primary-900 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white border border-primary-800 disabled:border-gray-300 rounded-r-lg transition-colors ${sizes.counterButton}`}
       >
-        <PlusIcon className={sizes.counterIcon} />
+        {/* Фирменный паттерн */}
+        <div
+          className="absolute inset-0 opacity-10 pointer-events-none"
+          style={{
+            backgroundImage: `url(${patternSvg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        ></div>
+        <PlusIcon className={`${sizes.counterIcon} relative z-10`} />
       </button>
     </div>
   );

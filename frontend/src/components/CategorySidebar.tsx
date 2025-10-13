@@ -132,11 +132,6 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
           title={`${category.category_visible_name} (${category.products_count || 0} товаров)`}
         >
           <div className="flex items-center flex-1 min-w-0 gap-2">
-            {/* Иконка папки */}
-            <svg className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-secondary-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-            </svg>
-
             <span
               className="text-sm truncate font-semibold"
               title={category.category_visible_name}

@@ -6,13 +6,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-import { MagnifyingGlassIcon, XMarkIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { HeartIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
+import { FaSearch } from 'react-icons/fa';
+import { MdClose } from 'react-icons/md';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ProductImage from '../components/ProductImage';
 import CategorySidebar from '../components/CategorySidebar';
 import CartButton from '../components/CartButton';
 import { CustomSelect } from '../components/CustomSelect';
+import patternSvg from '../assets/pattern.svg';
 
 interface Product {
   id: number;
@@ -429,31 +432,60 @@ const ProductsPage: React.FC = () => {
                 </div>
               </div>
             )}
-            {/* Поиск и фильтры над карточками */}
-            <div className="mb-6">
-              {/* Поисковая строка - на всю ширину */}
-              <div className="mb-4">
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+
+            {/* Заголовок "Товары" с поиском */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
+              <div className="relative bg-primary-800 text-white overflow-hidden">
+                {/* Фирменный паттерн */}
+                <div
+                  className="absolute inset-0 opacity-10"
+                  style={{
+                    backgroundImage: `url(${patternSvg})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                  }}
+                ></div>
+                <div className="relative p-3 flex items-center">
+                  {/* Левая часть - заголовок (50%) */}
+                  <div className="w-1/2">
+                    <h3 className="text-lg font-bold flex items-center gap-2">
+                      <svg className="w-5 h-5 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                      </svg>
+                      Товары
+                    </h3>
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Поиск товаров..."
-                    value={searchQuery}
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-secondary-500 focus:border-secondary-500 text-sm placeholder-gray-500"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={clearSearch}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600"
-                    >
-                      <XMarkIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                    </button>
-                  )}
+
+                  {/* Правая часть - поиск (50%) */}
+                  <div className="w-1/2">
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                        <FaSearch className="h-4 w-4 text-secondary-500" />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Поиск товаров..."
+                        value={searchQuery}
+                        onChange={(e) => handleSearchChange(e.target.value)}
+                        className="block w-full pl-10 pr-10 py-2 bg-white/10 border border-transparent rounded-lg text-white placeholder-white/60 focus:outline-none font-semibold text-sm transition-all"
+                      />
+                      {searchQuery && (
+                        <button
+                          onClick={clearSearch}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-500 hover:text-secondary-600 transition-colors z-10"
+                        >
+                          <MdClose className="h-5 w-5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* Фильтры над карточками */}
+            <div className="mb-6">
 
               {/* Вторая строка: фильтры слева, сортировка справа */}
               <div className="mb-4">
