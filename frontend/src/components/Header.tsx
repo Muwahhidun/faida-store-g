@@ -8,6 +8,7 @@ import { FaShoppingCart, FaUser, FaCog, FaSignOutAlt, FaChevronDown } from 'reac
 import { Menu, Transition } from '@headlessui/react';
 import { useCart } from '../contexts/CartContext';
 import logoFullSvg from '../assets/logo-full.svg';
+import patternSvg from '../assets/pattern.svg';
 
 interface UserData {
     role: 'user' | 'moderator' | 'admin';
@@ -74,8 +75,18 @@ const Header: React.FC = () => {
     }, []);
 
     return (
-        <header className="bg-primary-900 border-b border-primary-800 sticky top-0 z-50 shadow-lg">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <header className="relative bg-primary-900 border-b border-primary-800 sticky top-0 z-50 shadow-lg">
+            {/* Фирменный паттерн */}
+            <div
+                className="absolute inset-0 opacity-10 pointer-events-none"
+                style={{
+                    backgroundImage: `url(${patternSvg})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                }}
+            ></div>
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Логотип */}
                     <Link to="/" className="flex items-center group">
@@ -173,22 +184,17 @@ const Header: React.FC = () => {
                                     leaveFrom="transform opacity-100 scale-100"
                                     leaveTo="transform opacity-0 scale-95"
                                 >
-                                    <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y divide-gray-100">
-                                        <div className="px-4 py-3">
-                                            <p className="text-sm text-gray-500">Вы вошли как</p>
-                                            <p className="text-sm font-semibold text-gray-900 truncate">{userData.username}</p>
-                                        </div>
-
+                                    <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>
                                         <div className="py-1">
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <Link
                                                         to="/profile"
                                                         className={`${
-                                                            active ? 'bg-gray-100' : ''
-                                                        } flex items-center px-4 py-2 text-sm text-gray-700`}
+                                                            active ? 'bg-primary-800 text-white' : 'text-gray-700'
+                                                        } flex items-center px-4 py-2 text-sm transition-colors`}
                                                     >
-                                                        <FaUser className="mr-3 w-4 h-4 text-gray-400" />
+                                                        <FaUser className={`mr-3 w-4 h-4 ${active ? 'text-secondary-500' : 'text-gray-400'}`} />
                                                         Личный кабинет
                                                     </Link>
                                                 )}
@@ -199,10 +205,10 @@ const Header: React.FC = () => {
                                                         <Link
                                                             to="/panel"
                                                             className={`${
-                                                                active ? 'bg-gray-100' : ''
-                                                            } flex items-center px-4 py-2 text-sm text-gray-700`}
+                                                                active ? 'bg-primary-800 text-white' : 'text-gray-700'
+                                                            } flex items-center px-4 py-2 text-sm transition-colors`}
                                                         >
-                                                            <FaCog className="mr-3 w-4 h-4 text-gray-400" />
+                                                            <FaCog className={`mr-3 w-4 h-4 ${active ? 'text-secondary-500' : 'text-gray-400'}`} />
                                                             Панель управления
                                                         </Link>
                                                     )}
@@ -221,8 +227,8 @@ const Header: React.FC = () => {
                                                             navigate('/');
                                                         }}
                                                         className={`${
-                                                            active ? 'bg-gray-100' : ''
-                                                        } flex items-center w-full px-4 py-2 text-sm text-red-600`}
+                                                            active ? 'bg-red-50' : ''
+                                                        } flex items-center w-full px-4 py-2 text-sm text-red-600 transition-colors`}
                                                     >
                                                         <FaSignOutAlt className="mr-3 w-4 h-4" />
                                                         Выйти
