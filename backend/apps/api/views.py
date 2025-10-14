@@ -419,14 +419,14 @@ class ProductManagementViewSet(mixins.ListModelMixin,
     serializer_class = ProductManagementSerializer
     permission_classes = [IsAdminUser]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    search_fields = ['name', 'code', 'article', 'brand']
+    search_fields = ['name', 'code', 'article', 'brand__name']
     ordering_fields = ['name', 'price', 'created_at', 'updated_at']
     ordering = ['-updated_at']
     filterset_fields = ['is_visible_on_site', 'in_stock', 'category', 'source', 'use_default_stock_settings']
     
     def get_queryset(self):
         """Возвращает все товары, включая неактивные и скрытые."""
-        return Product.objects.select_related('category', 'source').prefetch_related('images').all()
+        return Product.objects.select_related('category', 'source', 'brand').prefetch_related('images').all()
 
 
 class SiteSettingsViewSet(mixins.ListModelMixin,
@@ -468,7 +468,7 @@ class SiteSettingsViewSet(mixins.ListModelMixin,
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     """
     ViewSet для товаров.
-    
+
     Поддерживает:
     - Список товаров с фильтрацией
     - Детальный просмотр товара
@@ -476,11 +476,11 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     - Похожие товары
     - Популярные товары
     """
-    
+
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
-    search_fields = ['name', 'description', 'tags', 'brand', 'barcodes']
+    search_fields = ['name', 'description', 'tags', 'brand__name', 'barcodes']
     ordering_fields = ['price', 'name', 'created_at', 'updated_at']
     ordering = ['-created_at']
     
@@ -499,7 +499,7 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         min_stock = site_settings.min_stock_for_display
 
         return Product.objects.select_related(
-            'category', 'source'
+            'category', 'source', 'brand'
         ).prefetch_related(
             'images', 'related_products'
         ).filter(
