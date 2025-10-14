@@ -5,7 +5,7 @@ Django сигналы для интеграции системных событ�
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.contrib.auth import get_user_model
-from djoser.signals import user_registered
+from djoser.signals import user_registered, user_activated
 from .services import NotificationDispatcher
 import logging
 
@@ -36,6 +36,31 @@ def send_registration_notification(sender, user, request, **kwargs):
         logger.info(f"✅ Уведомление о регистрации обработано для {user.username}")
     except Exception as e:
         logger.error(f"❌ Ошибка отправки уведомления о регистрации: {e}")
+
+
+@receiver(user_activated)
+def send_activation_notification(sender, user, request, **kwargs):
+    """
+    Отправка уведомления при активации аккаунта пользователя.
+    Срабатывает после успешной активации через ссылку из email.
+    """
+    try:
+        logger.info(f"🔔 Сигнал активации получен для пользователя: {user.username}")
+
+        context = {
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name or 'Пользователь',
+            'last_name': user.last_name or '',
+            'full_name': user.get_full_name() or user.username,
+        }
+
+        # Отправляем уведомление через новую систему правил
+        NotificationDispatcher.send_notification('user_activation', context)
+
+        logger.info(f"✅ Уведомление об активации обработано для {user.username}")
+    except Exception as e:
+        logger.error(f"❌ Ошибка отправки уведомления об активации: {e}")
 
 
 def send_password_reset_notification(user, reset_url):
