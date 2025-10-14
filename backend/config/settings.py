@@ -310,7 +310,7 @@ DJOSER = {
         'confirmation': 'apps.users.email.ConfirmationEmail',
     },
     'SERIALIZERS': {
-        'user_create': 'djoser.serializers.UserCreateSerializer',
+        'user_create': 'apps.users.serializers.CustomUserCreateSerializer',  # Создает пользователя с is_active=False
         'user': 'djoser.serializers.UserSerializer',
         'current_user': 'djoser.serializers.UserSerializer',
         'password_reset': 'apps.users.serializers.CustomPasswordResetSerializer',
