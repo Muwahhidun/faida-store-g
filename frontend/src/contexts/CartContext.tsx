@@ -43,35 +43,42 @@ interface CartProviderProps {
 }
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
-
-  // Загружаем корзину из localStorage при инициализации
-  useEffect(() => {
+  // Инициализируем state из localStorage сразу (синхронно)
+  const [items, setItems] = useState<CartItem[]>(() => {
     try {
       const savedCart = localStorage.getItem('shopping_cart');
       if (savedCart) {
-        setItems(JSON.parse(savedCart));
+        const parsed = JSON.parse(savedCart);
+        console.log('🔄 CartContext: Инициализация из localStorage. Товаров:', parsed.length);
+        return parsed;
       }
+      console.log('ℹ️ CartContext: Инициализация пустой корзины');
+      return [];
     } catch (error) {
-      console.error('Ошибка загрузки корзины:', error);
+      console.error('❌ Ошибка загрузки корзины при инициализации:', error);
+      return [];
     }
-  }, []);
+  });
 
   // Сохраняем корзину в localStorage при изменении
   useEffect(() => {
     try {
+      console.log('💾 CartContext: Сохранение корзины в localStorage. Товаров:', items.length);
       localStorage.setItem('shopping_cart', JSON.stringify(items));
+      console.log('✅ CartContext: Корзина сохранена');
     } catch (error) {
-      console.error('Ошибка сохранения корзины:', error);
+      console.error('❌ Ошибка сохранения корзины:', error);
     }
   }, [items]);
 
   const addItem = (product: Omit<CartItem, 'quantity'>, quantity: number = 1) => {
+    console.log('➕ CartContext: Добавление товара:', product.name, 'количество:', quantity);
     setItems(prev => {
       const existingItem = prev.find(item => item.id === product.id);
-      
+
       if (existingItem) {
         // Товар уже в корзине, увеличиваем количество
+        console.log('📦 CartContext: Товар уже в корзине, увеличиваем количество');
         return prev.map(item =>
           item.id === product.id
             ? { ...item, quantity: Math.min(item.quantity + quantity, item.stock_quantity) }
@@ -79,6 +86,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         );
       } else {
         // Новый товар
+        console.log('🆕 CartContext: Новый товар добавлен в корзину');
         return [...prev, { ...product, quantity: Math.min(quantity, product.stock_quantity) }];
       }
     });
