@@ -292,7 +292,7 @@ DJOSER = {
     'USERNAME_CHANGED_EMAIL_CONFIRMATION': False,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
     'SEND_CONFIRMATION_EMAIL': False,  # Не нужно, так как SEND_ACTIVATION_EMAIL включен
-    'SEND_ACTIVATION_EMAIL': True,  # ✅ Активация через email ВКЛЮЧЕНА
+    'SEND_ACTIVATION_EMAIL': False,  # ❌ Отключено - используем свою систему уведомлений через signal
     'SET_USERNAME_RETYPE': False,
     'SET_PASSWORD_RETYPE': True,
     # URL для фронтенда (не для API!)
