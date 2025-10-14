@@ -291,8 +291,8 @@ DJOSER = {
     'USER_CREATE_PASSWORD_RETYPE': True,  # Подтверждение пароля при регистрации
     'USERNAME_CHANGED_EMAIL_CONFIRMATION': False,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
-    'SEND_CONFIRMATION_EMAIL': False,  # Пока отключаем подтверждение email
-    'SEND_ACTIVATION_EMAIL': False,  # Активация через email отключена
+    'SEND_CONFIRMATION_EMAIL': False,  # Не нужно, так как SEND_ACTIVATION_EMAIL включен
+    'SEND_ACTIVATION_EMAIL': True,  # ✅ Активация через email ВКЛЮЧЕНА
     'SET_USERNAME_RETYPE': False,
     'SET_PASSWORD_RETYPE': True,
     # URL для фронтенда (не для API!)

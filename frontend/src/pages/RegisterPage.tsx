@@ -17,6 +17,7 @@ const RegisterPage: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [usernameValidationError, setUsernameValidationError] = useState('');
+    const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
     // Валидация username на клиентской стороне
     const validateUsername = (username: string): boolean => {
@@ -73,19 +74,8 @@ const RegisterPage: React.FC = () => {
         try {
             await axios.post('http://localhost:8000/api/auth/users/', formData);
 
-            // Успешная регистрация - автоматический вход
-            const loginResponse = await axios.post('http://localhost:8000/api/token/', {
-                username: formData.username,
-                password: formData.password,
-            });
-
-            localStorage.setItem('access_token', loginResponse.data.access);
-            localStorage.setItem('refresh_token', loginResponse.data.refresh);
-
-            // Уведомляем Header об изменении состояния авторизации
-            window.dispatchEvent(new Event('authChanged'));
-
-            navigate('/');
+            // Успешная регистрация - показываем сообщение об активации
+            setRegistrationSuccess(true);
         } catch (err: any) {
             if (err.response?.data) {
                 // Обработка ошибок от djoser
@@ -115,6 +105,48 @@ const RegisterPage: React.FC = () => {
             setIsLoading(false);
         }
     };
+
+    // Если регистрация успешна - показываем сообщение об активации
+    if (registrationSuccess) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+                <div className="max-w-md w-full">
+                    <div className="bg-white p-8 rounded-lg shadow-md text-center">
+                        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mb-4">
+                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                            Регистрация успешна!
+                        </h2>
+                        <p className="text-gray-600 mb-6">
+                            На ваш email <strong>{formData.email}</strong> отправлено письмо с ссылкой для активации аккаунта.
+                        </p>
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <p className="text-sm text-blue-800">
+                                <strong>Важно:</strong> Проверьте папку "Спам", если письмо не пришло в течение нескольких минут.
+                            </p>
+                        </div>
+                        <div className="space-y-3">
+                            <Link
+                                to="/login"
+                                className="block w-full px-4 py-2 bg-primary-800 hover:bg-primary-900 text-white rounded-lg transition-colors font-semibold"
+                            >
+                                Перейти к входу
+                            </Link>
+                            <Link
+                                to="/"
+                                className="block w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                            >
+                                На главную
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
