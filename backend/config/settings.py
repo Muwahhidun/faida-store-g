@@ -318,5 +318,8 @@ DJOSER = {
     'PERMISSIONS': {
         'user': ['rest_framework.permissions.IsAuthenticated'],
         'user_list': ['rest_framework.permissions.IsAdminUser'],
+        'activation': ['rest_framework.permissions.AllowAny'],  # Активация доступна всем
+        'password_reset': ['rest_framework.permissions.AllowAny'],  # Восстановление пароля доступно всем
+        'password_reset_confirm': ['rest_framework.permissions.AllowAny'],  # Подтверждение сброса пароля доступно всем
     },
 }
