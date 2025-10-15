@@ -4,10 +4,11 @@
 
 import React, { useEffect, useState, Fragment } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { FaShoppingCart, FaUser, FaCog, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
+import { FaShoppingCart, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
 import { Menu, Transition } from '@headlessui/react';
 import { useCart } from '../contexts/CartContext';
 import logoFullSvg from '../assets/logo-full.svg';
+import BrandIcon from './BrandIcon';
 import patternSvg from '../assets/pattern.svg';
 
 interface UserData {
@@ -172,7 +173,7 @@ const Header: React.FC = () => {
                                         {userData.username.charAt(0).toUpperCase()}
                                     </div>
                                     <span className="hidden sm:inline">{userData.username}</span>
-                                    <FaChevronDown className="w-3 h-3 text-gray-300" />
+                                    <BrandIcon direction="down" className="w-3 h-3 text-gray-300" />
                                 </Menu.Button>
 
                                 <Transition

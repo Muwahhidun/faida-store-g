@@ -10,6 +10,7 @@ import { ArrowLeftIcon, CogIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ProductImage from '../components/ProductImage';
 import CartButton from '../components/CartButton';
+import BrandIcon from '../components/BrandIcon';
 
 /**
  * Декодирует JWT токен без проверки подписи (только для чтения payload)
@@ -165,6 +166,22 @@ const ProductDetailPage: React.FC = () => {
     retryDelay: 1000,
   });
 
+  const nextImage = () => {
+    if (product && product.images.length > 1) {
+      setSelectedImageIndex((prevIndex) =>
+        prevIndex === product.images.length - 1 ? 0 : prevIndex + 1
+      );
+    }
+  };
+
+  const prevImage = () => {
+    if (product && product.images.length > 1) {
+      setSelectedImageIndex((prevIndex) =>
+        prevIndex === 0 ? product.images.length - 1 : prevIndex - 1
+      );
+    }
+  };
+
   // Сбрасываем выбранный индекс изображения при смене товара и устанавливаем основное изображение
   React.useEffect(() => {
     if (product && product.images && product.images.length > 0) {
@@ -232,12 +249,30 @@ const ProductDetailPage: React.FC = () => {
             {product.images && product.images.length > 0 ? (
               <div className="grid gap-4">
                 {/* Основное изображение */}
-                <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden">
+                <div className="relative aspect-square bg-gray-50 rounded-lg overflow-hidden group">
                   <ProductImage
                     src={product.images[selectedImageIndex]?.image || product.images[0].image}
                     alt={product.images[selectedImageIndex]?.alt_text || product.name}
                     className="w-full h-full object-contain"
                   />
+                  {product.images.length > 1 && (
+                    <>
+                      <button
+                        onClick={prevImage}
+                        className="absolute top-1/2 left-2 -translate-y-1/2 bg-white/50 rounded-full p-2 text-primary-900 hover:bg-white focus:outline-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        aria-label="Previous image"
+                      >
+                        <BrandIcon direction="left" className="w-6 h-6" />
+                      </button>
+                      <button
+                        onClick={nextImage}
+                        className="absolute top-1/2 right-2 -translate-y-1/2 bg-white/50 rounded-full p-2 text-primary-900 hover:bg-white focus:outline-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        aria-label="Next image"
+                      >
+                        <BrandIcon direction="right" className="w-6 h-6" />
+                      </button>
+                    </>
+                  )}
                 </div>
                 
                 {/* Миниатюры */}

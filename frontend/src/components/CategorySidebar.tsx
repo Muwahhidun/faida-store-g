@@ -4,6 +4,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import BrandIcon from './BrandIcon';
 import patternSvg from '../assets/pattern.svg';
 
 interface Category {
@@ -157,14 +158,10 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
                 isSelected ? 'hover:bg-primary-900' : 'hover:bg-gray-200'
               }`}
             >
-              <svg
-                className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <BrandIcon
+                direction={isExpanded ? 'down' : 'right'}
+                className={"w-4 h-4"}
+              />
             </button>
           )}
         </div>
