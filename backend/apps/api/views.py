@@ -1195,3 +1195,19 @@ class BrandViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         """Возвращает только бренды с логотипами."""
         return Brand.objects.exclude(logo='').exclude(logo__isnull=True).order_by('name')
+
+
+class BrandManagementViewSet(mixins.ListModelMixin,
+                             mixins.CreateModelMixin,
+                             mixins.UpdateModelMixin,
+                             mixins.DestroyModelMixin,
+                             viewsets.GenericViewSet):
+    """
+    ViewSet для управления брендами в админ-панели.
+    Позволяет создавать, редактировать и удалять бренды.
+    Доступно только администраторам.
+    """
+    queryset = Brand.objects.all().order_by('name')
+    serializer_class = BrandSerializer
+    permission_classes = [IsAdminUser]
+    pagination_class = None  # Отключаем пагинацию для брендов

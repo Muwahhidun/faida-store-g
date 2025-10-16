@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCog, FaDatabase, FaList, FaTags, FaPowerOff, FaUsers, FaShoppingBag, FaBell } from 'react-icons/fa';
+import { FaCog, FaDatabase, FaList, FaTags, FaPowerOff, FaUsers, FaShoppingBag, FaBell, FaTrademark } from 'react-icons/fa';
 import { adminClient } from '../api/adminClient';
-import { Source, Category, AvailableOptions } from '../types/admin';
+import { Source, Category, AvailableOptions, Brand } from '../types/admin';
 import {
     SourcesSection,
     CategoriesSection,
+    BrandsSection,
     ProductsSection,
     SettingsSection,
     UsersSection,
@@ -22,16 +23,16 @@ const AdminPanelPage: React.FC = () => {
     const navigate = useNavigate();
 
     // Получаем вкладку из URL hash или используем 'settings' по умолчанию
-    const getInitialTab = (): 'settings' | 'sources' | 'categories' | 'products' | 'users' | 'orders' | 'notifications' => {
+    const getInitialTab = (): 'settings' | 'sources' | 'categories' | 'brands' | 'products' | 'users' | 'orders' | 'notifications' => {
         const hash = window.location.hash.slice(1); // Убираем '#'
-        if (hash === 'sources' || hash === 'categories' || hash === 'products' || hash === 'settings' || hash === 'users' || hash === 'orders' || hash === 'notifications') {
+        if (hash === 'sources' || hash === 'categories' || hash === 'brands' || hash === 'products' || hash === 'settings' || hash === 'users' || hash === 'orders' || hash === 'notifications') {
             return hash;
         }
         return 'settings';
     };
 
     // Основное состояние
-    const [selectedTab, setSelectedTab] = useState<'settings' | 'sources' | 'categories' | 'products' | 'users' | 'orders' | 'notifications'>(getInitialTab());
+    const [selectedTab, setSelectedTab] = useState<'settings' | 'sources' | 'categories' | 'brands' | 'products' | 'users' | 'orders' | 'notifications'>(getInitialTab());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -39,6 +40,7 @@ const AdminPanelPage: React.FC = () => {
     // Данные
     const [sources, setSources] = useState<Source[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [brands, setBrands] = useState<Brand[]>([]);
     const [productsCount, setProductsCount] = useState<number>(0);
     const [usersCount, setUsersCount] = useState<number>(0);
     const [ordersCount, setOrdersCount] = useState<number>(0);
@@ -84,6 +86,19 @@ const AdminPanelPage: React.FC = () => {
             console.error('Ошибка загрузки категорий:', err);
         } finally {
             setLoadingCategories(false);
+        }
+    };
+
+    // Загрузка брендов
+    const fetchBrands = async () => {
+        try {
+            const brandsResponse = await adminClient.get('/brands-management/');
+            const brandsData = Array.isArray(brandsResponse.data)
+                ? brandsResponse.data
+                : brandsResponse.data.results || [];
+            setBrands(brandsData);
+        } catch (err) {
+            console.error('Ошибка загрузки брендов:', err);
         }
     };
 
@@ -149,6 +164,7 @@ const AdminPanelPage: React.FC = () => {
             await fetchSettings();
             await fetchSources();
             await fetchCategories();
+            await fetchBrands();
             await fetchProductsCount();
             await fetchUsersCount();
             await fetchOrdersCount();
@@ -276,18 +292,29 @@ const AdminPanelPage: React.FC = () => {
                             >
                                 <FaList className="w-4 h-4" />
                                 <span>Категории ({categories.length})</span>
-                            </button>
-                            <button
-                                onClick={() => setSelectedTab('products')}
-                                className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                                    selectedTab === 'products'
-                                        ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                                }`}
-                            >
-                                <FaTags className="w-4 h-4" />
-                                <span>Товары ({productsCount})</span>
-                            </button>
+                                </button>
+                                <button
+                                    onClick={() => setSelectedTab('brands')}
+                                    className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                                        selectedTab === 'brands'
+                                            ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    <FaTrademark className="w-4 h-4" />
+                                    <span>Бренды ({brands.length})</span>
+                                </button>
+                                <button
+                                    onClick={() => setSelectedTab('products')}
+                                    className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                                        selectedTab === 'products'
+                                            ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    <FaTags className="w-4 h-4" />
+                                    <span>Товары ({productsCount})</span>
+                                </button>
                             <button
                                 onClick={() => setSelectedTab('users')}
                                 className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
@@ -364,6 +391,14 @@ const AdminPanelPage: React.FC = () => {
                                     onCategoriesUpdate={fetchCategories}
                                     onError={handleError}
                                     onSuccess={handleSuccess}
+                                />
+                            </div>
+
+                            <div style={{ display: selectedTab === 'brands' ? 'block' : 'none' }}>
+                                <BrandsSection
+                                    onError={handleError}
+                                    onSuccess={handleSuccess}
+                                    onBrandsUpdate={fetchBrands}
                                 />
                             </div>
 

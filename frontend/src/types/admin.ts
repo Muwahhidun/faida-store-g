@@ -137,3 +137,12 @@ export interface User {
     date_joined: string;
     last_login: string | null;
 }
+
+export interface Brand {
+    id: number;
+    name: string;
+    logo: string | null;
+    description: string;
+    products_count: number;
+    created_at: string;
+}

@@ -10,7 +10,7 @@ from rest_framework.permissions import AllowAny
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 # TODO: Временно отключено
-from .views import ProductViewSet, CategoryViewSet, ProductImageViewSet, SiteSettingsViewSet, IntegrationSourceViewSet, AvailableOptionsAPIView, CategoryManagementViewSet, ProductManagementViewSet, SyncLogViewSet, UserManagementViewSet, DeliveryAddressViewSet, JobViewSet, NewsViewSet, NewsCategoryViewSet, OrderViewSet, BrandViewSet  # NotificationSettingsViewSet, WhatsAppOperatorViewSet
+from .views import ProductViewSet, CategoryViewSet, ProductImageViewSet, SiteSettingsViewSet, IntegrationSourceViewSet, AvailableOptionsAPIView, CategoryManagementViewSet, ProductManagementViewSet, SyncLogViewSet, UserManagementViewSet, DeliveryAddressViewSet, JobViewSet, NewsViewSet, NewsCategoryViewSet, OrderViewSet, BrandViewSet, BrandManagementViewSet  # NotificationSettingsViewSet, WhatsAppOperatorViewSet
 
 
 # Создаем роутер для API
@@ -30,6 +30,7 @@ router.register(r'news', NewsViewSet, basename='news')
 router.register(r'news-categories', NewsCategoryViewSet, basename='news-categories')
 router.register(r'orders', OrderViewSet, basename='orders')
 router.register(r'brands', BrandViewSet, basename='brands')
+router.register(r'brands-management', BrandManagementViewSet, basename='brands-management')
 # router.register(r'notification-settings', NotificationSettingsViewSet, basename='notification-settings')  # TODO: Временно отключено
 # router.register(r'whatsapp-operators', WhatsAppOperatorViewSet, basename='whatsapp-operators')  # TODO: Временно отключено
 

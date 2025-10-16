@@ -3,6 +3,7 @@
  */
 export { SourcesSection } from './SourcesSection';
 export { CategoriesSection } from './CategoriesSection';
+export { BrandsSection } from './BrandsSection';
 export { ProductsSection } from './ProductsSection';
 export { SettingsSection } from './SettingsSection';
 export { UsersSection } from './UsersSection';
