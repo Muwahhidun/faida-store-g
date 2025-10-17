@@ -3,11 +3,14 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
 import patternSvg from '../assets/pattern.svg';
-import { FaCheckCircle, FaUsers, FaHandHoldingHeart, FaUtensils, FaHome, FaBirthdayCake, FaCouch } from 'react-icons/fa';
+import { FaCheckCircle, FaUsers, FaHandHoldingHeart } from 'react-icons/fa';
+import faidaproductIcon from '../assets/images/faidaproduct.svg';
+import faidahomeIcon from '../assets/images/faidahome.svg';
+import faidalacomstoryIcon from '../assets/images/faidalacomstory.svg';
+import faidatimedesignIcon from '../assets/images/faidatimedesign.svg';
 
 interface Brand {
   id: number;
@@ -35,6 +38,19 @@ const HomePage: React.FC = () => {
     queryFn: fetchBrands,
     staleTime: 5 * 60 * 1000, // 5 минут
   });
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Автоматическая карусель для брендов
+  useEffect(() => {
+    if (brands.length <= 4) return; // Карусель только если больше 4 брендов
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % brands.length);
+    }, 3000); // Меняем каждые 3 секунды
+
+    return () => clearInterval(interval);
+  }, [brands.length]);
 
   return (
     <>
@@ -101,28 +117,28 @@ const HomePage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
             <div className="bg-white p-8 rounded-lg shadow-lg text-center group">
                 <div className="bg-primary-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transform transition-all duration-200 group-hover:scale-110 group-hover:bg-secondary-500">
-                    <FaUtensils className="w-8 h-8 text-secondary-500 group-hover:text-primary-900 transition-colors" />
+                    <img src={faidaproductIcon} alt="Faida Product" className="w-16 h-16 [filter:invert(85%)_sepia(45%)_saturate(450%)_hue-rotate(355deg)_brightness(100%)_contrast(92%)] group-hover:[filter:invert(11%)_sepia(18%)_saturate(3245%)_hue-rotate(201deg)_brightness(94%)_contrast(99%)] transition-all" />
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-primary-900" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>Faida Product</h3>
                 <p className="text-gray-600 text-sm">Продажа продуктов питания.</p>
             </div>
             <div className="bg-white p-8 rounded-lg shadow-lg text-center group">
                 <div className="bg-primary-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transform transition-all duration-200 group-hover:scale-110 group-hover:bg-secondary-500">
-                    <FaHome className="w-8 h-8 text-secondary-500 group-hover:text-primary-900 transition-colors" />
+                    <img src={faidahomeIcon} alt="Faida Home" className="w-16 h-16 [filter:invert(85%)_sepia(45%)_saturate(450%)_hue-rotate(355deg)_brightness(100%)_contrast(92%)] group-hover:[filter:invert(11%)_sepia(18%)_saturate(3245%)_hue-rotate(201deg)_brightness(94%)_contrast(99%)] transition-all" />
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-primary-900" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>Faida Home</h3>
                 <p className="text-gray-600 text-sm">Продажа товаров для дома и хозяйственных нужд.</p>
             </div>
             <div className="bg-white p-8 rounded-lg shadow-lg text-center group">
                 <div className="bg-primary-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transform transition-all duration-200 group-hover:scale-110 group-hover:bg-secondary-500">
-                    <FaBirthdayCake className="w-8 h-8 text-secondary-500 group-hover:text-primary-900 transition-colors" />
+                    <img src={faidalacomstoryIcon} alt="Faida Lacomstory" className="w-16 h-16 [filter:invert(85%)_sepia(45%)_saturate(450%)_hue-rotate(355deg)_brightness(100%)_contrast(92%)] group-hover:[filter:invert(11%)_sepia(18%)_saturate(3245%)_hue-rotate(201deg)_brightness(94%)_contrast(99%)] transition-all" />
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-primary-900" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>Faida Lacomstory</h3>
                 <p className="text-gray-600 text-sm">Производство кондитерских изделий.</p>
             </div>
             <div className="bg-white p-8 rounded-lg shadow-lg text-center group">
                 <div className="bg-primary-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transform transition-all duration-200 group-hover:scale-110 group-hover:bg-secondary-500">
-                    <FaCouch className="w-8 h-8 text-secondary-500 group-hover:text-primary-900 transition-colors" />
+                    <img src={faidatimedesignIcon} alt="Faida Time Design" className="w-16 h-16 [filter:invert(85%)_sepia(45%)_saturate(450%)_hue-rotate(355deg)_brightness(100%)_contrast(92%)] group-hover:[filter:invert(11%)_sepia(18%)_saturate(3245%)_hue-rotate(201deg)_brightness(94%)_contrast(99%)] transition-all" />
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-primary-900" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>Faida Time Design</h3>
                 <p className="text-gray-600 text-sm">Производство корпусной мебели.</p>
@@ -175,29 +191,63 @@ const HomePage: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>Наши бренды</h2>
+            </div>
 
-            </div>
-            <div className="flex justify-center">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-8 max-w-4xl">
-                {brands.map((brand) => (
-                  <div
-                    key={brand.id}
-                    className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 group"
-                  >
-                    <div className="w-32 h-32 mb-4 flex items-center justify-center">
-                      <img
-                        src={brand.logo}
-                        alt={brand.name}
-                        className="max-w-full max-h-full object-contain transform group-hover:scale-110 transition-transform duration-200"
-                      />
+            {brands.length <= 4 ? (
+              // Статичный вариант для 4 и менее брендов
+              <div className="flex justify-center">
+                <div className={`grid gap-8 ${
+                  brands.length <= 3 ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 max-w-3xl' : 'grid-cols-2 md:grid-cols-4 max-w-6xl'
+                }`}>
+                  {brands.map((brand) => (
+                    <div
+                      key={brand.id}
+                      className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 group"
+                    >
+                      <div className="w-32 h-32 mb-4 flex items-center justify-center">
+                        <img
+                          src={brand.logo}
+                          alt={brand.name}
+                          className="max-w-full max-h-full object-contain transform group-hover:scale-110 transition-transform duration-200"
+                        />
+                      </div>
+                      <p className="text-sm font-semibold text-primary-800 text-center">
+                        {brand.name}
+                      </p>
                     </div>
-                    <p className="text-sm font-semibold text-primary-800 text-center">
-                      {brand.name}
-                    </p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              // Карусель для более 4 брендов
+              <div className="relative overflow-hidden max-w-6xl mx-auto">
+                <div
+                  className="flex gap-8 transition-transform duration-1000 ease-in-out"
+                  style={{
+                    transform: `translateX(-${currentSlide * (100 / 4)}%)`
+                  }}
+                >
+                  {[...brands, ...brands.slice(0, 4)].map((brand, index) => (
+                    <div
+                      key={`${brand.id}-${index}`}
+                      className="flex-shrink-0 flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 group"
+                      style={{ width: 'calc(25% - 1.5rem)' }}
+                    >
+                      <div className="w-32 h-32 mb-4 flex items-center justify-center">
+                        <img
+                          src={brand.logo}
+                          alt={brand.name}
+                          className="max-w-full max-h-full object-contain transform group-hover:scale-110 transition-transform duration-200"
+                        />
+                      </div>
+                      <p className="text-sm font-semibold text-primary-800 text-center">
+                        {brand.name}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </section>
       )}

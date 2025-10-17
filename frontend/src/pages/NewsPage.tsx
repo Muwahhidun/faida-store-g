@@ -95,8 +95,8 @@ const NewsPage: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Новости</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-2" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>Новости</h1>
+            <p className="text-gray-600 font-light">
               {news.length > 0
                 ? `Всего новостей: ${news.length}`
                 : 'Пока нет опубликованных новостей'}
@@ -106,7 +106,7 @@ const NewsPage: React.FC = () => {
           {canManageNews && (
             <Link
               to="/news/new"
-              className="flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+              className="flex items-center px-4 py-2 bg-secondary-500 text-primary-900 rounded-lg hover:bg-secondary-600 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-105"
             >
               <FaPlus className="w-4 h-4 mr-2" />
               Добавить новость
@@ -115,11 +115,11 @@ const NewsPage: React.FC = () => {
         </div>
 
         {news.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-8">
+          <div className="bg-white rounded-lg shadow-lg p-8 border-t-4 border-secondary-500">
             <div className="text-center">
-              <FaNewspaper className="w-24 h-24 text-gray-300 mx-auto mb-6" />
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Пока нет новостей</h2>
-              <p className="text-gray-600">
+              <FaNewspaper className="w-24 h-24 text-primary-200 mx-auto mb-6" />
+              <h2 className="text-xl font-bold text-primary-900 mb-4">Пока нет новостей</h2>
+              <p className="text-gray-600 font-light">
                 Следите за обновлениями! Здесь будут публиковаться новости компании, акции и
                 специальные предложения.
               </p>
@@ -131,18 +131,18 @@ const NewsPage: React.FC = () => {
               <Link
                 key={item.id}
                 to={`/news/${item.slug}`}
-                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col"
+                className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden flex flex-col group border-t-4 border-secondary-500 transform hover:scale-105"
               >
                 {/* Превью изображение */}
-                <div className="w-full h-48 bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center overflow-hidden">
+                <div className="w-full h-48 bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center overflow-hidden">
                   {item.preview_image ? (
                     <img
                       src={item.preview_image}
                       alt={item.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   ) : (
-                    <FaNewspaper className="w-16 h-16 text-emerald-300" />
+                    <FaNewspaper className="w-16 h-16 text-secondary-500" />
                   )}
                 </div>
 
@@ -151,34 +151,34 @@ const NewsPage: React.FC = () => {
                   {/* Категория и статус */}
                   <div className="flex items-center gap-2 mb-3">
                     {item.category_name && (
-                      <span className="inline-flex items-center px-2 py-1 text-xs bg-emerald-100 text-emerald-700 rounded-full">
+                      <span className="inline-flex items-center px-2 py-1 text-xs bg-secondary-100 text-primary-900 rounded-full font-semibold">
                         <FaTag className="w-3 h-3 mr-1" />
                         {item.category_name}
                       </span>
                     )}
                     {!item.is_published && canManageNews && (
-                      <span className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded-full">
+                      <span className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded-full font-semibold">
                         Черновик
                       </span>
                     )}
                   </div>
 
                   {/* Заголовок */}
-                  <h2 className="text-xl font-semibold text-gray-900 mb-2 hover:text-emerald-600 line-clamp-2">
+                  <h2 className="text-xl font-bold text-primary-900 mb-2 group-hover:text-secondary-600 line-clamp-2 transition-colors">
                     {item.title}
                   </h2>
 
                   {/* Описание */}
-                  <p className="text-gray-600 mb-4 line-clamp-3 flex-1">{item.short_description}</p>
+                  <p className="text-gray-600 mb-4 line-clamp-3 flex-1 font-light">{item.short_description}</p>
 
                   {/* Метаинформация */}
-                  <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-100">
-                    <div className="flex items-center">
-                      <FaCalendarAlt className="w-4 h-4 mr-1" />
+                  <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-secondary-200">
+                    <div className="flex items-center font-light">
+                      <FaCalendarAlt className="w-4 h-4 mr-1 text-primary-600" />
                       {formatDate(item.published_at)}
                     </div>
-                    <div className="flex items-center">
-                      <FaEye className="w-4 h-4 mr-1" />
+                    <div className="flex items-center font-light">
+                      <FaEye className="w-4 h-4 mr-1 text-primary-600" />
                       {item.views_count}
                     </div>
                   </div>

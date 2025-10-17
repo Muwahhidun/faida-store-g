@@ -161,9 +161,10 @@ backend/
 - `DeliveryAddress`: Адреса доставки пользователей с координатами (latitude, longitude)
 
 *Каталог товаров:*
-- `Product`: code (уникальный), article, name, barcodes, price, currency, unit, stock_quantity, in_stock, category FK, images (через ProductImage), prices_data JSONField, stocks_data JSONField, source FK
+- `Product`: code (уникальный), article, name, barcodes, price, currency, unit, stock_quantity, in_stock, category FK, brand FK, images (через ProductImage), prices_data JSONField, stocks_data JSONField, source FK
 - `ProductImage`: product FK, image FileField, file_hash MD5 (для дедупликации), display_order
 - `Category`: code_1c (уникальный), name, slug, parent FK (самоссылающаяся иерархия), is_visible_on_site
+- `Brand`: name (уникальный), logo (ImageField), description, created_at
 
 *Интеграция с 1С:*
 - `IntegrationSource`: name, json_file_path, media_dir_path, is_active, show_on_site, auto_sync_enabled, import_status
@@ -329,10 +330,13 @@ frontend/src/
 - `/products/:id` - ProductDetailPage
 - `/category/:slug` - CategoryPage (товары по категории)
 - `/cart` - CartPage
+- `/checkout` - CheckoutPage (оформление заказа, защищенный маршрут)
+- `/order-success/:number` - OrderSuccessPage (подтверждение заказа, защищенный маршрут)
 - `/login` - LoginPage (вход по email или username)
 - `/register` - RegisterPage
 - `/forgot-password` - ForgotPasswordPage
 - `/password/reset/confirm/:uid/:token` - ResetPasswordPage
+- `/activate/:uid/:token` - ActivateAccountPage (активация аккаунта через email)
 - `/panel` - AdminPanelPage (защищенный маршрут, требует аутентификации)
 - `/profile` - ProfilePage (защищенный маршрут, требует аутентификации)
 - `/jobs` - JobsPage (список вакансий)
@@ -468,7 +472,10 @@ PostgreSQL доступна по адресу `localhost:5432`:
     - Case-insensitive поиск для email (admin@example.com = ADMIN@EXAMPLE.COM)
     - LoginPage показывает единое поле "Email или логин"
     - При регистрации email обязателен (`REQUIRED_FIELDS = ['email']`)
-    - Djoser обрабатывает регистрацию, восстановление пароля, смену пароля
+    - **Активация аккаунта**: пользователи создаются неактивными (is_active=False), активация через email
+    - После перехода по ссылке активации пользователь автоматически входит в систему
+    - Система уведомлений отправляет письмо активации и подтверждение активации
+    - Djoser обрабатывает регистрацию, восстановление пароля, смену пароля, активацию
 
 13. **Система уведомлений (apps/notifications)**:
     - **Два типа правил**:
@@ -495,6 +502,15 @@ PostgreSQL доступна по адресу `localhost:5432`:
       - Импорт: `frontend/src/index.css` → `@import './assets/fonts/tiktok-sans.css'`
     - **Полная документация:** `BRANDBOOK.md` - единое руководство по фирменному стилю
     - Применение: `bg-primary-900`, `text-secondary-500`, `font-bold`, `font-light`
+
+15. **Система брендов**:
+    - Модель `Brand` хранит информацию о производителях/брендах товаров
+    - Поля: name (уникальный), logo (изображение), description
+    - Товары связаны с брендом через FK (`Product.brand`)
+    - Логотипы брендов отображаются в карточках товаров и на главной странице (карусель брендов)
+    - Компонент `BrandIcon` для единообразного отображения логотипов
+    - Фильтрация товаров по бренду в ProductFilter
+    - Управление брендами через админ-панель Django
 
 ## Рабочий процесс разработки
 

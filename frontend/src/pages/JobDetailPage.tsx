@@ -119,8 +119,8 @@ const JobDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-red-600 text-lg">{error || 'Вакансия не найдена'}</div>
-          <Link to="/jobs" className="text-emerald-600 hover:text-emerald-700 mt-4 inline-block">
+          <div className="text-red-600 text-lg font-semibold">{error || 'Вакансия не найдена'}</div>
+          <Link to="/jobs" className="text-secondary-600 hover:text-secondary-700 mt-4 inline-block font-semibold">
             ← Вернуться к списку вакансий
           </Link>
         </div>
@@ -140,7 +140,7 @@ const JobDetailPage: React.FC = () => {
         <div className="mb-6">
           <Link
             to="/jobs"
-            className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            className="inline-flex items-center text-gray-600 hover:text-primary-900 transition-colors font-semibold"
           >
             <FaArrowLeft className="w-4 h-4 mr-2" />
             Все вакансии
@@ -148,21 +148,21 @@ const JobDetailPage: React.FC = () => {
         </div>
 
         {/* Карточка вакансии */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden border-t-4 border-secondary-500">
           {/* Заголовок */}
-          <div className="p-6 border-b border-gray-200">
+          <div className="p-6 border-b border-secondary-200">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{job.title}</h1>
-                <p className="text-lg text-gray-600 mb-3">{job.short_description}</p>
+                <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-2" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>{job.title}</h1>
+                <p className="text-lg text-gray-600 mb-3 font-light">{job.short_description}</p>
                 <div className="flex gap-2">
                   {job.is_closed && (
-                    <span className="inline-block px-3 py-1 text-sm bg-red-100 text-red-700 rounded-full">
+                    <span className="inline-block px-3 py-1 text-sm bg-red-100 text-red-700 rounded-full font-semibold">
                       Вакансия закрыта
                     </span>
                   )}
                   {!job.is_active && (
-                    <span className="inline-block px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full">
+                    <span className="inline-block px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full font-semibold">
                       Неактивная вакансия
                     </span>
                   )}
@@ -173,7 +173,7 @@ const JobDetailPage: React.FC = () => {
                 <div className="flex gap-2 ml-4">
                   <Link
                     to={`/jobs/edit/${job.slug}`}
-                    className="p-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                    className="p-2 text-gray-600 hover:text-secondary-600 hover:bg-secondary-50 rounded-lg transition-colors"
                     title="Редактировать"
                   >
                     <FaEdit className="w-5 h-5" />
@@ -191,24 +191,24 @@ const JobDetailPage: React.FC = () => {
             </div>
 
             {/* Мета информация */}
-            <div className="flex flex-wrap gap-4 text-gray-600">
+            <div className="flex flex-wrap gap-4 text-gray-600 font-light">
               <div className="flex items-center">
-                <FaClock className="w-4 h-4 mr-2 text-gray-400" />
+                <FaClock className="w-4 h-4 mr-2 text-primary-600" />
                 {job.employment_type_display}
               </div>
 
               <div className="flex items-center">
-                <FaMapMarkerAlt className="w-4 h-4 mr-2 text-gray-400" />
+                <FaMapMarkerAlt className="w-4 h-4 mr-2 text-primary-600" />
                 {job.location}
               </div>
 
               <div className="flex items-center">
-                <FaCalendarAlt className="w-4 h-4 mr-2 text-gray-400" />
+                <FaCalendarAlt className="w-4 h-4 mr-2 text-primary-600" />
                 {job.work_schedule}
               </div>
 
               <div className="flex items-center">
-                <FaMoneyBillWave className="w-4 h-4 mr-2 text-gray-400" />
+                <FaMoneyBillWave className="w-4 h-4 mr-2 text-primary-600" />
                 {formatSalary()}
               </div>
             </div>
@@ -273,12 +273,12 @@ const JobDetailPage: React.FC = () => {
               }
 
               .job-content a {
-                color: #059669;
+                color: #D8AE64;
                 text-decoration: none;
               }
 
               .job-content a:hover {
-                color: #047857;
+                color: #F2C56D;
                 text-decoration: underline;
               }
 
@@ -348,11 +348,11 @@ const JobDetailPage: React.FC = () => {
 
           {/* Медиа файлы */}
           {job.media && job.media.length > 0 && (
-            <div className="p-6 border-t border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Дополнительные материалы</h2>
+            <div className="p-6 border-t border-secondary-200">
+              <h2 className="text-xl md:text-2xl font-bold text-primary-900 mb-4" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>Дополнительные материалы</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {job.media.map((media) => (
-                  <div key={media.id} className="rounded-lg overflow-hidden">
+                  <div key={media.id} className="rounded-lg overflow-hidden shadow-md">
                     {media.media_type === 'image' && media.file && (
                       <img
                         src={media.file}
@@ -371,7 +371,7 @@ const JobDetailPage: React.FC = () => {
                       </div>
                     )}
                     {media.caption && (
-                      <p className="text-sm text-gray-600 mt-2">{media.caption}</p>
+                      <p className="text-sm text-gray-600 mt-2 font-light">{media.caption}</p>
                     )}
                   </div>
                 ))}
@@ -380,18 +380,18 @@ const JobDetailPage: React.FC = () => {
           )}
 
           {/* Контакты для откликов */}
-          <div className="p-6 bg-emerald-50 border-t border-emerald-100">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Контакты</h2>
+          <div className="p-6 bg-secondary-50 border-t border-secondary-200">
+            <h2 className="text-xl md:text-2xl font-bold text-primary-900 mb-4" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>Контакты</h2>
             <div className="space-y-2">
-              <p className="text-gray-800">
-                <strong>Email:</strong>{' '}
-                <a href={`mailto:${job.hr_email}`} className="text-emerald-600 hover:text-emerald-700">
+              <p className="text-gray-800 font-light">
+                <strong className="font-semibold">Email:</strong>{' '}
+                <a href={`mailto:${job.hr_email}`} className="text-primary-600 hover:text-primary-700 font-semibold">
                   {job.hr_email}
                 </a>
               </p>
-              <p className="text-gray-800">
-                <strong>Телефон:</strong>{' '}
-                <a href={`tel:${job.hr_phone.replace(/[^+\d]/g, '')}`} className="text-emerald-600 hover:text-emerald-700">
+              <p className="text-gray-800 font-light">
+                <strong className="font-semibold">Телефон:</strong>{' '}
+                <a href={`tel:${job.hr_phone.replace(/[^+\d]/g, '')}`} className="text-primary-600 hover:text-primary-700 font-semibold">
                   {job.hr_phone}
                 </a>
               </p>

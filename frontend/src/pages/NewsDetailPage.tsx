@@ -119,8 +119,8 @@ const NewsDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-red-600 text-lg">{error || 'Новость не найдена'}</div>
-          <Link to="/news" className="text-emerald-600 hover:text-emerald-700 mt-4 inline-block">
+          <div className="text-red-600 text-lg font-semibold">{error || 'Новость не найдена'}</div>
+          <Link to="/news" className="text-secondary-600 hover:text-secondary-700 mt-4 inline-block font-semibold">
             ← Вернуться к новостям
           </Link>
         </div>
@@ -140,7 +140,7 @@ const NewsDetailPage: React.FC = () => {
         <div className="mb-6">
           <Link
             to="/news"
-            className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            className="inline-flex items-center text-gray-600 hover:text-primary-900 transition-colors font-semibold"
           >
             <FaArrowLeft className="w-4 h-4 mr-2" />
             Все новости
@@ -148,7 +148,7 @@ const NewsDetailPage: React.FC = () => {
         </div>
 
         {/* Карточка новости */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden border-t-4 border-secondary-500">
           {/* Превью изображение */}
           {news.preview_image && (
             <div className="w-full h-96 overflow-hidden">
@@ -161,33 +161,33 @@ const NewsDetailPage: React.FC = () => {
           )}
 
           {/* Заголовок и мета */}
-          <div className="p-6 border-b border-gray-200">
+          <div className="p-6 border-b border-secondary-200">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 {/* Категория и статус */}
                 <div className="flex items-center gap-2 mb-3">
                   {news.category_name && (
-                    <span className="inline-flex items-center px-3 py-1 text-sm bg-emerald-100 text-emerald-700 rounded-full">
+                    <span className="inline-flex items-center px-3 py-1 text-sm bg-secondary-100 text-primary-900 rounded-full font-semibold">
                       <FaTag className="w-3 h-3 mr-2" />
                       {news.category_name}
                     </span>
                   )}
                   {!news.is_published && canManageNews && (
-                    <span className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full">
+                    <span className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full font-semibold">
                       Черновик
                     </span>
                   )}
                 </div>
 
-                <h1 className="text-3xl font-bold text-gray-900 mb-3">{news.title}</h1>
-                <p className="text-lg text-gray-600 mb-4">{news.short_description}</p>
+                <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-3" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>{news.title}</h1>
+                <p className="text-lg text-gray-600 mb-4 font-light">{news.short_description}</p>
               </div>
 
               {canManageNews && (
                 <div className="flex gap-2 ml-4">
                   <Link
                     to={`/news/edit/${news.slug}`}
-                    className="p-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                    className="p-2 text-gray-600 hover:text-secondary-600 hover:bg-secondary-50 rounded-lg transition-colors"
                     title="Редактировать"
                   >
                     <FaEdit className="w-5 h-5" />
@@ -205,20 +205,20 @@ const NewsDetailPage: React.FC = () => {
             </div>
 
             {/* Мета информация */}
-            <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+            <div className="flex flex-wrap gap-4 text-sm text-gray-600 font-light">
               <div className="flex items-center">
-                <FaCalendarAlt className="w-4 h-4 mr-2 text-gray-400" />
+                <FaCalendarAlt className="w-4 h-4 mr-2 text-primary-600" />
                 {formatDate(news.published_at)}
               </div>
 
               <div className="flex items-center">
-                <FaEye className="w-4 h-4 mr-2 text-gray-400" />
+                <FaEye className="w-4 h-4 mr-2 text-primary-600" />
                 {news.views_count} просмотров
               </div>
 
               {news.author_name && (
                 <div className="flex items-center">
-                  <FaUser className="w-4 h-4 mr-2 text-gray-400" />
+                  <FaUser className="w-4 h-4 mr-2 text-primary-600" />
                   {news.author_name}
                 </div>
               )}
@@ -284,12 +284,12 @@ const NewsDetailPage: React.FC = () => {
               }
 
               .news-content a {
-                color: #059669;
+                color: #D8AE64;
                 text-decoration: none;
               }
 
               .news-content a:hover {
-                color: #047857;
+                color: #F2C56D;
                 text-decoration: underline;
               }
 
@@ -359,11 +359,11 @@ const NewsDetailPage: React.FC = () => {
 
           {/* Медиа файлы */}
           {news.media && news.media.length > 0 && (
-            <div className="p-6 border-t border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Дополнительные материалы</h2>
+            <div className="p-6 border-t border-secondary-200">
+              <h2 className="text-xl md:text-2xl font-bold text-primary-900 mb-4" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>Дополнительные материалы</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {news.media.map((media) => (
-                  <div key={media.id} className="rounded-lg overflow-hidden">
+                  <div key={media.id} className="rounded-lg overflow-hidden shadow-md">
                     {media.media_type === 'image' && media.file && (
                       <img
                         src={media.file}
@@ -382,7 +382,7 @@ const NewsDetailPage: React.FC = () => {
                       </div>
                     )}
                     {media.caption && (
-                      <p className="text-sm text-gray-600 mt-2">{media.caption}</p>
+                      <p className="text-sm text-gray-600 mt-2 font-light">{media.caption}</p>
                     )}
                   </div>
                 ))}

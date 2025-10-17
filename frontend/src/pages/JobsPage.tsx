@@ -97,8 +97,8 @@ const JobsPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Вакансии</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-2" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>Вакансии</h1>
+            <p className="text-gray-600 font-light">
               {jobs.length > 0
                 ? `Доступно вакансий: ${jobs.length}`
                 : 'В данный момент открытых вакансий нет'}
@@ -108,7 +108,7 @@ const JobsPage: React.FC = () => {
           {canManageJobs && (
             <Link
               to="/jobs/new"
-              className="flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+              className="flex items-center px-4 py-2 bg-secondary-500 text-primary-900 rounded-lg hover:bg-secondary-600 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-105"
             >
               <FaPlus className="w-4 h-4 mr-2" />
               Добавить вакансию
@@ -117,26 +117,26 @@ const JobsPage: React.FC = () => {
         </div>
 
         {jobs.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-8">
+          <div className="bg-white rounded-lg shadow-lg p-8 border-t-4 border-secondary-500">
             <div className="text-center">
-              <FaBriefcase className="w-24 h-24 text-gray-300 mx-auto mb-6" />
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <FaBriefcase className="w-24 h-24 text-primary-200 mx-auto mb-6" />
+              <h2 className="text-xl font-bold text-primary-900 mb-4">
                 Хотите работать в Faida Group?
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-6 font-light">
                 Мы всегда рады талантливым и ответственным сотрудникам! Отправьте ваше резюме, и
                 мы свяжемся с вами при появлении подходящих вакансий.
               </p>
               <div className="space-y-2">
-                <p className="text-gray-700">
-                  <strong>Телефон:</strong>{' '}
-                  <a href="tel:+79991234567" className="text-emerald-600 hover:text-emerald-700">
+                <p className="text-gray-700 font-light">
+                  <strong className="font-semibold">Телефон:</strong>{' '}
+                  <a href="tel:+79991234567" className="text-secondary-600 hover:text-secondary-700 font-semibold">
                     +7 (999) 123-45-67
                   </a>
                 </p>
-                <p className="text-gray-700">
-                  <strong>Email:</strong>{' '}
-                  <a href="mailto:hr@faida.ru" className="text-emerald-600 hover:text-emerald-700">
+                <p className="text-gray-700 font-light">
+                  <strong className="font-semibold">Email:</strong>{' '}
+                  <a href="mailto:hr@faida.ru" className="text-secondary-600 hover:text-secondary-700 font-semibold">
                     hr@faida.ru
                   </a>
                 </p>
@@ -149,62 +149,62 @@ const JobsPage: React.FC = () => {
               <Link
                 key={job.id}
                 to={`/jobs/${job.slug}`}
-                className="block bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                className="block bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden group border-t-4 border-secondary-500 transform hover:scale-[1.02]"
               >
                 <div className="flex">
                   {/* Превью изображения слева */}
-                  <div className="w-48 h-48 flex-shrink-0 bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center overflow-hidden">
+                  <div className="w-48 h-48 flex-shrink-0 bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center overflow-hidden">
                     {job.preview_image ? (
                       <img
                         src={job.preview_image}
                         alt={job.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                     ) : (
-                      <FaBriefcase className="w-16 h-16 text-emerald-300" />
+                      <FaBriefcase className="w-16 h-16 text-secondary-500" />
                     )}
                   </div>
 
                   {/* Контент справа */}
                   <div className="flex-1 p-6">
                     <div className="flex items-start justify-between mb-3">
-                      <h2 className="text-2xl font-semibold text-gray-900 hover:text-emerald-600">
+                      <h2 className="text-2xl font-bold text-primary-900 group-hover:text-secondary-600 transition-colors">
                         {job.title}
                       </h2>
                       <div className="flex gap-2">
                         {job.is_closed && (
-                          <span className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-full">
+                          <span className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-full font-semibold">
                             Закрыта
                           </span>
                         )}
                         {!job.is_active && (
-                          <span className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full">
+                          <span className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-full font-semibold">
                             Неактивна
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <p className="text-gray-600 mb-4 line-clamp-2">{job.short_description}</p>
+                    <p className="text-gray-600 mb-4 line-clamp-2 font-light">{job.short_description}</p>
 
-                    <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4">
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4 font-light">
                       <div className="flex items-center">
-                        <FaClock className="w-4 h-4 mr-2 text-gray-400" />
+                        <FaClock className="w-4 h-4 mr-2 text-primary-600" />
                         {job.employment_type_display}
                       </div>
 
                       <div className="flex items-center">
-                        <FaMapMarkerAlt className="w-4 h-4 mr-2 text-gray-400" />
+                        <FaMapMarkerAlt className="w-4 h-4 mr-2 text-primary-600" />
                         {job.location}
                       </div>
 
                       <div className="flex items-center">
-                        <FaCalendarAlt className="w-4 h-4 mr-2 text-gray-400" />
+                        <FaCalendarAlt className="w-4 h-4 mr-2 text-primary-600" />
                         {job.work_schedule}
                       </div>
 
                       <div className="flex items-center">
-                        <FaMoneyBillWave className="w-4 h-4 mr-2 text-gray-400" />
+                        <FaMoneyBillWave className="w-4 h-4 mr-2 text-primary-600" />
                         {formatSalary(job)}
                       </div>
                     </div>
