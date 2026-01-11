@@ -8,7 +8,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { HeartIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaArrowLeft } from 'react-icons/fa';
 import { IoApps } from 'react-icons/io5';
 import { MdClose } from 'react-icons/md';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -399,17 +399,24 @@ const ProductsPage: React.FC = () => {
         <meta name="description" content="Каталог халяль продуктов Faida Group - колбасы, деликатесы, мясные изделия" />
       </Helmet>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Заголовок страницы */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Каталог товаров</h1>
-          <p className="mt-2 text-gray-600">
-            Найдено товаров: {totalCount}
-          </p>
+      <div className="min-h-screen bg-gray-50">
+        {/* Шапка */}
+        <div className="bg-primary-900 text-white py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Link to="/" className="inline-flex items-center gap-2 text-secondary-500 hover:text-secondary-400 mb-6 transition-colors">
+              <FaArrowLeft className="w-4 h-4" />
+              На главную
+            </Link>
+            <h1 className="text-3xl font-bold">Каталог товаров</h1>
+            <p className="text-gray-400 mt-2">
+              Найдено товаров: {totalCount}
+            </p>
+          </div>
         </div>
 
-        {/* Основной контент с боковой панелью */}
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Основной контент с боковой панелью */}
+          <div className="flex flex-col lg:flex-row gap-8">
           {/* Левая панель категорий */}
           <div className="w-full lg:w-80 flex-shrink-0">
             <CategorySidebar

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-import { FaBriefcase, FaMapMarkerAlt, FaMoneyBillWave, FaClock, FaCalendarAlt, FaPlus } from 'react-icons/fa';
+import { FaBriefcase, FaMapMarkerAlt, FaMoneyBillWave, FaClock, FaCalendarAlt, FaPlus, FaArrowLeft } from 'react-icons/fa';
 import { JobListItem } from '../types';
 import api from '../api/client';
 
@@ -88,33 +88,43 @@ const JobsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <>
       <Helmet>
         <title>Вакансии - Faida Group</title>
         <meta name="description" content="Актуальные вакансии в компании Faida Group" />
       </Helmet>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-2" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>Вакансии</h1>
-            <p className="text-gray-600 font-light">
-              {jobs.length > 0
-                ? `Доступно вакансий: ${jobs.length}`
-                : 'В данный момент открытых вакансий нет'}
-            </p>
-          </div>
-
-          {canManageJobs && (
-            <Link
-              to="/jobs/new"
-              className="flex items-center px-4 py-2 bg-secondary-500 text-primary-900 rounded-lg hover:bg-secondary-600 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-105"
-            >
-              <FaPlus className="w-4 h-4 mr-2" />
-              Добавить вакансию
+      <div className="min-h-screen bg-gray-50">
+        {/* Шапка */}
+        <div className="bg-primary-900 text-white py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <Link to="/" className="inline-flex items-center gap-2 text-secondary-500 hover:text-secondary-400 mb-6 transition-colors">
+              <FaArrowLeft className="w-4 h-4" />
+              На главную
             </Link>
-          )}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold">Вакансии</h1>
+                <p className="text-gray-400 mt-2">
+                  {jobs.length > 0
+                    ? `Доступно вакансий: ${jobs.length}`
+                    : 'Присоединяйтесь к команде Faida Group'}
+                </p>
+              </div>
+              {canManageJobs && (
+                <Link
+                  to="/jobs/new"
+                  className="flex items-center px-4 py-2 bg-secondary-500 text-primary-900 rounded-lg hover:bg-secondary-600 transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+                >
+                  <FaPlus className="w-4 h-4 mr-2" />
+                  Добавить вакансию
+                </Link>
+              )}
+            </div>
+          </div>
         </div>
+
+        <div className="max-w-4xl mx-auto px-4 py-12">
 
         {jobs.length === 0 ? (
           <div className="bg-white rounded-lg shadow-lg p-8 border-t-4 border-secondary-500">
@@ -214,8 +224,9 @@ const JobsPage: React.FC = () => {
             ))}
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
