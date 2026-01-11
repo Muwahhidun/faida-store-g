@@ -17,7 +17,7 @@ from django.utils import timezone as django_timezone
 from PIL import Image
 from decimal import Decimal
 
-from apps.products.models import Product, ProductImage
+from apps.products.models import Product, ProductImage, Brand
 from apps.categories.models import Category
 from .models import SyncLog, SyncError, IntegrationSource
 
@@ -244,6 +244,9 @@ class ProductImporter:
         barcodes = product_data.get('Штрихкоды', [])
         barcode_str = ', '.join(barcodes) if barcodes else ''
         
+        # Получаем или создаем бренд
+        brand = self._get_or_create_brand(product_data.get('Производитель', ''))
+
         product = Product.objects.create(
             code=product_data['Код'],
             source=self.source,  # Привязываем товар к источнику
@@ -256,7 +259,7 @@ class ProductImporter:
             in_stock=in_stock,
             stock_quantity=stock_quantity,
             description=product_data.get('Описание', ''),
-            brand=product_data.get('Производитель', ''),
+            brand=brand,
             weight=product_data.get('ВесЕдиницыВесовогоТовара', ''),
             composition='',
             shelf_life='',
@@ -292,6 +295,11 @@ class ProductImporter:
         barcodes = product_data.get('Штрихкоды', [])
         barcode_str = ', '.join(barcodes) if barcodes else ''
         
+        # Получаем или создаем бренд
+        brand_name = product_data.get('Производитель', '')
+        if brand_name:
+            product.brand = self._get_or_create_brand(brand_name)
+
         # Обновляем поля
         product.source = self.source  # Перепривязываем к источнику
         product.is_visible_on_site = True  # Активируем товар
@@ -302,7 +310,6 @@ class ProductImporter:
         product.in_stock = in_stock
         product.stock_quantity = stock_quantity
         product.description = product_data.get('Описание', product.description)
-        product.brand = product_data.get('Производитель', product.brand)
         product.weight = product_data.get('ВесЕдиницыВесовогоТовара', product.weight)
         product.barcodes = barcode_str
         product.tags = ''  # Очищаем теги - теперь штрихкоды в отдельном поле
@@ -602,6 +609,19 @@ class ProductImporter:
             
         return price, stock_quantity, in_stock
     
+    def _get_or_create_brand(self, brand_name: str) -> Optional[Brand]:
+        """Получение или создание бренда по имени."""
+        if not brand_name or not brand_name.strip():
+            return None
+
+        brand_name = brand_name.strip()
+        brand, created = Brand.objects.get_or_create(name=brand_name)
+
+        if created:
+            logger.info(f"Создан новый бренд: {brand_name}")
+
+        return brand
+
     def _slugify(self, text: str) -> str:
         """Создание slug из текста."""
         import re
