@@ -754,6 +754,7 @@ const ProductsPage: React.FC = () => {
             )}
           </div>
         </div>
+        </div>
       </div>
     </>
   );
