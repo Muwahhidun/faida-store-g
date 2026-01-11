@@ -422,6 +422,7 @@ const ProductsPage: React.FC = () => {
             <CategorySidebar
               selectedCategoryId={selectedCategoryId}
               onCategorySelect={handleCategorySelect}
+              inStockOnly={inStockOnly}
             />
           </div>
 

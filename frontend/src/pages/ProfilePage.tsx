@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaShoppingBag, FaMapMarkerAlt, FaSignOutAlt } from 'react-icons/fa';
+import { FaUser, FaShoppingBag, FaMapMarkerAlt, FaSignOutAlt, FaHeart } from 'react-icons/fa';
 import { Toast } from '../components/Toast';
 import { ProfileSection } from '../components/profile/ProfileSection';
 import AddressesSection from '../components/profile/AddressesSection';
 import OrdersSection from '../components/profile/OrdersSection';
+import FavoritesSection from '../components/profile/FavoritesSection';
 
 /**
  * Личный кабинет пользователя
@@ -14,15 +15,15 @@ const ProfilePage: React.FC = () => {
     const navigate = useNavigate();
 
     // Получаем вкладку из URL hash
-    const getInitialTab = (): 'profile' | 'orders' | 'addresses' => {
+    const getInitialTab = (): 'profile' | 'orders' | 'addresses' | 'favorites' => {
         const hash = window.location.hash.slice(1);
-        if (hash === 'orders' || hash === 'addresses' || hash === 'profile') {
+        if (hash === 'orders' || hash === 'addresses' || hash === 'profile' || hash === 'favorites') {
             return hash;
         }
         return 'profile';
     };
 
-    const [selectedTab, setSelectedTab] = useState<'profile' | 'orders' | 'addresses'>(getInitialTab());
+    const [selectedTab, setSelectedTab] = useState<'profile' | 'orders' | 'addresses' | 'favorites'>(getInitialTab());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -170,6 +171,17 @@ const ProfilePage: React.FC = () => {
                             <FaMapMarkerAlt className="w-4 h-4" />
                             <span>Адреса доставки</span>
                         </button>
+                        <button
+                            onClick={() => setSelectedTab('favorites')}
+                            className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+                                selectedTab === 'favorites'
+                                    ? 'border-red-500 text-red-500'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                            }`}
+                        >
+                            <FaHeart className="w-4 h-4" />
+                            <span>Избранное</span>
+                        </button>
                     </div>
                 </div>
 
@@ -190,6 +202,10 @@ const ProfilePage: React.FC = () => {
 
                     {selectedTab === 'addresses' && (
                         <AddressesSection />
+                    )}
+
+                    {selectedTab === 'favorites' && (
+                        <FavoritesSection />
                     )}
                 </div>
             </div>

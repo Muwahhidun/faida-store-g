@@ -144,7 +144,8 @@ const OrdersManagementSection: React.FC<OrdersManagementSectionProps> = ({
   const getPaymentMethodLabel = (method: string) => {
     const methods: Record<string, string> = {
       cash_on_delivery: 'Наличными при получении',
-      card_on_delivery: 'Картой при получении'
+      card_on_delivery: 'Картой при получении',
+      online: 'Оплата онлайн'
     };
     return methods[method] || method;
   };

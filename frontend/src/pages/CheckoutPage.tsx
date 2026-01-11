@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import axios from 'axios';
-import { FaShoppingCart, FaUser, FaPhone, FaMapMarkerAlt, FaComment, FaCreditCard, FaArrowLeft, FaPlus } from 'react-icons/fa';
+import { FaShoppingCart, FaUser, FaPhone, FaMapMarkerAlt, FaComment, FaCreditCard, FaArrowLeft, FaPlus, FaMoneyBillWave, FaGlobe } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import OrderStepper from '../components/OrderStepper';
 import AddEditAddressModal from '../components/profile/AddEditAddressModal';
@@ -23,7 +23,7 @@ const CheckoutPage: React.FC = () => {
         customer_email: '',
         delivery_address: '',
         comment: '',
-        payment_method: 'cash_on_delivery' as 'cash_on_delivery' | 'card_on_delivery',
+        payment_method: 'cash_on_delivery' as 'cash_on_delivery' | 'card_on_delivery' | 'online',
     });
 
     // Загрузка данных профиля пользователя
@@ -481,23 +481,129 @@ const CheckoutPage: React.FC = () => {
 
                                 {/* Способ оплаты */}
                                 <div>
-                                    <label htmlFor="payment_method" className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-3">
                                         Способ оплаты <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <FaCreditCard className="h-4 w-4 text-gray-400" />
-                                        </div>
-                                        <select
-                                            id="payment_method"
-                                            name="payment_method"
-                                            value={formData.payment_method}
-                                            onChange={handleChange}
-                                            className="input pl-10"
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                        {/* Наличными */}
+                                        <label
+                                            className={`relative flex flex-col items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                                                formData.payment_method === 'cash_on_delivery'
+                                                    ? 'border-emerald-500 bg-emerald-50 shadow-md'
+                                                    : 'border-gray-200 hover:border-emerald-300 hover:bg-gray-50'
+                                            }`}
                                         >
-                                            <option value="cash_on_delivery">Наличными при получении</option>
-                                            <option value="card_on_delivery">Картой при получении</option>
-                                        </select>
+                                            <input
+                                                type="radio"
+                                                name="payment_method"
+                                                value="cash_on_delivery"
+                                                checked={formData.payment_method === 'cash_on_delivery'}
+                                                onChange={handleChange}
+                                                className="sr-only"
+                                            />
+                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${
+                                                formData.payment_method === 'cash_on_delivery'
+                                                    ? 'bg-emerald-500 text-white'
+                                                    : 'bg-gray-100 text-gray-500'
+                                            }`}>
+                                                <FaMoneyBillWave className="w-5 h-5" />
+                                            </div>
+                                            <span className={`text-sm font-medium text-center ${
+                                                formData.payment_method === 'cash_on_delivery'
+                                                    ? 'text-emerald-700'
+                                                    : 'text-gray-700'
+                                            }`}>
+                                                Наличными
+                                            </span>
+                                            <span className="text-xs text-gray-500 mt-1">при получении</span>
+                                            {formData.payment_method === 'cash_on_delivery' && (
+                                                <div className="absolute top-2 right-2 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                                                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            )}
+                                        </label>
+
+                                        {/* Картой */}
+                                        <label
+                                            className={`relative flex flex-col items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                                                formData.payment_method === 'card_on_delivery'
+                                                    ? 'border-emerald-500 bg-emerald-50 shadow-md'
+                                                    : 'border-gray-200 hover:border-emerald-300 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="payment_method"
+                                                value="card_on_delivery"
+                                                checked={formData.payment_method === 'card_on_delivery'}
+                                                onChange={handleChange}
+                                                className="sr-only"
+                                            />
+                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${
+                                                formData.payment_method === 'card_on_delivery'
+                                                    ? 'bg-emerald-500 text-white'
+                                                    : 'bg-gray-100 text-gray-500'
+                                            }`}>
+                                                <FaCreditCard className="w-5 h-5" />
+                                            </div>
+                                            <span className={`text-sm font-medium text-center ${
+                                                formData.payment_method === 'card_on_delivery'
+                                                    ? 'text-emerald-700'
+                                                    : 'text-gray-700'
+                                            }`}>
+                                                Картой
+                                            </span>
+                                            <span className="text-xs text-gray-500 mt-1">при получении</span>
+                                            {formData.payment_method === 'card_on_delivery' && (
+                                                <div className="absolute top-2 right-2 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                                                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            )}
+                                        </label>
+
+                                        {/* Онлайн */}
+                                        <label
+                                            className={`relative flex flex-col items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                                                formData.payment_method === 'online'
+                                                    ? 'border-emerald-500 bg-emerald-50 shadow-md'
+                                                    : 'border-gray-200 hover:border-emerald-300 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="payment_method"
+                                                value="online"
+                                                checked={formData.payment_method === 'online'}
+                                                onChange={handleChange}
+                                                className="sr-only"
+                                            />
+                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${
+                                                formData.payment_method === 'online'
+                                                    ? 'bg-emerald-500 text-white'
+                                                    : 'bg-gray-100 text-gray-500'
+                                            }`}>
+                                                <FaGlobe className="w-5 h-5" />
+                                            </div>
+                                            <span className={`text-sm font-medium text-center ${
+                                                formData.payment_method === 'online'
+                                                    ? 'text-emerald-700'
+                                                    : 'text-gray-700'
+                                            }`}>
+                                                Онлайн
+                                            </span>
+                                            <span className="text-xs text-gray-500 mt-1">оплата сейчас</span>
+                                            {formData.payment_method === 'online' && (
+                                                <div className="absolute top-2 right-2 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                                                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            )}
+                                        </label>
                                     </div>
                                 </div>
 
@@ -567,7 +673,7 @@ const CheckoutPage: React.FC = () => {
                             {/* Дополнительная информация */}
                             <div className="mt-6 pt-6 border-t border-gray-200">
                                 <div className="text-sm text-gray-600 space-y-2">
-                                    <p>✓ Бесплатная доставка от 2000 ₽</p>
+                                    <p>✓ Бесплатная доставка</p>
                                     <p>✓ Возврат в течение 14 дней</p>
                                     <p>✓ Гарантия качества</p>
                                 </div>

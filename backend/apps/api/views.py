@@ -596,6 +596,77 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         
         return Response(data)
 
+    @action(detail=False, methods=['get'])
+    def favorites(self, request):
+        """
+        Получить товары по списку ID для страницы избранного.
+
+        Возвращает товары БЕЗ фильтрации по видимости (is_visible_on_site),
+        чтобы пользователь мог видеть и удалять товары из избранного,
+        даже если они были скрыты администратором или закончились.
+
+        Query parameters:
+        - ids: строка с ID товаров через запятую (например: "1,2,3,4")
+
+        Каждый товар содержит дополнительное поле is_available,
+        указывающее, доступен ли товар для покупки.
+        """
+        ids_param = request.query_params.get('ids', '')
+
+        if not ids_param:
+            return Response([])
+
+        try:
+            ids = [int(id_str.strip()) for id_str in ids_param.split(',') if id_str.strip().isdigit()]
+        except (ValueError, TypeError):
+            return Response([])
+
+        if not ids:
+            return Response([])
+
+        # Получаем настройки сайта для определения минимального остатка
+        site_settings = SiteSettings.load()
+        min_stock = site_settings.min_stock_for_display
+
+        # Получаем товары по ID БЕЗ фильтрации по видимости
+        products = Product.objects.select_related(
+            'category', 'source', 'brand'
+        ).prefetch_related(
+            'images'
+        ).filter(id__in=ids)
+
+        # Сериализуем с добавлением поля is_available
+        data = []
+        for product in products:
+            serializer = ProductListSerializer(product)
+            product_data = serializer.data
+
+            # Определяем доступность товара (те же условия что и в get_queryset)
+            is_available = (
+                product.is_visible_on_site and
+                product.source and product.source.show_on_site and
+                product.category and product.category.is_active and product.category.is_visible_on_site and
+                product.stock_quantity >= min_stock
+            )
+            product_data['is_available'] = is_available
+
+            # Добавляем причину недоступности для отладки/отображения
+            if not is_available:
+                reasons = []
+                if not product.is_visible_on_site:
+                    reasons.append('hidden')
+                if product.source and not product.source.show_on_site:
+                    reasons.append('source_hidden')
+                if not product.in_stock:
+                    reasons.append('out_of_stock')
+                if product.stock_quantity < min_stock:
+                    reasons.append('low_stock')
+                product_data['unavailable_reason'] = reasons[0] if reasons else 'unknown'
+
+            data.append(product_data)
+
+        return Response(data)
+
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -637,24 +708,43 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     def tree(self, request):
         """
         Иерархическое дерево категорий.
-        
+
+        Query parameters:
+        - in_stock: true/false - фильтр по наличию товаров для подсчёта products_count
+
         Логика видимости:
         - Показываются только категории с is_visible_on_site=True
-        - Если родительская категория скрыта, её дочерние категории 
+        - Если родительская категория скрыта, её дочерние категории
           поднимаются на уровень выше (становятся корневыми)
         - Это позволяет не потерять доступ к товарам при скрытии родителей
+
+        products_count учитывает те же фильтры, что и ProductViewSet:
+        - is_visible_on_site=True (товар видим)
+        - source__show_on_site=True (источник видим на сайте)
+        - stock_quantity >= min_stock_for_display (SiteSettings)
+        - in_stock=True (если передан параметр)
         """
+        # Получаем параметр фильтра наличия
+        in_stock_param = request.query_params.get('in_stock', None)
+        in_stock = None
+        if in_stock_param is not None:
+            in_stock = in_stock_param.lower() in ('true', '1', 'yes')
+
+        # Загружаем настройки сайта для min_stock_for_display
+        site_settings = SiteSettings.load()
+        min_stock = site_settings.min_stock_for_display
+
         # УПРОЩЕННАЯ ЛОГИКА ДЛЯ БЫСТРОДЕЙСТВИЯ
         # Просто показываем видимые категории как есть, без сложной логики перемещения
         visible_categories = Category.objects.filter(
             is_active=True,
             is_visible_on_site=True
         ).select_related('parent').prefetch_related('children').order_by('order', 'name')
-        
+
         def build_simple_tree(categories, parent_id=None):
             """Простое построение дерева видимых категорий."""
             result = []
-            
+
             for category in categories:
                 # Проверяем принадлежность к уровню
                 if parent_id is None:
@@ -662,27 +752,39 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
                     if category.parent_id is None or (category.parent and category.parent.is_visible_on_site):
                         if category.parent_id is None:  # Только настоящие корневые
                             category_data = CategorySerializer(category).data
-                            
+
+                            # Всегда пересчитываем products_count с учётом фильтров ProductViewSet
+                            category_data['products_count'] = category.get_products_count_filtered(
+                                in_stock=in_stock,
+                                min_stock=min_stock
+                            )
+
                             # Добавляем дочерние категории
                             children = build_simple_tree(categories, category.id)
                             if children:
                                 category_data['children'] = children
-                            
+
                             result.append(category_data)
                 else:
                     # Дочерний уровень
                     if category.parent_id == parent_id:
                         category_data = CategorySerializer(category).data
-                        
+
+                        # Всегда пересчитываем products_count с учётом фильтров ProductViewSet
+                        category_data['products_count'] = category.get_products_count_filtered(
+                            in_stock=in_stock,
+                            min_stock=min_stock
+                        )
+
                         # Добавляем дочерние категории
                         children = build_simple_tree(categories, category.id)
                         if children:
                             category_data['children'] = children
-                        
+
                         result.append(category_data)
-            
+
             return result
-        
+
         tree_data = build_simple_tree(visible_categories)
         return Response(tree_data)
     
@@ -1171,8 +1273,19 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def my_orders(self, request):
-        """Получить заказы текущего пользователя (дубликат list для удобства)."""
-        queryset = self.filter_queryset(self.get_queryset())
+        """
+        Получить только свои заказы текущего пользователя.
+        Используется в Личном кабинете — возвращает ТОЛЬКО заказы текущего пользователя,
+        даже если он админ или модератор.
+        """
+        # Всегда фильтруем по текущему пользователю, независимо от роли
+        queryset = Order.objects.filter(
+            user=request.user
+        ).select_related('user').prefetch_related('items__product').order_by('-created_at')
+
+        # Применяем фильтры
+        queryset = self.filter_queryset(queryset)
+
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

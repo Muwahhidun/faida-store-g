@@ -679,6 +679,8 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Создание заказа с товарами."""
+        from django.db import transaction
+
         items_data = validated_data.pop('items')
         user = self.context['request'].user
 
@@ -712,19 +714,22 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 'subtotal': subtotal
             })
 
-        # Создаем заказ
-        order = Order.objects.create(
-            user=user,
-            total_amount=total_amount,
-            **validated_data
-        )
-
-        # Создаем товары заказа
-        for item_data in order_items:
-            OrderItem.objects.create(
-                order=order,
-                **item_data
+        # Оборачиваем создание заказа и товаров в транзакцию,
+        # чтобы signal.on_commit() сработал ПОСЛЕ создания всех OrderItems
+        with transaction.atomic():
+            # Создаем заказ
+            order = Order.objects.create(
+                user=user,
+                total_amount=total_amount,
+                **validated_data
             )
+
+            # Создаем товары заказа
+            for item_data in order_items:
+                OrderItem.objects.create(
+                    order=order,
+                    **item_data
+                )
 
         return order
 

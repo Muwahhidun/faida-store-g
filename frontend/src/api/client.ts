@@ -281,7 +281,7 @@ export const addressApi = {
 
 // API методы для заказов
 export const ordersApi = {
-  // Получить список заказов текущего пользователя
+  // Получить все заказы (для админов - все, для пользователей - свои)
   getOrders: async (params?: { limit?: number; offset?: number }): Promise<any> => {
     const token = localStorage.getItem('access_token');
     const response = await apiClient.get('/orders/', {
@@ -291,6 +291,18 @@ export const ordersApi = {
       params,
     });
     // API возвращает пагинированный ответ с count и results
+    return response.data;
+  },
+
+  // Получить ТОЛЬКО свои заказы (для личного кабинета, даже если пользователь админ)
+  getMyOrders: async (params?: { limit?: number; offset?: number }): Promise<any> => {
+    const token = localStorage.getItem('access_token');
+    const response = await apiClient.get('/orders/my_orders/', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params,
+    });
     return response.data;
   },
 
@@ -312,7 +324,7 @@ export const ordersApi = {
     customer_email?: string;
     delivery_address: string;
     comment?: string;
-    payment_method: 'cash_on_delivery' | 'card_on_delivery';
+    payment_method: 'cash_on_delivery' | 'card_on_delivery' | 'online';
     items: Array<{
       product_id: number;
       quantity: number;

@@ -294,7 +294,7 @@ const CartPage: React.FC = () => {
               {/* Дополнительная информация */}
               <div className="mt-6 pt-6 border-t border-gray-200">
                 <div className="text-sm text-gray-600 space-y-2">
-                  <p>✓ Бесплатная доставка от 2000 ₽</p>
+                  <p>✓ Бесплатная доставка</p>
                   <p>✓ Возврат в течение 14 дней</p>
                   <p>✓ Гарантия качества</p>
                 </div>

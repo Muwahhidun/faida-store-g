@@ -139,11 +139,40 @@ class Category(models.Model):
         """Количество товаров в категории (включая подкатегории)."""
         # Прямые товары категории
         count = self.products.filter(is_visible_on_site=True).count()
-        
+
         # Добавляем товары из всех подкатегорий
         for child in self.children.filter(is_active=True):
             count += child.products_count
-        
+
+        return count
+
+    def get_products_count_filtered(self, in_stock=None, min_stock=0):
+        """
+        Количество товаров в категории с учётом фильтров.
+        Учитывает те же фильтры, что и ProductViewSet для консистентности.
+
+        Args:
+            in_stock: True - только в наличии, False - только не в наличии, None - все
+            min_stock: минимальный остаток для отображения (из SiteSettings)
+        """
+        # Базовые фильтры - такие же как в ProductViewSet.get_queryset()
+        filters = {
+            'is_visible_on_site': True,
+            'source__show_on_site': True,  # Источник должен показываться на сайте
+            'stock_quantity__gte': min_stock,  # Остаток >= минимального порога
+        }
+
+        # Добавляем фильтр по наличию если указан
+        if in_stock is not None:
+            filters['in_stock'] = in_stock
+
+        # Прямые товары категории
+        count = self.products.filter(**filters).count()
+
+        # Добавляем товары из всех подкатегорий
+        for child in self.children.filter(is_active=True):
+            count += child.get_products_count_filtered(in_stock=in_stock, min_stock=min_stock)
+
         return count
     
     def has_visible_content(self):

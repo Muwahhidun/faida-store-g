@@ -486,11 +486,16 @@ class NotificationDispatcher:
                 from_email=settings.get('from_email'),
                 use_tls=settings.get('use_tls', True)
             )
+            # Преобразуем переносы строк в <br> для HTML, если шаблон не содержит HTML тегов
+            html_content = message
+            if '<' not in message:  # Если нет HTML тегов, это plain text
+                html_content = message.replace('\n', '<br>\n')
+
             return email_service.send_message(
                 to_email=email,
                 subject=subject,
                 message=message,
-                html_message=message  # Предполагаем что шаблон может содержать HTML
+                html_message=html_content
             )
 
         except Exception as e:
@@ -523,11 +528,16 @@ class NotificationDispatcher:
                     from_email=settings.get('from_email'),
                     use_tls=settings.get('use_tls', True)
                 )
+                # Преобразуем переносы строк в <br> для HTML, если шаблон не содержит HTML тегов
+                html_content = message
+                if '<' not in message:  # Если нет HTML тегов, это plain text
+                    html_content = message.replace('\n', '<br>\n')
+
                 return email_service.send_message(
                     to_email=contact.value,
                     subject=subject,
                     message=message,
-                    html_message=message  # Предполагаем что шаблон может содержать HTML
+                    html_message=html_content
                 )
 
             elif channel.code == 'whatsapp':

@@ -24,6 +24,7 @@ class Order(models.Model):
     PAYMENT_METHOD_CHOICES = [
         ('cash_on_delivery', 'Наличными при получении'),
         ('card_on_delivery', 'Картой при получении'),
+        ('online', 'Оплата онлайн'),
     ]
 
     # Связь с пользователем

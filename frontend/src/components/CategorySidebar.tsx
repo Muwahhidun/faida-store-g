@@ -22,22 +22,30 @@ interface CategorySidebarProps {
   selectedCategoryId?: number | null;
   onCategorySelect: (categoryId: number | null) => void;
   className?: string;
+  inStockOnly?: boolean;  // Фильтр "только в наличии" для пересчёта products_count
 }
 
-const fetchCategories = async (): Promise<Category[]> => {
+const fetchCategories = async (inStockOnly?: boolean): Promise<Category[]> => {
   const startTime = performance.now();
   console.log('🚀 Начинаем загрузку категорий...');
-  
+
   try {
-    const response = await fetch('http://localhost:8000/api/categories/tree/');
+    // Формируем URL с параметром in_stock только когда фильтр включён (true)
+    // Если фильтр выключен (false) — не передаём параметр, чтобы получить ВСЕ товары
+    let url = 'http://localhost:8000/api/categories/tree/';
+    if (inStockOnly === true) {
+      url += '?in_stock=true';
+    }
+
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    
+
     const endTime = performance.now();
     console.log(`✅ Категории загружены за ${(endTime - startTime).toFixed(0)}мс, получено ${data.length} категорий`);
-    
+
     return data;
   } catch (error) {
     const endTime = performance.now();
@@ -46,10 +54,11 @@ const fetchCategories = async (): Promise<Category[]> => {
   }
 };
 
-const CategorySidebar: React.FC<CategorySidebarProps> = ({ 
-  selectedCategoryId, 
-  onCategorySelect, 
-  className = '' 
+const CategorySidebar: React.FC<CategorySidebarProps> = ({
+  selectedCategoryId,
+  onCategorySelect,
+  className = '',
+  inStockOnly
 }) => {
   // Восстанавливаем развёрнутые ветки из sessionStorage, чтобы не сворачивались при перерисовках
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(() => {
@@ -64,8 +73,8 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
   });
 
   const { data: categories = [], isLoading, error } = useQuery({
-    queryKey: ['categories'],
-    queryFn: fetchCategories,
+    queryKey: ['categories', inStockOnly],  // Добавляем inStockOnly в ключ для перезагрузки при изменении
+    queryFn: () => fetchCategories(inStockOnly),
     staleTime: 5 * 60 * 1000, // 5 минут — не рефетчим на каждый клик
     cacheTime: 30 * 60 * 1000, // 30 минут кэша
     refetchOnWindowFocus: false,

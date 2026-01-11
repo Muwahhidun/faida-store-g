@@ -28,7 +28,7 @@ const OrdersSection: React.FC = () => {
         limit: PAGE_SIZE,
         offset: (page - 1) * PAGE_SIZE,
       };
-      const data = await ordersApi.getOrders(params);
+      const data = await ordersApi.getMyOrders(params);
       const ordersData = data.results || data;
       const count = data.count || ordersData.length;
 
@@ -111,7 +111,8 @@ const OrdersSection: React.FC = () => {
   const getPaymentMethodLabel = (method: string) => {
     const methods: Record<string, string> = {
       cash_on_delivery: 'Наличными при получении',
-      card_on_delivery: 'Картой при получении'
+      card_on_delivery: 'Картой при получении',
+      online: 'Оплата онлайн'
     };
     return methods[method] || method;
   };

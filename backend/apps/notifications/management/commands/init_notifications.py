@@ -21,7 +21,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Создание начальных данных для системы уведомлений...'))
 
         # 1. Категории
-        category_orders, _ = NotificationCategory.objects.get_or_create(
+        category_orders, _ = NotificationCategory.objects.update_or_create(
             code='orders',
             defaults={
                 'name': 'Заказы',
@@ -31,7 +31,7 @@ class Command(BaseCommand):
             }
         )
 
-        category_users, _ = NotificationCategory.objects.get_or_create(
+        category_users, _ = NotificationCategory.objects.update_or_create(
             code='users',
             defaults={
                 'name': 'Пользователи',
@@ -41,7 +41,7 @@ class Command(BaseCommand):
             }
         )
 
-        category_system, _ = NotificationCategory.objects.get_or_create(
+        category_system, _ = NotificationCategory.objects.update_or_create(
             code='system',
             defaults={
                 'name': 'Системные',
@@ -54,7 +54,7 @@ class Command(BaseCommand):
         self.stdout.write('✓ Категории созданы')
 
         # 2. Каналы
-        channel_email, _ = NotificationChannel.objects.get_or_create(
+        channel_email, _ = NotificationChannel.objects.update_or_create(
             code='email',
             name='Email',
             defaults={
@@ -64,7 +64,7 @@ class Command(BaseCommand):
             }
         )
 
-        channel_whatsapp, _ = NotificationChannel.objects.get_or_create(
+        channel_whatsapp, _ = NotificationChannel.objects.update_or_create(
             code='whatsapp',
             name='WhatsApp',
             defaults={
@@ -79,7 +79,7 @@ class Command(BaseCommand):
         # 3. Типы уведомлений
 
         # --- ЗАКАЗЫ ---
-        type_new_order, _ = NotificationType.objects.get_or_create(
+        type_new_order, _ = NotificationType.objects.update_or_create(
             code='new_order',
             defaults={
                 'category': category_orders,
@@ -101,7 +101,7 @@ class Command(BaseCommand):
             }
         )
 
-        type_status_changed, _ = NotificationType.objects.get_or_create(
+        type_status_changed, _ = NotificationType.objects.update_or_create(
             code='order_status_changed',
             defaults={
                 'category': category_orders,
@@ -121,7 +121,7 @@ class Command(BaseCommand):
         )
 
         # --- ПОЛЬЗОВАТЕЛИ ---
-        type_user_activation, _ = NotificationType.objects.get_or_create(
+        type_user_activation, _ = NotificationType.objects.update_or_create(
             code='user_activation',
             defaults={
                 'category': category_users,
@@ -139,7 +139,7 @@ class Command(BaseCommand):
             }
         )
 
-        type_user_registration, _ = NotificationType.objects.get_or_create(
+        type_user_registration, _ = NotificationType.objects.update_or_create(
             code='user_registration',
             defaults={
                 'category': category_users,
@@ -157,7 +157,7 @@ class Command(BaseCommand):
             }
         )
 
-        type_password_reset, _ = NotificationType.objects.get_or_create(
+        type_password_reset, _ = NotificationType.objects.update_or_create(
             code='password_reset',
             defaults={
                 'category': category_users,
@@ -176,9 +176,10 @@ class Command(BaseCommand):
         self.stdout.write('✓ Типы уведомлений созданы')
 
         # 4. Шаблоны (используем channel_type вместо channel FK)
+        # Используем update_or_create для обновления существующих шаблонов
 
         # --- ШАБЛОНЫ ДЛЯ ЗАКАЗОВ ---
-        template_new_order_email, _ = NotificationTemplate.objects.get_or_create(
+        template_new_order_email, _ = NotificationTemplate.objects.update_or_create(
             notification_type=type_new_order,
             channel_type='email',
             name='Стандартный',
@@ -196,16 +197,13 @@ Email: {{email}}
 Товары:
 {{items_list}}
 
-Адрес доставки:
-{{delivery_address}}
-
+Адрес доставки: {{delivery_address}}
 Примечание к адресу: {{delivery_comment}}
-
 Комментарий к заказу: {{comment}}'''
             }
         )
 
-        template_new_order_whatsapp, _ = NotificationTemplate.objects.get_or_create(
+        template_new_order_whatsapp, _ = NotificationTemplate.objects.update_or_create(
             notification_type=type_new_order,
             channel_type='whatsapp',
             name='Стандартный',
@@ -220,18 +218,13 @@ Email: {{email}}
 🛒 *Товары:*
 {{items_list}}
 
-📍 *Адрес доставки:*
-{{delivery_address}}
-
-📝 *Примечание к адресу:* {{delivery_comment}}
-
-💬 *Комментарий:* {{comment}}
-
-🔗 Перейти к заказу: http://localhost:5173/panel#orders'''
+📍 *Адрес:* {{delivery_address}}
+📝 *Примечание:* {{delivery_comment}}
+💬 *Комментарий:* {{comment}}'''
             }
         )
 
-        template_status_email, _ = NotificationTemplate.objects.get_or_create(
+        template_status_email, _ = NotificationTemplate.objects.update_or_create(
             notification_type=type_status_changed,
             channel_type='email',
             name='Стандартный',
@@ -249,7 +242,7 @@ Faida Group Store'''
             }
         )
 
-        template_status_whatsapp, _ = NotificationTemplate.objects.get_or_create(
+        template_status_whatsapp, _ = NotificationTemplate.objects.update_or_create(
             notification_type=type_status_changed,
             channel_type='whatsapp',
             name='Стандартный',
@@ -265,7 +258,7 @@ Faida Group Store'''
         )
 
         # --- ШАБЛОНЫ ДЛЯ ПОЛЬЗОВАТЕЛЕЙ ---
-        template_activation_email, _ = NotificationTemplate.objects.get_or_create(
+        template_activation_email, _ = NotificationTemplate.objects.update_or_create(
             notification_type=type_user_activation,
             channel_type='email',
             name='Стандартный',
@@ -309,7 +302,7 @@ Faida Group Store'''
             }
         )
 
-        template_registration_email, _ = NotificationTemplate.objects.get_or_create(
+        template_registration_email, _ = NotificationTemplate.objects.update_or_create(
             notification_type=type_user_registration,
             channel_type='email',
             name='Стандартный',
@@ -327,7 +320,7 @@ Email: {{email}}
             }
         )
 
-        template_registration_whatsapp, _ = NotificationTemplate.objects.get_or_create(
+        template_registration_whatsapp, _ = NotificationTemplate.objects.update_or_create(
             notification_type=type_user_registration,
             channel_type='whatsapp',
             name='Стандартный',
@@ -343,7 +336,7 @@ Email: {{email}}
             }
         )
 
-        template_password_reset_email, _ = NotificationTemplate.objects.get_or_create(
+        template_password_reset_email, _ = NotificationTemplate.objects.update_or_create(
             notification_type=type_password_reset,
             channel_type='email',
             name='Стандартный',
@@ -391,7 +384,7 @@ Email: {{email}}
         self.stdout.write('✓ Шаблоны созданы')
 
         # 5. Контакты (используем channel_type)
-        contact_admin, _ = NotificationContact.objects.get_or_create(
+        contact_admin, _ = NotificationContact.objects.update_or_create(
             channel_type='email',
             value='admin@faida.ru',
             defaults={
@@ -406,7 +399,7 @@ Email: {{email}}
 
         # --- ПРАВИЛА ДЛЯ НОВОГО ЗАКАЗА ---
         # Системное правило - уведомление клиенту на email
-        rule_new_order_system, created = NotificationRule.objects.get_or_create(
+        rule_new_order_system, created = NotificationRule.objects.update_or_create(
             notification_type=type_new_order,
             channel=channel_email,
             rule_type='system',
@@ -418,7 +411,7 @@ Email: {{email}}
         )
 
         # Дополнительное правило - уведомление админу на email
-        rule_new_order_admin_email, created = NotificationRule.objects.get_or_create(
+        rule_new_order_admin_email, created = NotificationRule.objects.update_or_create(
             notification_type=type_new_order,
             channel=channel_email,
             rule_type='additional',
@@ -432,7 +425,7 @@ Email: {{email}}
 
         # --- ПРАВИЛА ДЛЯ СМЕНЫ СТАТУСА ---
         # Системное правило - уведомление клиенту на email
-        rule_status_system, created = NotificationRule.objects.get_or_create(
+        rule_status_system, created = NotificationRule.objects.update_or_create(
             notification_type=type_status_changed,
             channel=channel_email,
             rule_type='system',
@@ -445,7 +438,7 @@ Email: {{email}}
 
         # --- ПРАВИЛА ДЛЯ АКТИВАЦИИ ---
         # Системное правило - письмо активации пользователю
-        rule_activation_system, created = NotificationRule.objects.get_or_create(
+        rule_activation_system, created = NotificationRule.objects.update_or_create(
             notification_type=type_user_activation,
             channel=channel_email,
             rule_type='system',
@@ -458,7 +451,7 @@ Email: {{email}}
 
         # --- ПРАВИЛА ДЛЯ РЕГИСТРАЦИИ ---
         # Дополнительное правило - уведомление админу о новой регистрации
-        rule_registration_admin, created = NotificationRule.objects.get_or_create(
+        rule_registration_admin, created = NotificationRule.objects.update_or_create(
             notification_type=type_user_registration,
             channel=channel_email,
             rule_type='additional',
@@ -472,7 +465,7 @@ Email: {{email}}
 
         # --- ПРАВИЛА ДЛЯ СБРОСА ПАРОЛЯ ---
         # Системное правило - письмо со ссылкой сброса пароля
-        rule_password_reset, created = NotificationRule.objects.get_or_create(
+        rule_password_reset, created = NotificationRule.objects.update_or_create(
             notification_type=type_password_reset,
             channel=channel_email,
             rule_type='system',
