@@ -95,7 +95,7 @@ const NewsPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50">
         {/* Шапка */}
         <div className="bg-primary-900 text-white py-12">
-          <div className="max-w-6xl mx-auto px-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Link to="/" className="inline-flex items-center gap-2 text-secondary-500 hover:text-secondary-400 mb-6 transition-colors">
               <FaArrowLeft className="w-4 h-4" />
               На главную
@@ -122,7 +122,7 @@ const NewsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto px-4 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
         {news.length === 0 ? (
           <div className="bg-white rounded-lg shadow-lg p-8 border-t-4 border-secondary-500">
