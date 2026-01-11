@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Обзор проекта
 
-**Faida Group Store** - Платформа электронной коммерции с интеграцией 1С для продажи халяльных продуктов. Full-stack приложение с Django REST API бэкендом и React/Vite фронтендом.
+**Faida Group** - Платформа электронной коммерции с интеграцией 1С для продажи халяльных продуктов. Full-stack приложение с Django REST API бэкендом и React/Vite фронтендом.
 
 ### Стек технологий
 

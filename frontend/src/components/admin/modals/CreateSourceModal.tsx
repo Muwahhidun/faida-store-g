@@ -100,8 +100,8 @@ export const CreateSourceModal: React.FC<CreateSourceModalProps> = ({ onClose, o
                             placeholder="pp/export_media"
                         />
                     </div>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="flex items-center justify-between sm:justify-start">
                             <label htmlFor="is-active" className="text-sm font-medium text-gray-700 mr-3">Активен</label>
                             <Switch
                                 checked={newSource.is_active ?? true}
@@ -115,7 +115,7 @@ export const CreateSourceModal: React.FC<CreateSourceModalProps> = ({ onClose, o
                                 />
                             </Switch>
                         </div>
-                        <div className="flex items-center">
+                        <div className="flex items-center justify-between sm:justify-start">
                             <label htmlFor="show-on-site" className="text-sm font-medium text-gray-700 mr-3">Показывать на сайте</label>
                             <Switch
                                 checked={newSource.show_on_site ?? true}

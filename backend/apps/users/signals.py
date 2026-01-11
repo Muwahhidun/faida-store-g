@@ -3,13 +3,13 @@
 Сигналы для приложения пользователей.
 """
 import logging
-from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from djoser import utils
 
 from apps.notifications.services import NotificationDispatcher
+from apps.core.models import SiteSettings
 from .models import User
 
 logger = logging.getLogger(__name__)
@@ -41,8 +41,9 @@ def handle_new_user_registration(sender, instance, created, **kwargs):
             uid = utils.encode_uid(instance.pk)
             token = default_token_generator.make_token(instance)
 
-            # Формируем URL активации
-            activation_url = f"{settings.DJOSER['PROTOCOL']}://{settings.DJOSER['DOMAIN']}/{settings.DJOSER['ACTIVATION_URL'].format(uid=uid, token=token)}"
+            # Формируем URL активации из настроек сайта
+            site_url = SiteSettings.get_effective_site_url()
+            activation_url = f"{site_url}/activate/{uid}/{token}"
 
             context = {
                 'username': instance.username,
@@ -50,6 +51,7 @@ def handle_new_user_registration(sender, instance, created, **kwargs):
                 'first_name': instance.first_name or 'Пользователь',
                 'full_name': instance.get_full_name() or instance.username,
                 'activation_url': activation_url,
+                'site_url': site_url,
             }
 
             # Отправляем уведомления через систему правил

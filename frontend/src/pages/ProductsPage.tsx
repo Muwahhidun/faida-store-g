@@ -2,15 +2,16 @@
  * Страница каталога товаров.
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { HeartIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
-import { FaSearch, FaArrowLeft } from 'react-icons/fa';
+import { FaSearch, FaArrowLeft, FaFilter, FaTimes } from 'react-icons/fa';
 import { IoApps } from 'react-icons/io5';
 import { MdClose } from 'react-icons/md';
+import { Transition } from '@headlessui/react';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ProductImage from '../components/ProductImage';
 import CategorySidebar from '../components/CategorySidebar';
@@ -173,7 +174,22 @@ const ProductsPage: React.FC = () => {
     }
   });
 
+  // Мобильный фильтр
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  // Блокируем скролл когда открыт мобильный фильтр
+  useEffect(() => {
+    if (isMobileFilterOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileFilterOpen]);
   
   // Дебаунс для поиска (500мс задержка)
   useEffect(() => {
@@ -250,6 +266,8 @@ const ProductsPage: React.FC = () => {
   // Сброс страницы при смене категории, поиска или фильтра наличия
   const handleCategorySelect = (categoryId: number | null) => {
     setSelectedCategoryId(categoryId);
+    // Закрываем мобильный фильтр при выборе категории
+    setIsMobileFilterOpen(false);
   };
   
   const handleSearchChange = (value: string) => {
@@ -415,10 +433,26 @@ const ProductsPage: React.FC = () => {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Кнопка фильтров для мобильных */}
+          <div className="lg:hidden mb-4">
+            <button
+              onClick={() => setIsMobileFilterOpen(true)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-800 text-white rounded-lg shadow-md hover:bg-primary-700 transition-colors"
+            >
+              <FaFilter className="w-4 h-4" />
+              <span className="font-medium">Категории и фильтры</span>
+              {selectedCategoryId && (
+                <span className="ml-2 bg-secondary-500 text-primary-900 text-xs font-bold px-2 py-0.5 rounded-full">
+                  1
+                </span>
+              )}
+            </button>
+          </div>
+
           {/* Основной контент с боковой панелью */}
           <div className="flex flex-col lg:flex-row gap-8">
-          {/* Левая панель категорий */}
-          <div className="w-full lg:w-80 flex-shrink-0">
+          {/* Левая панель категорий - скрыта на мобильных */}
+          <div className="hidden lg:block w-80 flex-shrink-0">
             <CategorySidebar
               selectedCategoryId={selectedCategoryId}
               onCategorySelect={handleCategorySelect}
@@ -757,6 +791,74 @@ const ProductsPage: React.FC = () => {
         </div>
         </div>
       </div>
+
+      {/* Мобильный drawer для фильтров */}
+      <Transition show={isMobileFilterOpen} as={Fragment}>
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Overlay */}
+          <Transition.Child
+            as={Fragment}
+            enter="transition-opacity ease-linear duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition-opacity ease-linear duration-300"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50"
+              onClick={() => setIsMobileFilterOpen(false)}
+            />
+          </Transition.Child>
+
+          {/* Drawer */}
+          <Transition.Child
+            as={Fragment}
+            enter="transition ease-in-out duration-300 transform"
+            enterFrom="-translate-x-full"
+            enterTo="translate-x-0"
+            leave="transition ease-in-out duration-300 transform"
+            leaveFrom="translate-x-0"
+            leaveTo="-translate-x-full"
+          >
+            <div className="fixed inset-y-0 left-0 w-80 max-w-[90vw] bg-gray-50 shadow-xl flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between p-4 bg-primary-900 text-white">
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                  <FaFilter className="w-4 h-4 text-secondary-500" />
+                  Категории
+                </h2>
+                <button
+                  onClick={() => setIsMobileFilterOpen(false)}
+                  className="p-2 text-gray-300 hover:text-secondary-500 hover:bg-primary-800 rounded-lg transition-colors"
+                  aria-label="Закрыть"
+                >
+                  <FaTimes size={20} />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <CategorySidebar
+                  selectedCategoryId={selectedCategoryId}
+                  onCategorySelect={handleCategorySelect}
+                  inStockOnly={inStockOnly}
+                />
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 border-t border-gray-200 bg-white">
+                <button
+                  onClick={() => setIsMobileFilterOpen(false)}
+                  className="w-full px-4 py-3 bg-primary-800 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
+                >
+                  Показать товары
+                </button>
+              </div>
+            </div>
+          </Transition.Child>
+        </div>
+      </Transition>
     </>
   );
 };

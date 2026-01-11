@@ -1,5 +1,5 @@
 """
-Основные URL конфигурации для проекта Faida Group Store.
+Основные URL конфигурации для проекта Faida Group.
 """
 
 from django.contrib import admin

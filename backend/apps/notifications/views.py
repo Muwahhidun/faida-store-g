@@ -301,7 +301,7 @@ class NotificationChannelViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        test_message = request.data.get('message', f'Тестовое сообщение от Faida Group Store через {channel.name}')
+        test_message = request.data.get('message', f'Тестовое сообщение от Faida Group через {channel.name}')
 
         results = []
 
@@ -344,7 +344,7 @@ class NotificationChannelViewSet(viewsets.ModelViewSet):
                     )
                     result = email_service.send_message(
                         to_email=contact.value,
-                        subject='Тестовое уведомление - Faida Group Store',
+                        subject='Тестовое уведомление - Faida Group',
                         message=test_message
                     )
 
@@ -458,7 +458,7 @@ class NotificationContactViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        test_message = request.data.get('message', f'Тестовое сообщение от Faida Group Store')
+        test_message = request.data.get('message', f'Тестовое сообщение от Faida Group')
 
         try:
             if contact.channel_type == 'whatsapp':
@@ -497,7 +497,7 @@ class NotificationContactViewSet(viewsets.ModelViewSet):
                 )
                 result = email_service.send_message(
                     to_email=contact.value,
-                    subject='Тестовое уведомление - Faida Group Store',
+                    subject='Тестовое уведомление - Faida Group',
                     message=test_message
                 )
 
@@ -704,7 +704,7 @@ class NotificationRuleViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        test_message = request.data.get('message', f'Тестовое сообщение от Faida Group Store через правило "{rule.notification_type.name}"')
+        test_message = request.data.get('message', f'Тестовое сообщение от Faida Group через правило "{rule.notification_type.name}"')
 
         results = []
         channel = rule.channel
@@ -748,7 +748,7 @@ class NotificationRuleViewSet(viewsets.ModelViewSet):
                     )
                     result = email_service.send_message(
                         to_email=contact.value,
-                        subject='Тестовое уведомление - Faida Group Store',
+                        subject='Тестовое уведомление - Faida Group',
                         message=test_message
                     )
 
@@ -898,7 +898,7 @@ class NotificationLogViewSet(viewsets.ReadOnlyModelViewSet):
 
                 result = email_service.send_message(
                     to_email=recipient,
-                    subject=f'{log.notification_type.name} - Faida Group Store',
+                    subject=f'{log.notification_type.name} - Faida Group',
                     message=log.message
                 )
 

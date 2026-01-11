@@ -9,10 +9,19 @@ from django.conf import settings
 from django.db import transaction
 
 from .services import NotificationDispatcher
+from apps.core.models import SiteSettings
 import logging
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
+
+
+def get_site_url():
+    """
+    Получить URL сайта из настроек.
+    """
+    return SiteSettings.get_effective_site_url()
+
 
 def send_password_reset_notification(user, reset_url):
     """
@@ -24,6 +33,7 @@ def send_password_reset_notification(user, reset_url):
             'username': user.username,
             'email': user.email,
             'reset_url': reset_url,
+            'site_url': get_site_url(),
         }
 
         # Отправляем уведомление через новую систему правил
@@ -60,6 +70,7 @@ def send_order_notifications(sender, instance, created, **kwargs):
             'delivery_address': instance.delivery_address or 'Не указан',
             'delivery_comment': instance.delivery_comment or 'Не указано',
             'comment': instance.comment or 'Без комментариев',
+            'site_url': get_site_url(),
         }
 
         if created:
@@ -90,6 +101,7 @@ def send_order_notifications(sender, instance, created, **kwargs):
                         'delivery_address': order.delivery_address or 'Не указан',
                         'delivery_comment': order.delivery_comment or 'Не указано',
                         'comment': order.comment or 'Без комментариев',
+                        'site_url': get_site_url(),
                     }
 
                     logger.info(f"🔔 Отправка уведомления о новом заказе: {order.order_number}")

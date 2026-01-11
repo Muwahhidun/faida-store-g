@@ -48,6 +48,7 @@ const AdminPanelPage: React.FC = () => {
     const [loadingCategories, setLoadingCategories] = useState(false);
 
     // Настройки
+    const [siteUrl, setSiteUrl] = useState<string>('');
     const [minStock, setMinStock] = useState<number>(0);
     const [defaultStockDisplayStyle, setDefaultStockDisplayStyle] = useState<string>('detailed_status');
     const [defaultLowStockThreshold, setDefaultLowStockThreshold] = useState<number>(5);
@@ -145,6 +146,7 @@ const AdminPanelPage: React.FC = () => {
     const fetchSettings = async () => {
         try {
             const settingsResponse = await adminClient.get('/settings/1/');
+            setSiteUrl(settingsResponse.data.site_url || '');
             setMinStock(settingsResponse.data.min_stock_for_display);
             setDefaultStockDisplayStyle(settingsResponse.data.default_stock_display_style || 'detailed_status');
             setDefaultLowStockThreshold(settingsResponse.data.default_low_stock_threshold || 5);
@@ -258,95 +260,95 @@ const AdminPanelPage: React.FC = () => {
                 {/* Основной контент */}
                 <div className="container mx-auto px-4 py-6">
                     {/* Табы */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-x-auto">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-x-auto scrollbar-hide">
                         <div className="flex border-b border-gray-200">
                             <button
                                 onClick={() => setSelectedTab('settings')}
-                                className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                                className={`flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2 px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
                                     selectedTab === 'settings'
                                         ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
                                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
-                                <FaCog className="w-4 h-4" />
-                                <span>Настройки сайта</span>
+                                <FaCog className="w-5 h-5 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">Настройки сайта</span>
                             </button>
                             <button
                                 onClick={() => setSelectedTab('sources')}
-                                className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                                className={`flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2 px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
                                     selectedTab === 'sources'
                                         ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
                                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
-                                <FaDatabase className="w-4 h-4" />
-                                <span>Источники ({sources.length})</span>
+                                <FaDatabase className="w-5 h-5 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">Источники ({sources.length})</span>
                             </button>
                             <button
                                 onClick={() => setSelectedTab('categories')}
-                                className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                                className={`flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2 px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
                                     selectedTab === 'categories'
                                         ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
                                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
-                                <FaList className="w-4 h-4" />
-                                <span>Категории ({categories.length})</span>
-                                </button>
-                                <button
-                                    onClick={() => setSelectedTab('brands')}
-                                    className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                                        selectedTab === 'brands'
-                                            ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                                    }`}
-                                >
-                                    <FaTrademark className="w-4 h-4" />
-                                    <span>Бренды ({brands.length})</span>
-                                </button>
-                                <button
-                                    onClick={() => setSelectedTab('products')}
-                                    className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                                        selectedTab === 'products'
-                                            ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                                    }`}
-                                >
-                                    <FaTags className="w-4 h-4" />
-                                    <span>Товары ({productsCount})</span>
-                                </button>
+                                <FaList className="w-5 h-5 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">Категории ({categories.length})</span>
+                            </button>
+                            <button
+                                onClick={() => setSelectedTab('brands')}
+                                className={`flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2 px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
+                                    selectedTab === 'brands'
+                                        ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                }`}
+                            >
+                                <FaTrademark className="w-5 h-5 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">Бренды ({brands.length})</span>
+                            </button>
+                            <button
+                                onClick={() => setSelectedTab('products')}
+                                className={`flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2 px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
+                                    selectedTab === 'products'
+                                        ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                }`}
+                            >
+                                <FaTags className="w-5 h-5 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">Товары ({productsCount})</span>
+                            </button>
                             <button
                                 onClick={() => setSelectedTab('users')}
-                                className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                                className={`flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2 px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
                                     selectedTab === 'users'
                                         ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
                                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
-                                <FaUsers className="w-4 h-4" />
-                                <span>Пользователи ({usersCount})</span>
+                                <FaUsers className="w-5 h-5 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">Пользователи ({usersCount})</span>
                             </button>
                             <button
                                 onClick={() => setSelectedTab('orders')}
-                                className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                                className={`flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2 px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
                                     selectedTab === 'orders'
                                         ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
                                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
-                                <FaShoppingBag className="w-4 h-4" />
-                                <span>Заказы ({ordersCount})</span>
+                                <FaShoppingBag className="w-5 h-5 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">Заказы ({ordersCount})</span>
                             </button>
                             <button
                                 onClick={() => setSelectedTab('notifications')}
-                                className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                                className={`flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2 px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
                                     selectedTab === 'notifications'
                                         ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
                                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
-                                <FaBell className="w-4 h-4" />
-                                <span>Уведомления</span>
+                                <FaBell className="w-5 h-5 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">Уведомления</span>
                             </button>
                         </div>
                     </div>
@@ -362,6 +364,7 @@ const AdminPanelPage: React.FC = () => {
                             <div style={{ display: selectedTab === 'settings' ? 'block' : 'none' }}>
                                 <SettingsSection
                                     initialSettings={{
+                                        siteUrl,
                                         minStock,
                                         defaultStockDisplayStyle,
                                         defaultLowStockThreshold,

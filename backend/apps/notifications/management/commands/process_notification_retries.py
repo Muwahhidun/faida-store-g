@@ -70,7 +70,7 @@ class Command(BaseCommand):
 
                     try:
                         send_mail(
-                            subject=f"{log.notification_type.name} - Faida Group Store",
+                            subject=f"{log.notification_type.name} - Faida Group",
                             message=log.message,
                             from_email=settings.DEFAULT_FROM_EMAIL,
                             recipient_list=[log.recipient_value],

@@ -48,8 +48,8 @@ const App: React.FC = () => {
       <CartProvider>
         <Toaster position="top-right" />
         <Helmet
-        defaultTitle="Faida Group Store - Качественные халяль продукты"
-        titleTemplate="%s | Faida Group Store"
+        defaultTitle="Faida Group - Качественные халяль продукты"
+        titleTemplate="%s | Faida Group"
       >
         <meta name="description" content="Интернет-магазин качественных халяль продуктов Faida Group. Натуральные колбасные изделия, мясные деликатесы с доставкой по России." />
         <meta name="keywords" content="халяль, колбаса, мясные продукты, натуральные, качественные, доставка" />
@@ -57,13 +57,13 @@ const App: React.FC = () => {
         
         {/* Open Graph */}
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Faida Group Store - Качественные халяль продукты" />
+        <meta property="og:title" content="Faida Group - Качественные халяль продукты" />
         <meta property="og:description" content="Интернет-магазин качественных халяль продуктов с доставкой по России" />
         <meta property="og:image" content="/og-image.jpg" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Faida Group Store" />
+        <meta name="twitter:title" content="Faida Group" />
         <meta name="twitter:description" content="Качественные халяль продукты с доставкой" />
       </Helmet>
 

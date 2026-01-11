@@ -238,7 +238,7 @@ Email: {{email}}
 Новый статус: {{new_status}}
 
 С уважением,
-Faida Group Store'''
+Faida Group'''
             }
         )
 
@@ -263,10 +263,10 @@ Faida Group Store'''
             channel_type='email',
             name='Стандартный',
             defaults={
-                'subject': 'Активация аккаунта - Faida Group Store',
+                'subject': 'Активация аккаунта - Faida Group',
                 'template': '''<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
     <div style="background: linear-gradient(135deg, #0E1A3A 0%, #162956 100%); padding: 30px; text-align: center;">
-        <h1 style="color: #F2C56D; margin: 0;">Faida Group Store</h1>
+        <h1 style="color: #F2C56D; margin: 0;">Faida Group</h1>
     </div>
     <div style="padding: 30px; background: #f9f9f9;">
         <h2 style="color: #0E1A3A;">Добро пожаловать, {{first_name}}!</h2>
@@ -295,7 +295,7 @@ Faida Group Store'''
     </div>
     <div style="background: #0E1A3A; padding: 20px; text-align: center;">
         <p style="color: #F2C56D; margin: 0; font-size: 12px;">
-            © Faida Group Store. Все права защищены.
+            © Faida Group. Все права защищены.
         </p>
     </div>
 </div>'''
@@ -310,7 +310,7 @@ Faida Group Store'''
                 'subject': 'Новая регистрация на сайте',
                 'template': '''Здравствуйте!
 
-На сайте Faida Group Store зарегистрировался новый пользователь:
+На сайте Faida Group зарегистрировался новый пользователь:
 
 Логин: {{username}}
 Email: {{email}}
@@ -341,10 +341,10 @@ Email: {{email}}
             channel_type='email',
             name='Стандартный',
             defaults={
-                'subject': 'Сброс пароля - Faida Group Store',
+                'subject': 'Сброс пароля - Faida Group',
                 'template': '''<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
     <div style="background: linear-gradient(135deg, #0E1A3A 0%, #162956 100%); padding: 30px; text-align: center;">
-        <h1 style="color: #F2C56D; margin: 0;">Faida Group Store</h1>
+        <h1 style="color: #F2C56D; margin: 0;">Faida Group</h1>
     </div>
     <div style="padding: 30px; background: #f9f9f9;">
         <h2 style="color: #0E1A3A;">Сброс пароля</h2>
@@ -374,7 +374,7 @@ Email: {{email}}
     </div>
     <div style="background: #0E1A3A; padding: 20px; text-align: center;">
         <p style="color: #F2C56D; margin: 0; font-size: 12px;">
-            © Faida Group Store. Все права защищены.
+            © Faida Group. Все права защищены.
         </p>
     </div>
 </div>'''

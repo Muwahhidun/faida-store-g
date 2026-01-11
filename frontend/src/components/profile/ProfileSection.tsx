@@ -114,10 +114,10 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                         </div>
                         <button
                             onClick={() => setEditNameOpen(true)}
-                            className="flex items-center space-x-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="flex items-center space-x-2 px-2 sm:px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                             <FaEdit className="w-4 h-4" />
-                            <span>Изменить</span>
+                            <span className="hidden sm:inline">Изменить</span>
                         </button>
                     </div>
                 </div>
@@ -137,10 +137,10 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                         </div>
                         <button
                             onClick={() => setEditEmailOpen(true)}
-                            className="flex items-center space-x-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="flex items-center space-x-2 px-2 sm:px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                             <FaEdit className="w-4 h-4" />
-                            <span>Изменить</span>
+                            <span className="hidden sm:inline">Изменить</span>
                         </button>
                     </div>
                 </div>
@@ -160,10 +160,10 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                         </div>
                         <button
                             onClick={() => setEditPhoneOpen(true)}
-                            className="flex items-center space-x-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="flex items-center space-x-2 px-2 sm:px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                             <FaEdit className="w-4 h-4" />
-                            <span>Изменить</span>
+                            <span className="hidden sm:inline">Изменить</span>
                         </button>
                     </div>
                 </div>
@@ -181,10 +181,10 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                         </div>
                         <button
                             onClick={() => setEditPasswordOpen(true)}
-                            className="flex items-center space-x-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="flex items-center space-x-2 px-2 sm:px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                             <FaEdit className="w-4 h-4" />
-                            <span>Изменить</span>
+                            <span className="hidden sm:inline">Изменить</span>
                         </button>
                     </div>
                 </div>

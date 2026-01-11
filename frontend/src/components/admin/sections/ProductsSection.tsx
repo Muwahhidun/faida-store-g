@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTags, FaSpinner, FaSlidersH, FaTimesCircle } from 'react-icons/fa';
+import { FaTags, FaSpinner, FaSlidersH, FaTimesCircle, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { Product, Category, Source, GlobalSettings } from '../../../types/admin';
 import { adminClient } from '../../../api/adminClient';
 import { VisibilityIndicator } from '../indicators/VisibilityIndicator';
@@ -189,11 +189,10 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
             </div>
 
             {/* Панель фильтров */}
-            <div className="mb-6">
-                <div className="flex items-end gap-4">
-                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+            <div className="mb-6 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                     {/* Поиск */}
-                    <div className="lg:col-span-2">
+                    <div className="sm:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2">Поиск</label>
                         <input
                             type="text"
@@ -284,29 +283,28 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
                             label="Настройки остатков"
                         />
                     </div>
-                    </div>
-
-                    {/* Кнопка очистки фильтров */}
-                    <button
-                        onClick={() => {
-                            setSearchTerm('');
-                            const clearedFilters = {
-                                source: '',
-                                category: '',
-                                is_visible_on_site: '',
-                                use_default_stock_settings: '',
-                                ordering: '-updated_at'
-                            };
-                            setFilters(clearedFilters);
-                            fetchProducts(1, '', clearedFilters);
-                        }}
-                        className="px-4 py-2 h-[42px] bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 text-sm font-medium whitespace-nowrap"
-                        title="Очистить все фильтры"
-                    >
-                        <FaTimesCircle className="w-4 h-4" />
-                        Очистить фильтры
-                    </button>
                 </div>
+
+                {/* Кнопка очистки фильтров */}
+                <button
+                    onClick={() => {
+                        setSearchTerm('');
+                        const clearedFilters = {
+                            source: '',
+                            category: '',
+                            is_visible_on_site: '',
+                            use_default_stock_settings: '',
+                            ordering: '-updated_at'
+                        };
+                        setFilters(clearedFilters);
+                        fetchProducts(1, '', clearedFilters);
+                    }}
+                    className="w-full sm:w-auto px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                    title="Очистить все фильтры"
+                >
+                    <FaTimesCircle className="w-4 h-4" />
+                    <span>Очистить фильтры</span>
+                </button>
             </div>
 
             {/* Список товаров */}
@@ -407,23 +405,25 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({
 
                 {/* Пагинация */}
                 {pagination.total_pages > 1 && (
-                    <div className="px-4 py-3 border border-gray-200 rounded-lg mt-4 flex items-center justify-between bg-white">
+                    <div className="px-3 sm:px-4 py-3 border border-gray-200 rounded-lg mt-4 flex items-center justify-between bg-white">
                         <button
                             onClick={() => fetchProducts(pagination.page - 1, searchTerm, filters)}
                             disabled={!pagination.previous}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
                         >
-                            Назад
+                            <FaChevronLeft className="w-4 h-4" />
+                            <span className="hidden sm:inline">Назад</span>
                         </button>
-                        <span className="text-sm text-gray-700">
-                            Страница {pagination.page} из {pagination.total_pages}
+                        <span className="text-xs sm:text-sm text-gray-700">
+                            {pagination.page} / {pagination.total_pages}
                         </span>
                         <button
                             onClick={() => fetchProducts(pagination.page + 1, searchTerm, filters)}
                             disabled={!pagination.next}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
                         >
-                            Вперёд
+                            <span className="hidden sm:inline">Вперёд</span>
+                            <FaChevronRight className="w-4 h-4" />
                         </button>
                     </div>
                 )}

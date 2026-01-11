@@ -160,7 +160,7 @@ const RegisterPage: React.FC = () => {
                         Создать аккаунт
                     </h2>
                     <p className="text-gray-600">
-                        Присоединяйтесь к Faida Group Store
+                        Присоединяйтесь к Faida Group
                     </p>
                 </div>
 

@@ -586,12 +586,12 @@ export default function ChannelModal({
                                             </div>
                                         )}
 
-                                        <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-6 pt-4 border-t gap-3">
                                             <button
                                                 type="button"
                                                 onClick={handleTestConnection}
                                                 disabled={isTesting || isSaving}
-                                                className="px-4 py-2 text-secondary-600 bg-blue-50 rounded-lg hover:bg-secondary-100 disabled:opacity-50 flex items-center space-x-2"
+                                                className="px-4 py-2 text-secondary-600 bg-blue-50 rounded-lg hover:bg-secondary-100 disabled:opacity-50 flex items-center justify-center space-x-2 w-full sm:w-auto"
                                             >
                                                 {isTesting ? (
                                                     <>
@@ -606,12 +606,12 @@ export default function ChannelModal({
                                                 )}
                                             </button>
 
-                                            <div className="flex space-x-3">
+                                            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                                 {mode === 'create' && (
                                                     <button
                                                         type="button"
                                                         onClick={handleBack}
-                                                        className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                                                        className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 w-full sm:w-auto"
                                                         disabled={isSaving}
                                                     >
                                                         Назад
@@ -620,7 +620,7 @@ export default function ChannelModal({
                                                 <button
                                                     type="button"
                                                     onClick={() => !isSaving && onClose()}
-                                                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                                                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 w-full sm:w-auto"
                                                     disabled={isSaving || isTesting}
                                                 >
                                                     Отмена
@@ -628,7 +628,7 @@ export default function ChannelModal({
                                                 <button
                                                     type="submit"
                                                     disabled={isSaving || isTesting}
-                                                    className="px-4 py-2 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 disabled:opacity-50 flex items-center space-x-2"
+                                                    className="px-4 py-2 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 disabled:opacity-50 flex items-center justify-center space-x-2 w-full sm:w-auto"
                                                 >
                                                     <FaSave />
                                                     <span>{isSaving ? 'Сохранение...' : 'Сохранить'}</span>

@@ -100,10 +100,10 @@ const NewsPage: React.FC = () => {
               <FaArrowLeft className="w-4 h-4" />
               На главную
             </Link>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold">Новости</h1>
-                <p className="text-gray-400 mt-2">
+                <h1 className="text-2xl sm:text-3xl font-bold">Новости</h1>
+                <p className="text-gray-400 mt-2 text-sm sm:text-base">
                   {news.length > 0
                     ? `Всего новостей: ${news.length}`
                     : 'Актуальные новости компании Faida Group'}
@@ -112,10 +112,10 @@ const NewsPage: React.FC = () => {
               {canManageNews && (
                 <Link
                   to="/news/new"
-                  className="flex items-center px-4 py-2 bg-secondary-500 text-primary-900 rounded-lg hover:bg-secondary-600 transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+                  className="flex items-center justify-center px-4 py-2 bg-secondary-500 text-primary-900 rounded-lg hover:bg-secondary-600 transition-all duration-200 font-semibold shadow-md hover:shadow-lg w-full sm:w-auto"
                 >
-                  <FaPlus className="w-4 h-4 mr-2" />
-                  Добавить новость
+                  <FaPlus className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Добавить новость</span>
                 </Link>
               )}
             </div>

@@ -203,7 +203,7 @@ const TemplatesTab: React.FC<TemplatesTabProps> = ({ onCreateTemplate, onEditTem
         return (
             <div className={`${template.is_system ? 'bg-gray-50' : 'bg-white'}`}>
                 {/* Заголовок шаблона (кликабельный) */}
-                <div className="flex items-center justify-between pl-12 pr-3 py-3 hover:bg-gray-100 transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pl-4 sm:pl-12 pr-3 py-3 hover:bg-gray-100 transition-colors gap-2">
                     <button
                         onClick={() => toggleTemplate(template.id)}
                         className="flex items-center space-x-2 flex-1 text-left"
@@ -231,7 +231,7 @@ const TemplatesTab: React.FC<TemplatesTabProps> = ({ onCreateTemplate, onEditTem
                     </button>
 
                     {/* Действия */}
-                    <div className="flex items-center space-x-1 ml-2 flex-shrink-0">
+                    <div className="flex items-center space-x-1 sm:ml-2 flex-shrink-0 self-end sm:self-auto">
                         {/* Кнопка "Установить по умолчанию" */}
                         <button
                             onClick={(e) => {
@@ -295,7 +295,7 @@ const TemplatesTab: React.FC<TemplatesTabProps> = ({ onCreateTemplate, onEditTem
 
                 {/* Детали шаблона (показываются при раскрытии) */}
                 {isExpanded && (
-                    <div className="pl-12 pr-3 pb-3 space-y-2">
+                    <div className="pl-4 sm:pl-12 pr-3 pb-3 space-y-2">
                         {/* Тема (для email) */}
                         {template.subject && (
                             <div className="p-2 bg-white rounded border border-gray-200">
@@ -372,7 +372,7 @@ const TemplatesTab: React.FC<TemplatesTabProps> = ({ onCreateTemplate, onEditTem
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                     <h3 className="text-lg font-semibold text-gray-900">Шаблоны уведомлений</h3>
                     <p className="text-sm text-gray-600 mt-1">
@@ -381,7 +381,7 @@ const TemplatesTab: React.FC<TemplatesTabProps> = ({ onCreateTemplate, onEditTem
                 </div>
                 <button
                     onClick={onCreateTemplate}
-                    className="btn-primary flex items-center space-x-2"
+                    className="btn-primary flex items-center justify-center space-x-2 w-full sm:w-auto"
                 >
                     <FaPlus className="w-4 h-4" />
                     <span>Создать шаблон</span>

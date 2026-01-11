@@ -137,50 +137,50 @@ const ProfilePage: React.FC = () => {
             <div className="container mx-auto px-4 py-6">
                 {/* Табы */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-                    <div className="flex border-b border-gray-200">
+                    <div className="flex border-b border-gray-200 overflow-x-auto scrollbar-hide">
                         <button
                             onClick={() => setSelectedTab('profile')}
-                            className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+                            className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
                                 selectedTab === 'profile'
                                     ? 'border-blue-600 text-secondary-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                         >
                             <FaUser className="w-4 h-4" />
-                            <span>Профиль</span>
+                            <span className="hidden sm:inline">Профиль</span>
                         </button>
                         <button
                             onClick={() => setSelectedTab('orders')}
-                            className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+                            className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
                                 selectedTab === 'orders'
                                     ? 'border-green-600 text-success-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                         >
                             <FaShoppingBag className="w-4 h-4" />
-                            <span>Мои заказы</span>
+                            <span className="hidden sm:inline">Мои заказы</span>
                         </button>
                         <button
                             onClick={() => setSelectedTab('addresses')}
-                            className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+                            className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
                                 selectedTab === 'addresses'
                                     ? 'border-purple-600 text-purple-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                         >
                             <FaMapMarkerAlt className="w-4 h-4" />
-                            <span>Адреса доставки</span>
+                            <span className="hidden sm:inline">Адреса</span>
                         </button>
                         <button
                             onClick={() => setSelectedTab('favorites')}
-                            className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+                            className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
                                 selectedTab === 'favorites'
                                     ? 'border-red-500 text-red-500'
                                     : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                         >
                             <FaHeart className="w-4 h-4" />
-                            <span>Избранное</span>
+                            <span className="hidden sm:inline">Избранное</span>
                         </button>
                     </div>
                 </div>

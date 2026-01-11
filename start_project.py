@@ -26,7 +26,7 @@ def run_command(command, check=True):
 def main():
     """Основная функция запуска."""
     
-    print("🚀 Запуск Faida Group Store...")
+    print("🚀 Запуск Faida Group...")
     
     # 1. Проверяем наличие Docker
     print("\n1️⃣ Проверяем Docker...")

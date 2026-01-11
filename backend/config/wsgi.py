@@ -1,5 +1,5 @@
 """
-WSGI конфигурация для проекта Faida Group Store.
+WSGI конфигурация для проекта Faida Group.
 """
 
 import os

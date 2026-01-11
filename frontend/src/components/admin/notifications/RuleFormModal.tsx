@@ -207,7 +207,7 @@ export const RuleFormModal: React.FC<RuleFormModalProps> = ({
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Тип правила <span className="text-red-500">*</span>
                         </label>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <button
                                 type="button"
                                 onClick={() => handleChange('rule_type', 'system')}

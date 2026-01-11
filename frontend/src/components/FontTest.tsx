@@ -72,7 +72,7 @@ export const FontTest = () => {
         <p className="font-light text-lg leading-relaxed">
           Фирменный шрифт TikTok Sans отлично читается как на светлом, так и на
           темном фоне. Это важно для создания единообразного дизайна во всех
-          разделах сайта Faida Group Store.
+          разделах сайта Faida Group.
         </p>
       </div>
 

@@ -116,8 +116,8 @@ const CartPage: React.FC = () => {
         
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center py-16">
-            <ShoppingCartIcon className="w-24 h-24 text-gray-300 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            <ShoppingCartIcon className="w-16 sm:w-24 h-16 sm:h-24 text-gray-300 mx-auto mb-6" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
               Корзина пуста
             </h1>
             <p className="text-gray-600 mb-8 text-lg">
@@ -163,11 +163,11 @@ const CartPage: React.FC = () => {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6"
               >
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3 sm:gap-4">
                   {/* Изображение товара */}
-                  <div className="flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden">
+                  <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-gray-50 rounded-lg overflow-hidden">
                     {item.image ? (
                       <ProductImage
                         src={item.image}
@@ -176,7 +176,7 @@ const CartPage: React.FC = () => {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                        <ShoppingCartIcon className="w-8 h-8 text-gray-400" />
+                        <ShoppingCartIcon className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
                       </div>
                     )}
                   </div>
@@ -212,7 +212,7 @@ const CartPage: React.FC = () => {
                     </div>
 
                     {/* Управление количеством */}
-                    <div className="flex items-center justify-between mt-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3">
                       <CartButton
                         product={{
                           id: item.id,
@@ -229,7 +229,7 @@ const CartPage: React.FC = () => {
                       />
 
                       {/* Общая стоимость позиции */}
-                      <div className="text-right">
+                      <div className="text-right sm:text-right">
                         <p className="text-lg font-bold text-primary-800">
                           {formatPrice((typeof item.price === 'string' ? parseFloat(item.price) : item.price) * item.quantity, item.currency)}
                         </p>
@@ -246,7 +246,7 @@ const CartPage: React.FC = () => {
 
           {/* Итоговая информация */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-4">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 lg:sticky lg:top-4">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 Итого
               </h2>
@@ -318,16 +318,16 @@ const CartPage: React.FC = () => {
                 Вы уверены, что хотите удалить все товары из корзины? Это действие нельзя отменить.
               </p>
 
-              <div className="flex justify-end space-x-3">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
                 <button
                   onClick={() => setShowClearConfirm(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium w-full sm:w-auto"
                 >
                   Отмена
                 </button>
                 <button
                   onClick={handleClearCart}
-                  className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-medium"
+                  className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-medium w-full sm:w-auto"
                 >
                   Очистить
                 </button>

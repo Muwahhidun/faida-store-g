@@ -102,7 +102,7 @@ export default function RulesTab({
         return (
             <div key={rule.id}>
                 {/* Заголовок правила (сворачиваемый) */}
-                <div className="flex items-center justify-between pl-12 pr-4 py-4 hover:bg-gray-50 transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pl-4 sm:pl-12 pr-4 py-4 hover:bg-gray-50 transition-colors gap-3">
                     <button
                         onClick={() => toggleRuleExpansion(rule.id)}
                         className="flex items-center space-x-3 flex-1 text-left"
@@ -152,7 +152,7 @@ export default function RulesTab({
                     </button>
 
                     {/* Кнопки управления в заголовке */}
-                    <div className="flex items-center space-x-2 ml-4 flex-shrink-0">
+                    <div className="flex items-center space-x-2 sm:ml-4 flex-shrink-0 self-end sm:self-auto">
                         {hasContacts && rule.is_enabled && onSendTest && (
                             <button
                                 onClick={(e) => {
@@ -215,7 +215,7 @@ export default function RulesTab({
 
                 {/* Детали правила (показываются при раскрытии) */}
                 {isExpanded && (
-                    <div className="pl-12 pr-6 pb-4 pt-2 bg-gray-50">
+                    <div className="pl-4 sm:pl-12 pr-4 sm:pr-6 pb-4 pt-2 bg-gray-50">
                         {/* Статус контактов */}
                         {!hasContacts ? (
                             <div className="flex items-center text-amber-600 p-3 bg-amber-50 border border-amber-200 rounded">
@@ -223,7 +223,7 @@ export default function RulesTab({
                                 <span className="text-sm">Контакты не назначены</span>
                             </div>
                         ) : (
-                            <div className="space-y-2 pl-16">
+                            <div className="space-y-2 pl-0 sm:pl-16">
                                 <div className="text-sm font-medium text-gray-700">
                                     Получатели ({rule.contacts.length}):
                                 </div>
@@ -257,11 +257,11 @@ export default function RulesTab({
     return (
         <div className="space-y-6">
             {/* Заголовок и кнопка создания */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <h3 className="text-lg font-semibold text-gray-900">Правила отправки</h3>
                 <button
                     onClick={onCreateRule}
-                    className="btn-primary flex items-center space-x-2"
+                    className="btn-primary flex items-center justify-center space-x-2 w-full sm:w-auto"
                 >
                     <FaPlus className="w-4 h-4" />
                     <span>Создать правило</span>

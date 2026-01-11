@@ -155,7 +155,7 @@ const ForgotPasswordPage: React.FC = () => {
                 {/* Дополнительная информация */}
                 <div className="text-center">
                     <p className="text-sm text-gray-600">
-                        Faida Group Store - Качественные халяль продукты
+                        Faida Group - Качественные халяль продукты
                     </p>
                 </div>
             </div>

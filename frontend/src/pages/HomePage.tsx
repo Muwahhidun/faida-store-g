@@ -219,32 +219,90 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
             ) : (
-              // Карусель для более 4 брендов
+              // Карусель для более 4 брендов - адаптивная
               <div className="relative overflow-hidden max-w-6xl mx-auto">
-                <div
-                  className="flex gap-8 transition-transform duration-1000 ease-in-out"
-                  style={{
-                    transform: `translateX(-${currentSlide * (100 / 4)}%)`
-                  }}
-                >
-                  {[...brands, ...brands.slice(0, 4)].map((brand, index) => (
-                    <div
-                      key={`${brand.id}-${index}`}
-                      className="flex-shrink-0 flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 group"
-                      style={{ width: 'calc(25% - 1.5rem)' }}
-                    >
-                      <div className="w-32 h-32 mb-4 flex items-center justify-center">
-                        <img
-                          src={brand.logo}
-                          alt={brand.name}
-                          className="max-w-full max-h-full object-contain transform group-hover:scale-110 transition-transform duration-200"
-                        />
+                {/* Мобильная версия - 2 бренда в ряд */}
+                <div className="block sm:hidden">
+                  <div
+                    className="flex gap-4 transition-transform duration-1000 ease-in-out"
+                    style={{
+                      transform: `translateX(-${currentSlide * 50}%)`
+                    }}
+                  >
+                    {[...brands, ...brands.slice(0, 2)].map((brand, index) => (
+                      <div
+                        key={`mobile-${brand.id}-${index}`}
+                        className="flex-shrink-0 w-[calc(50%-0.5rem)] flex flex-col items-center justify-center p-4 bg-white rounded-lg shadow-lg"
+                      >
+                        <div className="w-20 h-20 mb-3 flex items-center justify-center">
+                          <img
+                            src={brand.logo}
+                            alt={brand.name}
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                        <p className="text-xs font-semibold text-primary-800 text-center">
+                          {brand.name}
+                        </p>
                       </div>
-                      <p className="text-sm font-semibold text-primary-800 text-center">
-                        {brand.name}
-                      </p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                </div>
+
+                {/* Планшет - 3 бренда в ряд */}
+                <div className="hidden sm:block lg:hidden">
+                  <div
+                    className="flex gap-6 transition-transform duration-1000 ease-in-out"
+                    style={{
+                      transform: `translateX(-${currentSlide * 33.333}%)`
+                    }}
+                  >
+                    {[...brands, ...brands.slice(0, 3)].map((brand, index) => (
+                      <div
+                        key={`tablet-${brand.id}-${index}`}
+                        className="flex-shrink-0 w-[calc(33.333%-1rem)] flex flex-col items-center justify-center p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 group"
+                      >
+                        <div className="w-24 h-24 mb-4 flex items-center justify-center">
+                          <img
+                            src={brand.logo}
+                            alt={brand.name}
+                            className="max-w-full max-h-full object-contain transform group-hover:scale-110 transition-transform duration-200"
+                          />
+                        </div>
+                        <p className="text-sm font-semibold text-primary-800 text-center">
+                          {brand.name}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Десктоп - 4 бренда в ряд */}
+                <div className="hidden lg:block">
+                  <div
+                    className="flex gap-8 transition-transform duration-1000 ease-in-out"
+                    style={{
+                      transform: `translateX(-${currentSlide * 25}%)`
+                    }}
+                  >
+                    {[...brands, ...brands.slice(0, 4)].map((brand, index) => (
+                      <div
+                        key={`desktop-${brand.id}-${index}`}
+                        className="flex-shrink-0 w-[calc(25%-1.5rem)] flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 group"
+                      >
+                        <div className="w-32 h-32 mb-4 flex items-center justify-center">
+                          <img
+                            src={brand.logo}
+                            alt={brand.name}
+                            className="max-w-full max-h-full object-contain transform group-hover:scale-110 transition-transform duration-200"
+                          />
+                        </div>
+                        <p className="text-sm font-semibold text-primary-800 text-center">
+                          {brand.name}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

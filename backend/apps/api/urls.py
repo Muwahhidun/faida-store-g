@@ -73,7 +73,7 @@ def api_root(request, format=None):
     Корневой endpoint API с информацией о доступных маршрутах.
     """
     return Response({
-        'message': 'Добро пожаловать в API Faida Group Store!',
+        'message': 'Добро пожаловать в API Faida Group!',
         'version': '1.0.0',
         'endpoints': {
             'products': {

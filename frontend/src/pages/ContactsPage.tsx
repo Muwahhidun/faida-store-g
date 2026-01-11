@@ -40,7 +40,7 @@ const ContactsPage: React.FC = () => {
               <FaArrowLeft className="w-4 h-4" />
               На главную
             </Link>
-            <h1 className="text-3xl font-bold">Контакты и доставка</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">Контакты и доставка</h1>
             <p className="text-gray-400 mt-2">Свяжитесь с нами любым удобным способом</p>
           </div>
         </div>
@@ -242,11 +242,11 @@ const ContactsPage: React.FC = () => {
           </div>
 
           {/* Ссылки */}
-          <div className="mt-8 flex flex-wrap gap-4 justify-center text-sm">
+          <div className="mt-8 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 justify-center text-sm">
             <Link to="/privacy" className="text-primary-900 hover:text-secondary-600 transition-colors">
               Политика конфиденциальности
             </Link>
-            <span className="text-gray-300">|</span>
+            <span className="text-gray-300 hidden sm:inline">|</span>
             <Link to="/terms" className="text-primary-900 hover:text-secondary-600 transition-colors">
               Пользовательское соглашение
             </Link>

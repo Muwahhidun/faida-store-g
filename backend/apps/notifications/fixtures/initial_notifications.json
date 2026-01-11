@@ -121,7 +121,7 @@
       "notification_type": 2,
       "channel": 1,
       "subject": "Заказ №{{order_number}} - Статус изменен",
-      "template": "Здравствуйте, {{customer_name}}!\n\nСтатус вашего заказа №{{order_number}} изменен на: {{status_display}}\n\n{% if status == 'confirmed' %}Ваш заказ подтвержден и принят в работу.{% endif %}\n{% if status == 'processing' %}Ваш заказ находится в обработке.{% endif %}\n{% if status == 'shipping' %}Ваш заказ отправлен! Ожидайте доставку.{% endif %}\n{% if status == 'delivered' %}Ваш заказ доставлен. Спасибо за покупку!{% endif %}\n{% if status == 'cancelled' %}Ваш заказ отменен.{% endif %}\n\nС уважением,\nFaida Group Store",
+      "template": "Здравствуйте, {{customer_name}}!\n\nСтатус вашего заказа №{{order_number}} изменен на: {{status_display}}\n\n{% if status == 'confirmed' %}Ваш заказ подтвержден и принят в работу.{% endif %}\n{% if status == 'processing' %}Ваш заказ находится в обработке.{% endif %}\n{% if status == 'shipping' %}Ваш заказ отправлен! Ожидайте доставку.{% endif %}\n{% if status == 'delivered' %}Ваш заказ доставлен. Спасибо за покупку!{% endif %}\n{% if status == 'cancelled' %}Ваш заказ отменен.{% endif %}\n\nС уважением,\nFaida Group",
       "variables_help": {
         "order_number": "Номер заказа",
         "customer_name": "Имя клиента",

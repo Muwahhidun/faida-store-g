@@ -180,7 +180,7 @@ export const NotificationsSection: React.FC = () => {
             for (const operator of activeOperators) {
                 await adminClient.post('/notification-settings/test_whatsapp/', {
                     phone_number: operator.phone_number,
-                    message: `Тестовое сообщение от Faida Group Store\n\nОператор: ${operator.name}\nВремя: ${new Date().toLocaleString('ru-RU')}`,
+                    message: `Тестовое сообщение от Faida Group\n\nОператор: ${operator.name}\nВремя: ${new Date().toLocaleString('ru-RU')}`,
                 });
             }
 

@@ -6,6 +6,7 @@ import { CustomSelect } from '../../CustomSelect';
 
 interface SettingsSectionProps {
     initialSettings: {
+        siteUrl: string;
         minStock: number;
         defaultStockDisplayStyle: string;
         defaultLowStockThreshold: number;
@@ -26,6 +27,7 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
     onSuccess,
     onSettingsUpdate
 }) => {
+    const [siteUrl, setSiteUrl] = useState(initialSettings.siteUrl);
     const [minStock, setMinStock] = useState(initialSettings.minStock);
     const [defaultStockDisplayStyle, setDefaultStockDisplayStyle] = useState(initialSettings.defaultStockDisplayStyle);
     const [defaultLowStockThreshold, setDefaultLowStockThreshold] = useState(initialSettings.defaultLowStockThreshold);
@@ -37,6 +39,7 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
         try {
             // Отправляем PATCH на конкретный объект с ID=1
             await adminClient.patch(`/settings/1/`, {
+                site_url: siteUrl,
                 min_stock_for_display: minStock,
                 default_stock_display_style: defaultStockDisplayStyle,
                 default_low_stock_threshold: defaultLowStockThreshold,
@@ -64,6 +67,30 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
             </div>
 
             <div className="space-y-6">
+                {/* URL сайта */}
+                <div>
+                    <label htmlFor="siteUrl" className="block text-sm font-medium text-gray-700 mb-2">
+                        URL сайта
+                    </label>
+                    <div className="relative">
+                        <input
+                            type="url"
+                            id="siteUrl"
+                            value={siteUrl}
+                            onChange={(e) => setSiteUrl(e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                            placeholder="https://faida.ru"
+                        />
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">
+                        Полный URL сайта для ссылок в уведомлениях. Если пусто, используется значение из переменной окружения.
+                    </p>
+                </div>
+
+                <div className="border-t border-gray-200 pt-6">
+                    <h3 className="text-md font-medium text-gray-900 mb-4">Настройки отображения товаров</h3>
+                </div>
+
                 <div>
                     <label htmlFor="minStock" className="block text-sm font-medium text-gray-700 mb-2">
                         Минимальный остаток для показа

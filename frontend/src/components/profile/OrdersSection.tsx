@@ -152,11 +152,11 @@ const OrdersSection: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* Заголовок */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
         <h3 className="text-lg font-semibold text-gray-900">Мои заказы</h3>
         {pagination.count > 0 && (
           <span className="text-sm text-gray-600">
-            Всего заказов: {pagination.count} • Страница {pagination.page} из {pagination.totalPages}
+            Всего: {pagination.count} <span className="hidden sm:inline">•</span> <span className="sm:hidden">| </span>Стр. {pagination.page}/{pagination.totalPages}
           </span>
         )}
       </div>
@@ -187,34 +187,34 @@ const OrdersSection: React.FC = () => {
                 {/* Шапка заказа (кликабельная) */}
                 <div
                   onClick={() => toggleOrderDetails(order.id)}
-                  className={`flex items-start justify-between mb-4 p-4 rounded-lg cursor-pointer hover:opacity-90 transition-opacity ${statusInfo.bgColor}`}
+                  className={`flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 p-3 sm:p-4 rounded-lg cursor-pointer hover:opacity-90 transition-opacity ${statusInfo.bgColor} gap-3`}
                 >
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h4 className="text-lg font-semibold text-gray-900">
-                        Заказ №{order.order_number}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                      <h4 className="text-base sm:text-lg font-semibold text-gray-900">
+                        №{order.order_number}
                       </h4>
-                      <div className={`flex items-center space-x-1.5 px-3 py-1 rounded-full border-2 ${statusInfo.bgColor} ${statusInfo.color}`}>
-                        <StatusIcon className="w-4 h-4" />
-                        <span className="text-sm font-medium">{statusInfo.label}</span>
+                      <div className={`flex items-center space-x-1.5 px-2 sm:px-3 py-1 rounded-full border-2 ${statusInfo.bgColor} ${statusInfo.color} self-start sm:self-auto`}>
+                        <StatusIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="text-xs sm:text-sm font-medium">{statusInfo.label}</span>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs sm:text-sm text-gray-600">
                       {formatDate(order.created_at)}
                     </p>
                   </div>
 
-                  <div className="flex items-center space-x-3">
-                    <div className="text-right">
-                      <p className="text-sm text-gray-600 mb-1">Итого:</p>
-                      <p className="text-xl font-bold text-gray-900">
+                  <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-200/50">
+                    <div className="sm:text-right">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Итого:</p>
+                      <p className="text-lg sm:text-xl font-bold text-gray-900">
                         {formatPrice(order.total_amount, 'RUB')}
                       </p>
                     </div>
                     {expandedOrderDetails.has(order.id) ? (
-                      <FaChevronUp className="w-5 h-5 text-gray-600" />
+                      <FaChevronUp className="w-5 h-5 text-gray-600 flex-shrink-0" />
                     ) : (
-                      <FaChevronDown className="w-5 h-5 text-gray-600" />
+                      <FaChevronDown className="w-5 h-5 text-gray-600 flex-shrink-0" />
                     )}
                   </div>
                 </div>
@@ -224,37 +224,37 @@ const OrdersSection: React.FC = () => {
                   <>
                     {/* Информация о заказе */}
                     <div className="space-y-2 mb-4 pb-4 border-b border-gray-200">
-                  <div className="flex text-sm">
-                    <span className="text-gray-600 w-40 flex-shrink-0">Получатель:</span>
+                  <div className="flex flex-col sm:flex-row text-sm gap-0.5 sm:gap-0">
+                    <span className="text-gray-600 sm:w-40 flex-shrink-0 font-medium sm:font-normal">Получатель:</span>
                     <span className="text-gray-700">{order.customer_name}</span>
                   </div>
 
-                  <div className="flex text-sm">
-                    <span className="text-gray-600 w-40 flex-shrink-0">Телефон:</span>
+                  <div className="flex flex-col sm:flex-row text-sm gap-0.5 sm:gap-0">
+                    <span className="text-gray-600 sm:w-40 flex-shrink-0 font-medium sm:font-normal">Телефон:</span>
                     <span className="text-gray-700">{order.customer_phone}</span>
                   </div>
 
-                  <div className="flex text-sm">
-                    <span className="text-gray-600 w-40 flex-shrink-0">Адрес доставки:</span>
-                    <span className="text-gray-700">{order.delivery_address}</span>
+                  <div className="flex flex-col sm:flex-row text-sm gap-0.5 sm:gap-0">
+                    <span className="text-gray-600 sm:w-40 flex-shrink-0 font-medium sm:font-normal">Адрес доставки:</span>
+                    <span className="text-gray-700 break-words">{order.delivery_address}</span>
                   </div>
 
                   {order.delivery_comment && (
-                    <div className="flex text-sm">
-                      <span className="text-gray-600 w-40 flex-shrink-0">Примечание:</span>
-                      <span className="text-gray-700">{order.delivery_comment}</span>
+                    <div className="flex flex-col sm:flex-row text-sm gap-0.5 sm:gap-0">
+                      <span className="text-gray-600 sm:w-40 flex-shrink-0 font-medium sm:font-normal">Примечание:</span>
+                      <span className="text-gray-700 break-words">{order.delivery_comment}</span>
                     </div>
                   )}
 
-                  <div className="flex text-sm">
-                    <span className="text-gray-600 w-40 flex-shrink-0">Оплата:</span>
+                  <div className="flex flex-col sm:flex-row text-sm gap-0.5 sm:gap-0">
+                    <span className="text-gray-600 sm:w-40 flex-shrink-0 font-medium sm:font-normal">Оплата:</span>
                     <span className="text-gray-700">{getPaymentMethodLabel(order.payment_method)}</span>
                   </div>
 
                   {order.comment && (
-                    <div className="flex text-sm">
-                      <span className="text-gray-600 w-40 flex-shrink-0">Комментарий:</span>
-                      <span className="text-gray-700">{order.comment}</span>
+                    <div className="flex flex-col sm:flex-row text-sm gap-0.5 sm:gap-0">
+                      <span className="text-gray-600 sm:w-40 flex-shrink-0 font-medium sm:font-normal">Комментарий:</span>
+                      <span className="text-gray-700 break-words">{order.comment}</span>
                     </div>
                   )}
                 </div>
@@ -346,26 +346,26 @@ const OrdersSection: React.FC = () => {
 
       {/* Пагинация */}
       {pagination.totalPages > 1 && (
-        <div className="mt-6 flex items-center justify-between bg-white p-4 rounded-lg border border-gray-200">
+        <div className="mt-6 flex items-center justify-between bg-white p-3 sm:p-4 rounded-lg border border-gray-200">
           <button
             onClick={() => loadOrders(pagination.page - 1)}
             disabled={pagination.page === 1}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <FaChevronLeft className="w-4 h-4" />
-            Предыдущая
+            <span className="hidden sm:inline">Предыдущая</span>
           </button>
 
-          <span className="text-sm text-gray-600">
-            Страница {pagination.page} из {pagination.totalPages}
+          <span className="text-xs sm:text-sm text-gray-600">
+            {pagination.page} / {pagination.totalPages}
           </span>
 
           <button
             onClick={() => loadOrders(pagination.page + 1)}
             disabled={pagination.page === pagination.totalPages}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Следующая
+            <span className="hidden sm:inline">Следующая</span>
             <FaChevronRight className="w-4 h-4" />
           </button>
         </div>

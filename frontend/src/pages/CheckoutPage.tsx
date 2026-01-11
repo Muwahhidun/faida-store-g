@@ -299,9 +299,9 @@ const CheckoutPage: React.FC = () => {
     if (!cart || cart.length === 0) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-                <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8 text-center">
-                    <FaShoppingCart className="mx-auto h-16 w-16 text-gray-400 mb-4" />
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Корзина пуста</h2>
+                <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6 sm:p-8 text-center">
+                    <FaShoppingCart className="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mb-4" />
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Корзина пуста</h2>
                     <p className="text-gray-600 mb-6">
                         Добавьте товары в корзину для оформления заказа
                     </p>
@@ -325,7 +325,7 @@ const CheckoutPage: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Форма оформления */}
                     <div className="lg:col-span-2">
-                        <div className="bg-white shadow-md rounded-lg p-6">
+                        <div className="bg-white shadow-md rounded-lg p-4 sm:p-6">
                             <h2 className="text-xl font-bold mb-6">Контактная информация</h2>
 
                             <form id="checkout-form" onSubmit={handleSubmit} className="space-y-6">
@@ -382,14 +382,14 @@ const CheckoutPage: React.FC = () => {
 
                                 {/* Адрес доставки */}
                                 <div>
-                                    <div className="flex items-center justify-between mb-2">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
                                         <label className="block text-sm font-medium text-gray-700">
                                             Адрес доставки <span className="text-red-500">*</span>
                                         </label>
                                         <button
                                             type="button"
                                             onClick={() => setIsAddressModalOpen(true)}
-                                            className="flex items-center text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                                            className="flex items-center text-sm text-emerald-600 hover:text-emerald-700 font-medium self-start sm:self-auto"
                                         >
                                             <FaPlus className="mr-1" />
                                             Добавить адрес
@@ -613,7 +613,7 @@ const CheckoutPage: React.FC = () => {
 
                     {/* Итоговая информация */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-4">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 lg:sticky lg:top-4">
                             <h2 className="text-lg font-semibold text-gray-900 mb-4">
                                 Итого
                             </h2>

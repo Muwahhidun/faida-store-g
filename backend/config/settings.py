@@ -115,19 +115,22 @@ CACHES = {
     }
 }
 
-# Валидация паролей
+# Валидация паролей (кастомные валидаторы с русскими сообщениями)
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'apps.users.validators.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'apps.users.validators.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'apps.users.validators.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'apps.users.validators.NumericPasswordValidator',
     },
 ]
 
@@ -233,7 +236,7 @@ CORS_EXPOSE_HEADERS = [
 
 # Настройки drf-spectacular (документация API)
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Faida Group Store API',
+    'TITLE': 'Faida Group API',
     'DESCRIPTION': 'API для интернет-магазина с интеграцией 1С',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,

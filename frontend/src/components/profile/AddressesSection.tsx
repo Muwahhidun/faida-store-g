@@ -93,12 +93,12 @@ const AddressesSection: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* Заголовок и кнопка добавления (только если есть адреса) */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <h3 className="text-lg font-semibold text-gray-900">Мои адреса доставки</h3>
         {addresses.length > 0 && (
           <button
             onClick={handleAddAddress}
-            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition w-full sm:w-auto"
           >
             <FaPlus className="w-4 h-4" />
             <span>Добавить адрес</span>
@@ -127,11 +127,11 @@ const AddressesSection: React.FC = () => {
                 address.is_default ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white'
               }`}
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                <div className="flex-1 min-w-0">
                   {/* Метка и иконка основного адреса */}
-                  <div className="flex items-center space-x-2 mb-2">
-                    <FaMapMarkerAlt className={address.is_default ? 'text-blue-600' : 'text-gray-400'} />
+                  <div className="flex items-center flex-wrap gap-2 mb-2">
+                    <FaMapMarkerAlt className={`flex-shrink-0 ${address.is_default ? 'text-blue-600' : 'text-gray-400'}`} />
                     {address.label && (
                       <span className="text-sm font-medium text-gray-700">{address.label}</span>
                     )}
@@ -144,18 +144,18 @@ const AddressesSection: React.FC = () => {
                   </div>
 
                   {/* Адрес */}
-                  <p className="text-gray-900 mb-1">{formatAddress(address)}</p>
+                  <p className="text-gray-900 mb-1 text-sm sm:text-base break-words">{formatAddress(address)}</p>
 
                   {/* Комментарий */}
                   {address.comment && (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 break-words">
                       Примечание: {address.comment}
                     </p>
                   )}
                 </div>
 
                 {/* Кнопки действий */}
-                <div className="flex items-center space-x-2 ml-4">
+                <div className="flex items-center space-x-1 sm:space-x-2 sm:ml-4 border-t sm:border-t-0 pt-3 sm:pt-0 mt-1 sm:mt-0">
                   {!address.is_default && (
                     <button
                       onClick={() => handleSetDefault(address.id)}

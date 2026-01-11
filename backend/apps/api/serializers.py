@@ -164,11 +164,11 @@ class ProductManagementSerializer(serializers.ModelSerializer):
 
 class SiteSettingsSerializer(serializers.ModelSerializer):
     """Сериализатор для настроек сайта."""
-    
+
     class Meta:
         model = SiteSettings
         fields = [
-            'min_stock_for_display', 'default_stock_display_style',
+            'site_url', 'min_stock_for_display', 'default_stock_display_style',
             'default_low_stock_threshold', 'show_stock_quantities_globally'
         ]
 

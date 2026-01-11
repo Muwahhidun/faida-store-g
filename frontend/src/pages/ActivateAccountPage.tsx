@@ -9,6 +9,18 @@ import axios from 'axios';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { CheckCircleIcon, XCircleIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
+// Перевод ошибок Djoser на русский
+const translateDjoserError = (error: string): string => {
+  const translations: Record<string, string> = {
+    'Stale token for given user.': 'Ссылка активации устарела или уже была использована.',
+    'Invalid token for given user.': 'Неверная ссылка активации.',
+    'Invalid user id or user doesn\'t exist.': 'Пользователь не найден.',
+    'User account is disabled.': 'Аккаунт пользователя отключён.',
+    'User with given email does not exist.': 'Пользователь с таким email не найден.',
+  };
+  return translations[error] || error;
+};
+
 const ActivateAccountPage: React.FC = () => {
   const { uid, token } = useParams<{ uid: string; token: string }>();
   const navigate = useNavigate();
@@ -39,7 +51,8 @@ const ActivateAccountPage: React.FC = () => {
         } else {
           const data = await response.json();
           setStatus('error');
-          setErrorMessage(data.detail || 'Ошибка активации аккаунта. Возможно, ссылка устарела или недействительна.');
+          const rawError = data.detail || 'Ошибка активации аккаунта.';
+          setErrorMessage(translateDjoserError(rawError));
         }
       } catch (error) {
         setStatus('error');
@@ -90,7 +103,7 @@ const ActivateAccountPage: React.FC = () => {
     <>
       <Helmet>
         <title>Активация аккаунта</title>
-        <meta name="description" content="Активация аккаунта Faida Group Store" />
+        <meta name="description" content="Активация аккаунта Faida Group" />
       </Helmet>
 
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

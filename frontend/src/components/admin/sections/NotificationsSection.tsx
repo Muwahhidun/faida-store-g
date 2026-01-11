@@ -99,19 +99,19 @@ export const NotificationsSection: React.FC = () => {
 
                 {/* Табы */}
                 <div className="mt-6 border-b border-gray-200">
-                    <nav className="-mb-px flex space-x-4 overflow-x-auto">
+                    <nav className="-mb-px flex space-x-2 sm:space-x-4 overflow-x-auto scrollbar-hide">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center space-x-2 px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+                                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
                                     activeTab === tab.id
                                         ? 'border-blue-600 text-secondary-600'
                                         : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                                 }`}
                             >
                                 {tab.icon}
-                                <span>{tab.label}</span>
+                                <span className="hidden sm:inline">{tab.label}</span>
                             </button>
                         ))}
                     </nav>
@@ -391,11 +391,11 @@ const ChannelsTab: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <h3 className="text-lg font-semibold text-gray-900">Каналы связи</h3>
                 <button
                     onClick={handleOpenCreate}
-                    className="btn-secondary text-sm flex items-center space-x-2"
+                    className="btn-secondary text-sm flex items-center justify-center space-x-2 w-full sm:w-auto"
                 >
                     <FaPlus className="w-3 h-3" />
                     <span>Добавить канал</span>
@@ -649,7 +649,7 @@ const ContactsTab: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                     <h3 className="text-lg font-semibold text-gray-900">Контакты получателей</h3>
                     <p className="text-sm text-gray-600 mt-1">
@@ -658,7 +658,7 @@ const ContactsTab: React.FC = () => {
                 </div>
                 <button
                     onClick={handleCreate}
-                    className="btn-primary flex items-center space-x-2"
+                    className="btn-primary flex items-center justify-center space-x-2 w-full sm:w-auto"
                 >
                     <FaPlus className="w-4 h-4" />
                     <span>Добавить контакт</span>
@@ -1002,7 +1002,7 @@ const LogsTab: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <h3 className="text-lg font-semibold text-gray-900">Логи уведомлений</h3>
                 <p className="text-sm text-gray-600">Обновляется каждые 30 секунд</p>
             </div>
@@ -1043,9 +1043,9 @@ const LogsTab: React.FC = () => {
             <div className="space-y-3">
                 {filteredLogs.slice(0, 50).map((log) => (
                     <div key={log.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                        <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                                <div className="flex items-center space-x-3 mb-2">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                                <div className="flex flex-wrap items-center gap-2 mb-2">
                                     <h4 className="font-semibold text-gray-900">{log.notification_type_name}</h4>
                                     {getStatusBadge(log.status)}
                                     <span className="text-sm text-gray-500">{log.channel_name}</span>
@@ -1083,7 +1083,7 @@ const LogsTab: React.FC = () => {
                                 <button
                                     onClick={() => handleRetry(log.id)}
                                     disabled={retryNotification.isPending}
-                                    className="btn-secondary text-sm flex items-center space-x-2"
+                                    className="btn-secondary text-sm flex items-center justify-center space-x-2 w-full sm:w-auto flex-shrink-0"
                                     title="Повторить отправку"
                                 >
                                     {retryNotification.isPending ? (

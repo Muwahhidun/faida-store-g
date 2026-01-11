@@ -1,11 +1,21 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+import os
 
 class SiteSettings(models.Model):
     """
     Модель для хранения глобальных настроек сайта.
     Использует паттерн Singleton, чтобы гарантировать наличие только одной записи.
     """
+    # URL сайта для уведомлений
+    site_url = models.CharField(
+        max_length=255,
+        default='',
+        blank=True,
+        verbose_name="URL сайта",
+        help_text="Полный URL сайта для ссылок в уведомлениях (например: https://faida.ru). Если пусто, используется значение из переменной окружения FRONTEND_URL."
+    )
+
     min_stock_for_display = models.PositiveIntegerField(
         default=1,
         validators=[MinValueValidator(0)],
@@ -59,3 +69,25 @@ class SiteSettings(models.Model):
         """
         obj, created = cls.objects.get_or_create(pk=1)
         return obj
+
+    def get_site_url(self):
+        """
+        Возвращает URL сайта. Если не указан в настройках, берет из переменной окружения.
+        """
+        if self.site_url:
+            # Убираем trailing slash если есть
+            return self.site_url.rstrip('/')
+        # Fallback на переменную окружения
+        env_url = os.getenv('FRONTEND_URL', 'localhost:5173')
+        # Добавляем протокол если нет
+        if not env_url.startswith('http'):
+            env_url = f'http://{env_url}'
+        return env_url.rstrip('/')
+
+    @classmethod
+    def get_effective_site_url(cls):
+        """
+        Статический метод для получения URL сайта без создания экземпляра.
+        """
+        settings = cls.load()
+        return settings.get_site_url()
