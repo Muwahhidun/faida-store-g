@@ -3,6 +3,33 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
+// Перевод ошибок Djoser/Django на русский
+const translateError = (error: string): string => {
+    const translations: Record<string, string> = {
+        // Пароли
+        'The two password fields didn\'t match.': 'Пароли не совпадают.',
+        'This password is too short. It must contain at least 8 characters.': 'Пароль слишком короткий. Минимум 8 символов.',
+        'This password is too common.': 'Этот пароль слишком распространённый.',
+        'This password is entirely numeric.': 'Пароль не может состоять только из цифр.',
+        'The password is too similar to the username.': 'Пароль слишком похож на имя пользователя.',
+        'The password is too similar to the email address.': 'Пароль слишком похож на email.',
+        // Email
+        'user with this email already exists.': 'Пользователь с таким email уже зарегистрирован.',
+        'Enter a valid email address.': 'Введите корректный email адрес.',
+        // Username
+        'A user with that username already exists.': 'Пользователь с таким именем уже существует.',
+        'user with this username already exists.': 'Пользователь с таким именем уже существует.',
+        'This field may not be blank.': 'Это поле обязательно для заполнения.',
+        'This field is required.': 'Это поле обязательно для заполнения.',
+    };
+    return translations[error] || error;
+};
+
+// Перевод массива ошибок
+const translateErrors = (errors: string[]): string[] => {
+    return errors.map(translateError);
+};
+
 const RegisterPage: React.FC = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -82,15 +109,22 @@ const RegisterPage: React.FC = () => {
                 const errors = err.response.data;
 
                 if (typeof errors === 'object') {
-                    setFieldErrors(errors);
+                    // Переводим ошибки на русский
+                    const translatedErrors: Record<string, string[]> = {};
+                    Object.entries(errors).forEach(([field, messages]) => {
+                        translatedErrors[field] = translateErrors(messages as string[]);
+                    });
+                    setFieldErrors(translatedErrors);
+
                     // Формируем общее сообщение об ошибке
-                    const errorMessages = Object.entries(errors)
+                    const errorMessages = Object.entries(translatedErrors)
                         .map(([field, messages]) => {
                             const fieldName = field === 'username' ? 'Имя пользователя' :
                                             field === 'email' ? 'Email' :
                                             field === 'password' ? 'Пароль' :
-                                            field === 're_password' ? 'Подтверждение пароля' : field;
-                            return `${fieldName}: ${(messages as string[]).join(', ')}`;
+                                            field === 're_password' ? 'Подтверждение пароля' :
+                                            field === 'non_field_errors' ? 'Ошибка' : field;
+                            return `${fieldName}: ${messages.join(', ')}`;
                         })
                         .join('\n');
                     setError(errorMessages);
