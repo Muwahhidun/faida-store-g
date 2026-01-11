@@ -167,78 +167,82 @@ const Header: React.FC = () => {
                         {/* Dropdown меню пользователя */}
                         {isAuthenticated && userData ? (
                             <Menu as="div" className="relative">
-                                <Menu.Button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-primary-800 rounded-lg transition-colors">
-                                    {/* Аватар с инициалами */}
-                                    <div className="w-8 h-8 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-full flex items-center justify-center text-primary-900 font-semibold text-sm shadow-md">
-                                        {userData.username.charAt(0).toUpperCase()}
-                                    </div>
-                                    <span className="hidden sm:inline">{userData.username}</span>
-                                    <BrandIcon direction="down" className="w-3 h-3 text-gray-300" />
-                                </Menu.Button>
+                                {({ open }) => (
+                                    <>
+                                        <Menu.Button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-primary-800 rounded-lg transition-colors">
+                                            {/* Аватар с инициалами */}
+                                            <div className="w-8 h-8 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-full flex items-center justify-center text-primary-900 font-semibold text-sm shadow-md">
+                                                {userData.username.charAt(0).toUpperCase()}
+                                            </div>
+                                            <span className="hidden sm:inline">{userData.username}</span>
+                                            <BrandIcon direction={open ? 'right' : 'down'} className="w-3 h-3 text-gray-300" />
+                                        </Menu.Button>
 
-                                <Transition
-                                    as={Fragment}
-                                    enter="transition ease-out duration-100"
-                                    enterFrom="transform opacity-0 scale-95"
-                                    enterTo="transform opacity-100 scale-100"
-                                    leave="transition ease-in duration-75"
-                                    leaveFrom="transform opacity-100 scale-100"
-                                    leaveTo="transform opacity-0 scale-95"
-                                >
-                                    <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>
-                                        <div className="py-1">
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <Link
-                                                        to="/profile"
-                                                        className={`${
-                                                            active ? 'bg-primary-800 text-white' : 'text-gray-700'
-                                                        } flex items-center px-4 py-2 text-sm transition-colors`}
-                                                    >
-                                                        <FaUser className={`mr-3 w-4 h-4 ${active ? 'text-secondary-500' : 'text-gray-400'}`} />
-                                                        Личный кабинет
-                                                    </Link>
-                                                )}
-                                            </Menu.Item>
-                                            {(userData.role === 'admin' || userData.role === 'moderator') && (
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <Link
-                                                            to="/panel"
-                                                            className={`${
-                                                                active ? 'bg-primary-800 text-white' : 'text-gray-700'
-                                                            } flex items-center px-4 py-2 text-sm transition-colors`}
-                                                        >
-                                                            <FaCog className={`mr-3 w-4 h-4 ${active ? 'text-secondary-500' : 'text-gray-400'}`} />
-                                                            Панель управления
-                                                        </Link>
+                                        <Transition
+                                            as={Fragment}
+                                            enter="transition ease-out duration-100"
+                                            enterFrom="transform opacity-0 scale-95"
+                                            enterTo="transform opacity-100 scale-100"
+                                            leave="transition ease-in duration-75"
+                                            leaveFrom="transform opacity-100 scale-100"
+                                            leaveTo="transform opacity-0 scale-95"
+                                        >
+                                            <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" style={{ fontFamily: "'Tenor Sans', sans-serif" }}>
+                                                <div className="py-1">
+                                                    <Menu.Item>
+                                                        {({ active }) => (
+                                                            <Link
+                                                                to="/profile"
+                                                                className={`${
+                                                                    active ? 'bg-primary-800 text-white' : 'text-gray-700'
+                                                                } flex items-center px-4 py-2 text-sm transition-colors`}
+                                                            >
+                                                                <FaUser className={`mr-3 w-4 h-4 ${active ? 'text-secondary-500' : 'text-gray-400'}`} />
+                                                                Личный кабинет
+                                                            </Link>
+                                                        )}
+                                                    </Menu.Item>
+                                                    {(userData.role === 'admin' || userData.role === 'moderator') && (
+                                                        <Menu.Item>
+                                                            {({ active }) => (
+                                                                <Link
+                                                                    to="/panel"
+                                                                    className={`${
+                                                                        active ? 'bg-primary-800 text-white' : 'text-gray-700'
+                                                                    } flex items-center px-4 py-2 text-sm transition-colors`}
+                                                                >
+                                                                    <FaCog className={`mr-3 w-4 h-4 ${active ? 'text-secondary-500' : 'text-gray-400'}`} />
+                                                                    Панель управления
+                                                                </Link>
+                                                            )}
+                                                        </Menu.Item>
                                                     )}
-                                                </Menu.Item>
-                                            )}
-                                        </div>
+                                                </div>
 
-                                        <div className="py-1">
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <button
-                                                        onClick={() => {
-                                                            localStorage.removeItem('access_token');
-                                                            localStorage.removeItem('refresh_token');
-                                                            window.dispatchEvent(new Event('authChanged'));
-                                                            navigate('/');
-                                                        }}
-                                                        className={`${
-                                                            active ? 'bg-red-50' : ''
-                                                        } flex items-center w-full px-4 py-2 text-sm text-red-600 transition-colors`}
-                                                    >
-                                                        <FaSignOutAlt className="mr-3 w-4 h-4" />
-                                                        Выйти
-                                                    </button>
-                                                )}
-                                            </Menu.Item>
-                                        </div>
-                                    </Menu.Items>
-                                </Transition>
+                                                <div className="py-1">
+                                                    <Menu.Item>
+                                                        {({ active }) => (
+                                                            <button
+                                                                onClick={() => {
+                                                                    localStorage.removeItem('access_token');
+                                                                    localStorage.removeItem('refresh_token');
+                                                                    window.dispatchEvent(new Event('authChanged'));
+                                                                    navigate('/');
+                                                                }}
+                                                                className={`${
+                                                                    active ? 'bg-red-50' : ''
+                                                                } flex items-center w-full px-4 py-2 text-sm text-red-600 transition-colors`}
+                                                            >
+                                                                <FaSignOutAlt className="mr-3 w-4 h-4" />
+                                                                Выйти
+                                                            </button>
+                                                        )}
+                                                    </Menu.Item>
+                                                </div>
+                                            </Menu.Items>
+                                        </Transition>
+                                    </>
+                                )}
                             </Menu>
                         ) : (
                             <Link

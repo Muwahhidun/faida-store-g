@@ -27,6 +27,8 @@ import JobDetailPage from './pages/JobDetailPage';
 import JobEditorPage from './pages/JobEditorPage';
 import ImageTest from './pages/ImageTest';
 import NotFoundPage from './pages/NotFoundPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsPage from './pages/TermsPage';
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -133,6 +135,10 @@ const App: React.FC = () => {
             <Route element={<AuthenticatedRoute />}>
               <Route path="/profile" element={<ProfilePage />} />
             </Route>
+
+            {/* Правовые документы */}
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
 
             {/* 404 страница */}
             <Route path="*" element={<NotFoundPage />} />

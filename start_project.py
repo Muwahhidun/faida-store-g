@@ -60,15 +60,17 @@ def main():
         'docker-compose exec backend python manage.py shell -c "'
         'from django.contrib.auth import get_user_model; '
         'User = get_user_model(); '
-        'User.objects.filter(username=\"admin\").exists() or '
-        'User.objects.create_superuser(\"admin\", \"admin@faida.ru\", \"admin123\")'
+        'admin = User.objects.filter(username=\"admin\").first(); '
+        'admin and setattr(admin, \"is_active\", True) or None; '
+        'admin and admin.save() if admin else '
+        'User.objects.create_superuser(\"admin\", \"admin@faida.ru\", \"admin123\", is_active=True)'
         '"'
     )
-    
-    # 7. Импортируем тестовые данные
-    print("\n7️⃣ Импортируем тестовые данные из 1С...")
-    run_command("docker-compose exec backend python manage.py import_1c_data")
-    
+
+    # 7. Инициализируем систему уведомлений
+    print("\n7️⃣ Инициализируем систему уведомлений...")
+    run_command("docker-compose exec backend python manage.py init_notifications")
+
     # 8. Показываем информацию о запуске
     print("\n✅ Проект успешно запущен!")
     print("\n📍 Доступные адреса:")

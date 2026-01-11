@@ -78,6 +78,9 @@ docker-compose exec backend python manage.py shell -c "from django.contrib.auth 
 # Импорт данных из 1С
 docker-compose exec backend python manage.py import_1c_data
 
+# Инициализировать систему уведомлений (создаёт типы, шаблоны, правила)
+docker-compose exec backend python manage.py init_notifications
+
 # Запустить планировщик (автосинхронизация)
 docker-compose exec backend python manage.py run_scheduler
 
@@ -128,7 +131,9 @@ python start_project.py
 4. Ожидание запуска базы данных
 5. Выполнение миграций
 6. Создание суперпользователя (admin/admin123)
-7. Импорт тестовых данных из 1С
+7. Инициализацию системы уведомлений (типы, шаблоны, правила)
+
+После запуска настройте источники интеграции 1С через админ-панель (Интеграции → Источники).
 
 ## Архитектура
 
