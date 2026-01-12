@@ -50,7 +50,7 @@ const FavoritesSection: React.FC = () => {
       try {
         setIsLoading(true);
         const response = await fetch(
-          `http://localhost:8000/api/products/favorites/?ids=${favoriteIds.join(',')}`
+          `/api/products/favorites/?ids=${favoriteIds.join(',')}`
         );
         if (!response.ok) {
           throw new Error('Ошибка загрузки избранных товаров');

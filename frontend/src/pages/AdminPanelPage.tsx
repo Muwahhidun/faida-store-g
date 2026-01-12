@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCog, FaDatabase, FaList, FaTags, FaPowerOff, FaUsers, FaShoppingBag, FaBell, FaTrademark } from 'react-icons/fa';
+import { FaCog, FaDatabase, FaList, FaTags, FaPowerOff, FaUsers, FaShoppingBag, FaBell, FaTrademark, FaCreditCard } from 'react-icons/fa';
 import { adminClient } from '../api/adminClient';
 import { Source, Category, AvailableOptions, Brand } from '../types/admin';
 import {
@@ -10,7 +10,8 @@ import {
     ProductsSection,
     SettingsSection,
     UsersSection,
-    OrdersManagementSection
+    OrdersManagementSection,
+    PaymentsSection
 } from '../components/admin';
 import { NotificationsSection } from '../components/admin/sections/NotificationsSection';
 import { Toast } from '../components/Toast';
@@ -23,16 +24,16 @@ const AdminPanelPage: React.FC = () => {
     const navigate = useNavigate();
 
     // Получаем вкладку из URL hash или используем 'settings' по умолчанию
-    const getInitialTab = (): 'settings' | 'sources' | 'categories' | 'brands' | 'products' | 'users' | 'orders' | 'notifications' => {
+    const getInitialTab = (): 'settings' | 'sources' | 'categories' | 'brands' | 'products' | 'users' | 'orders' | 'notifications' | 'payments' => {
         const hash = window.location.hash.slice(1); // Убираем '#'
-        if (hash === 'sources' || hash === 'categories' || hash === 'brands' || hash === 'products' || hash === 'settings' || hash === 'users' || hash === 'orders' || hash === 'notifications') {
+        if (hash === 'sources' || hash === 'categories' || hash === 'brands' || hash === 'products' || hash === 'settings' || hash === 'users' || hash === 'orders' || hash === 'notifications' || hash === 'payments') {
             return hash;
         }
         return 'settings';
     };
 
     // Основное состояние
-    const [selectedTab, setSelectedTab] = useState<'settings' | 'sources' | 'categories' | 'brands' | 'products' | 'users' | 'orders' | 'notifications'>(getInitialTab());
+    const [selectedTab, setSelectedTab] = useState<'settings' | 'sources' | 'categories' | 'brands' | 'products' | 'users' | 'orders' | 'notifications' | 'payments'>(getInitialTab());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -350,6 +351,17 @@ const AdminPanelPage: React.FC = () => {
                                 <FaBell className="w-5 h-5 sm:w-4 sm:h-4" />
                                 <span className="hidden sm:inline">Уведомления</span>
                             </button>
+                            <button
+                                onClick={() => setSelectedTab('payments')}
+                                className={`flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2 px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
+                                    selectedTab === 'payments'
+                                        ? 'border-secondary-500 text-secondary-600 bg-secondary-50'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                }`}
+                            >
+                                <FaCreditCard className="w-5 h-5 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">Платежи</span>
+                            </button>
                         </div>
                     </div>
 
@@ -439,6 +451,10 @@ const AdminPanelPage: React.FC = () => {
 
                             <div style={{ display: selectedTab === 'notifications' ? 'block' : 'none' }}>
                                 <NotificationsSection />
+                            </div>
+
+                            <div style={{ display: selectedTab === 'payments' ? 'block' : 'none' }}>
+                                <PaymentsSection />
                             </div>
                         </>
                     )}

@@ -2,8 +2,49 @@
 Сериализаторы для API.
 """
 
+import re
 from rest_framework import serializers
 from apps.products.models import Product, ProductImage, Brand
+
+
+def convert_absolute_urls_to_relative(html_content: str) -> str:
+    """
+    Преобразует абсолютные URL в HTML контенте в относительные.
+    Это нужно для корректной работы через nginx/proxy.
+    """
+    if not html_content:
+        return html_content
+
+    # Заменяем http://localhost:8000/media/... на /media/...
+    # и http://backend:8000/media/... на /media/...
+    patterns = [
+        r'http://localhost:8000(/media/[^"\'>\s]+)',
+        r'http://backend:8000(/media/[^"\'>\s]+)',
+        r'https://localhost:8000(/media/[^"\'>\s]+)',
+        r'https://backend:8000(/media/[^"\'>\s]+)',
+    ]
+
+    result = html_content
+    for pattern in patterns:
+        result = re.sub(pattern, r'\1', result)
+
+    return result
+
+
+class RelativeImageField(serializers.ImageField):
+    """
+    Кастомное поле для изображений, возвращающее относительный URL.
+    Это нужно для корректной работы через nginx/proxy, т.к. стандартный
+    ImageField использует request.build_absolute_uri() который внутри
+    Docker возвращает http://backend:8000/...
+    """
+    def to_representation(self, value):
+        if not value:
+            return None
+        # Возвращаем только относительный URL (/media/...)
+        return value.url
+
+
 from apps.categories.models import Category
 from apps.core.models import SiteSettings
 from apps.sync1c.models import IntegrationSource, SyncLog
@@ -17,7 +58,9 @@ from apps.orders.models import Order, OrderItem
 
 class ProductImageSerializer(serializers.ModelSerializer):
     """Сериализатор для изображений товара."""
-    
+    # Используем кастомное поле для относительных URL
+    image = RelativeImageField()
+
     class Meta:
         model = ProductImage
         fields = ('id', 'image', 'alt_text', 'is_main', 'order')
@@ -201,7 +244,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     # Добавляем поля бренда
     brand_name = serializers.CharField(source='brand.name', read_only=True, allow_null=True)
-    brand_logo = serializers.ImageField(source='brand.logo', read_only=True, allow_null=True)
+    brand_logo = RelativeImageField(source='brand.logo', read_only=True, allow_null=True)
 
     # Добавляем поле для статуса остатков
     stock_status = serializers.SerializerMethodField()
@@ -231,7 +274,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     # Добавляем поля бренда
     brand_name = serializers.CharField(source='brand.name', read_only=True, allow_null=True)
-    brand_logo = serializers.ImageField(source='brand.logo', read_only=True, allow_null=True)
+    brand_logo = RelativeImageField(source='brand.logo', read_only=True, allow_null=True)
 
     # Добавляем новые поля для детальной информации
     retail_price = serializers.ReadOnlyField()
@@ -410,6 +453,7 @@ class DeliveryAddressSerializer(serializers.ModelSerializer):
 
 class JobMediaSerializer(serializers.ModelSerializer):
     """Сериализатор для медиа-файлов вакансии."""
+    file = RelativeImageField(allow_null=True)
 
     class Meta:
         model = JobMedia
@@ -444,6 +488,12 @@ class JobDetailSerializer(serializers.ModelSerializer):
     employment_type_display = serializers.CharField(source='get_employment_type_display', read_only=True)
     author_name = serializers.CharField(source='author.username', read_only=True)
     media = JobMediaSerializer(many=True, read_only=True)
+    preview_image = RelativeImageField(allow_null=True)
+    content = serializers.SerializerMethodField()
+
+    def get_content(self, obj):
+        """Преобразует абсолютные URL в контенте в относительные."""
+        return convert_absolute_urls_to_relative(obj.content)
 
     class Meta:
         model = Job
@@ -495,6 +545,7 @@ class NewsCategorySerializer(serializers.ModelSerializer):
 
 class NewsMediaSerializer(serializers.ModelSerializer):
     """Сериализатор для медиа-файлов новости."""
+    file = RelativeImageField(allow_null=True)
 
     class Meta:
         model = NewsMedia
@@ -529,6 +580,12 @@ class NewsDetailSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True, allow_null=True)
     author_name = serializers.CharField(source='author.username', read_only=True)
     media = NewsMediaSerializer(many=True, read_only=True)
+    preview_image = RelativeImageField(allow_null=True)
+    content = serializers.SerializerMethodField()
+
+    def get_content(self, obj):
+        """Преобразует абсолютные URL в контенте в относительные."""
+        return convert_absolute_urls_to_relative(obj.content)
 
     class Meta:
         model = News
@@ -578,9 +635,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
     def get_product_image(self, obj):
         """Получить главное изображение товара."""
         if obj.product.main_image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.product.main_image.image.url)
+            # Возвращаем относительный URL, который работает через proxy
+            return obj.product.main_image.image.url
         return None
 
     class Meta:
@@ -764,6 +820,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 class BrandSerializer(serializers.ModelSerializer):
     """Сериализатор для брендов."""
 
+    logo = RelativeImageField(allow_null=True)
     products_count = serializers.SerializerMethodField()
 
     def get_products_count(self, obj):

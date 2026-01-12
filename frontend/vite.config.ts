@@ -20,6 +20,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
+    allowedHosts: ['faidagroup.ru', 'www.faidagroup.ru', 'localhost'],
     proxy: {
       '/api': {
         target: 'http://backend:8000',  // Имя сервиса Docker Compose

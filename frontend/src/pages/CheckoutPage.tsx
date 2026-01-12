@@ -36,7 +36,7 @@ const CheckoutPage: React.FC = () => {
                     return;
                 }
 
-                const response = await axios.get('http://localhost:8000/api/users-management/me/', {
+                const response = await axios.get('/api/users-management/me/', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -253,14 +253,45 @@ const CheckoutPage: React.FC = () => {
             };
 
             // Отправляем заказ на сервер
-            const response = await axios.post('http://localhost:8000/api/orders/', orderData, {
+            const response = await axios.post('/api/orders/', orderData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
             });
 
-            // Успешное создание заказа
+            // Если выбрана онлайн-оплата - создаем платёж в YooKassa и редиректим
+            if (formData.payment_method === 'online') {
+                try {
+                    const paymentResponse = await axios.post(
+                        '/api/payments/create/',
+                        { order_id: response.data.id },
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json',
+                            },
+                        }
+                    );
+
+                    if (paymentResponse.data.confirmation_url) {
+                        // НЕ очищаем корзину здесь - она очистится на странице успеха после возврата с YooKassa
+                        // Редирект на страницу оплаты YooKassa
+                        window.location.href = paymentResponse.data.confirmation_url;
+                        return;
+                    } else {
+                        toast.error('Ошибка при создании платежа');
+                    }
+                } catch (paymentErr: any) {
+                    console.error('Ошибка при создании платежа:', paymentErr);
+                    toast.error(paymentErr.response?.data?.error || 'Ошибка при создании платежа');
+                    // Переходим на страницу заказа даже если платёж не создался
+                    navigate(`/order-success/${response.data.order_number}`);
+                    return;
+                }
+            }
+
+            // Для оплаты при получении - сразу переходим на страницу успеха
             toast.success('Заказ успешно оформлен!');
             clearCart(); // Очищаем корзину
             navigate(`/order-success/${response.data.order_number}`);

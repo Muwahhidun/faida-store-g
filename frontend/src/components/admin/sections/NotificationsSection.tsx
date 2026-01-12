@@ -227,7 +227,7 @@ const OverviewTab: React.FC = () => {
                     <p className="text-sm text-gray-700">
                         💡 <strong>Совет:</strong> Для расширенных настроек (типы, шаблоны, правила) используйте{' '}
                         <a
-                            href="http://localhost:8000/admin/notifications/"
+                            href="/admin/notifications/"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-secondary-600 hover:underline font-medium"

@@ -34,7 +34,7 @@ const ActivateAccountPage: React.FC = () => {
   useEffect(() => {
     const activateAccount = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/auth/users/activation/', {
+        const response = await fetch('/api/auth/users/activation/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ const ActivateAccountPage: React.FC = () => {
     setIsLoggingIn(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/token/', {
+      const response = await axios.post('/api/token/', {
         username: loginData.username,
         password: loginData.password,
       });

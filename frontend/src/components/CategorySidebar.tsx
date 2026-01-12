@@ -32,7 +32,7 @@ const fetchCategories = async (inStockOnly?: boolean): Promise<Category[]> => {
   try {
     // Формируем URL с параметром in_stock только когда фильтр включён (true)
     // Если фильтр выключен (false) — не передаём параметр, чтобы получить ВСЕ товары
-    let url = 'http://localhost:8000/api/categories/tree/';
+    let url = '/api/categories/tree/';
     if (inStockOnly === true) {
       url += '?in_stock=true';
     }

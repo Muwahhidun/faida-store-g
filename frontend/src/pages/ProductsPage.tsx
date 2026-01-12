@@ -78,10 +78,16 @@ const fetchProducts = async (
   try {
     let url: string;
     if (typeof pageOrUrl === 'string') {
-      url = pageOrUrl; // используем next/previous как есть
+      // Извлекаем только путь из URL (убираем http://backend:8000 и т.п.)
+      try {
+        const parsed = new URL(pageOrUrl);
+        url = parsed.pathname + parsed.search;
+      } catch {
+        url = pageOrUrl; // если не удалось распарсить - используем как есть
+      }
     } else {
       const offset = (pageOrUrl - 1) * PAGE_SIZE;
-      url = `http://localhost:8000/api/products/?limit=${PAGE_SIZE}&offset=${offset}`;
+      url = `/api/products/?limit=${PAGE_SIZE}&offset=${offset}`;
       if (categoryId) {
         url += `&category=${categoryId}`;
       }

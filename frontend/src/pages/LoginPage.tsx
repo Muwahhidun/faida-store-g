@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import logoIcon from '../assets/logo-icon.svg';
 
 /**
  * Декодирует JWT токен без проверки подписи (только для чтения payload)
@@ -37,7 +38,7 @@ const LoginPage: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:8000/api/token/', {
+            const response = await axios.post('/api/token/', {
                 username,
                 password,
             });
@@ -71,8 +72,8 @@ const LoginPage: React.FC = () => {
             <div className="max-w-md w-full space-y-8">
                 {/* Логотип и заголовок */}
                 <div className="text-center">
-                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mb-4">
-                        <span className="text-white font-bold text-2xl">F</span>
+                    <div className="mx-auto w-20 h-20 mb-4">
+                        <img src={logoIcon} alt="Faida Group" className="w-full h-full object-contain" />
                     </div>
                     <h2 className="text-3xl font-bold text-gray-900 mb-2">
                         Добро пожаловать

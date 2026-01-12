@@ -5,7 +5,7 @@ import axios from 'axios';
 
 // Создаем экземпляр axios для API
 export const adminClient = axios.create({
-    baseURL: 'http://localhost:8000/api',
+    baseURL: '/api',
 });
 
 // Добавляем перехватчик для автоматического добавления токена в заголовки

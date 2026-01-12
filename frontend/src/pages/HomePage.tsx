@@ -21,7 +21,7 @@ interface Brand {
 
 const fetchBrands = async (): Promise<Brand[]> => {
   try {
-    const response = await fetch('http://localhost:8000/api/brands/');
+    const response = await fetch('/api/brands/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

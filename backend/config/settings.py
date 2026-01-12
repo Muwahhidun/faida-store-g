@@ -46,6 +46,7 @@ LOCAL_APPS = [
     'apps.news',
     'apps.orders',  # Заказы
     'apps.notifications',  # Уведомления (Email, WhatsApp)
+    'apps.payments',  # Платежи YooKassa
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -327,3 +328,7 @@ DJOSER = {
         'password_reset_confirm': ['rest_framework.permissions.AllowAny'],  # Подтверждение сброса пароля доступно всем
     },
 }
+
+# Настройки YooKassa (платежная система)
+YOOKASSA_SHOP_ID = os.getenv('YOOKASSA_SHOP_ID', '')
+YOOKASSA_SECRET_KEY = os.getenv('YOOKASSA_SECRET_KEY', '')

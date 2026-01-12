@@ -15,7 +15,8 @@ const ProductImage: React.FC<ProductImageProps> = ({ src, alt, className = '' })
   const [isLoading, setIsLoading] = useState(true);
 
   // Правильно формируем URL для изображения
-  const imageUrl = src.startsWith('/') ? `http://localhost:8000${src}` : src;
+  // Относительные URL (/media/...) работают через Vite proxy
+  const imageUrl = src;
 
   const handleImageLoad = () => {
     setIsLoading(false);

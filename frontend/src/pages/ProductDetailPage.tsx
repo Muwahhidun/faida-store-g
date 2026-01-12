@@ -119,7 +119,7 @@ const formatQuantity = (quantity: number, unit: string): string => {
 
 const fetchProduct = async (id: string): Promise<ProductDetail> => {
   try {
-    const response = await fetch(`http://localhost:8000/api/products/${id}/`);
+    const response = await fetch(`/api/products/${id}/`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

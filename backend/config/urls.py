@@ -18,6 +18,9 @@ urlpatterns = [
     # API эндпоинты
     path('api/', include('apps.api.urls')),
 
+    # Платежи YooKassa
+    path('api/payments/', include('apps.payments.urls')),
+
     # Djoser endpoints (регистрация, восстановление пароля)
     path('api/auth/', include('djoser.urls')),
     path('api/auth/', include('djoser.urls.jwt')),
